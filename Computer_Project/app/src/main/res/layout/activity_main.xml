@@ -43,7 +43,12 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <!-- 按鍵區：4 欄 5 列，= 直向跨兩列、0 橫向跨兩欄 -->
+    <!-- 按鍵區：4 欄 5 列
+         AC ⌫ ±  %
+         7  8  9  ÷
+         4  5  6  ×
+         1  2  3  −
+         0  .  =  + -->
     <GridLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -53,6 +58,7 @@
         <!-- row 0 -->
         <Button
             android:id="@+id/btnClear"
+            android:contentDescription="清除全部"
             android:layout_row="0"
             android:layout_column="0"
             android:layout_width="0dp"
@@ -68,8 +74,8 @@
 
         <Button
             android:id="@+id/btnDiv"
-            android:layout_row="0"
-            android:layout_column="1"
+            android:layout_row="1"
+            android:layout_column="3"
             android:layout_width="0dp"
             android:layout_height="80dp"
             android:layout_gravity="fill"
@@ -83,8 +89,8 @@
 
         <Button
             android:id="@+id/btnMul"
-            android:layout_row="0"
-            android:layout_column="2"
+            android:layout_row="2"
+            android:layout_column="3"
             android:layout_width="0dp"
             android:layout_height="80dp"
             android:layout_gravity="fill"
@@ -98,6 +104,39 @@
 
         <Button
             android:id="@+id/btnBackspace"
+            android:contentDescription="退格，長按清除全部"
+            android:layout_row="0"
+            android:layout_column="1"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_gravity="fill"
+            android:layout_columnWeight="1"
+            android:layout_margin="3dp"
+            android:background="@drawable/btn_calc"
+            android:backgroundTint="@color/btn_function"
+            android:textColor="@color/btn_function_text"
+            android:textSize="32sp"
+            android:text="⌫" />
+
+        <Button
+            android:id="@+id/btnNegate"
+            android:contentDescription="正負號切換"
+            android:layout_row="0"
+            android:layout_column="2"
+            android:layout_width="0dp"
+            android:layout_height="80dp"
+            android:layout_gravity="fill"
+            android:layout_columnWeight="1"
+            android:layout_margin="3dp"
+            android:background="@drawable/btn_calc"
+            android:backgroundTint="@color/btn_function"
+            android:textColor="@color/btn_function_text"
+            android:textSize="32sp"
+            android:text="±" />
+
+        <Button
+            android:id="@+id/btnPercent"
+            android:contentDescription="百分比"
             android:layout_row="0"
             android:layout_column="3"
             android:layout_width="0dp"
@@ -109,7 +148,7 @@
             android:backgroundTint="@color/btn_function"
             android:textColor="@color/btn_function_text"
             android:textSize="32sp"
-            android:text="⌫" />
+            android:text="%" />
 
         <!-- row 1 -->
         <Button
@@ -159,7 +198,7 @@
 
         <Button
             android:id="@+id/btnSub"
-            android:layout_row="1"
+            android:layout_row="3"
             android:layout_column="3"
             android:layout_width="0dp"
             android:layout_height="80dp"
@@ -220,7 +259,7 @@
 
         <Button
             android:id="@+id/btnAdd"
-            android:layout_row="2"
+            android:layout_row="4"
             android:layout_column="3"
             android:layout_width="0dp"
             android:layout_height="80dp"
@@ -279,14 +318,13 @@
             android:textSize="32sp"
             android:text="3" />
 
-        <!-- = 直向跨 row 3~4 -->
+        <!-- row 4 -->
         <Button
             android:id="@+id/btnEquals"
-            android:layout_row="3"
-            android:layout_column="3"
-            android:layout_rowSpan="2"
+            android:layout_row="4"
+            android:layout_column="2"
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="80dp"
             android:layout_gravity="fill"
             android:layout_columnWeight="1"
             android:layout_margin="3dp"
@@ -296,12 +334,10 @@
             android:textSize="32sp"
             android:text="=" />
 
-        <!-- row 4，0 橫向跨 column 0~1 -->
         <Button
             android:id="@+id/btn0"
             android:layout_row="4"
             android:layout_column="0"
-            android:layout_columnSpan="2"
             android:layout_width="0dp"
             android:layout_height="80dp"
             android:layout_gravity="fill"
@@ -316,7 +352,7 @@
         <Button
             android:id="@+id/btnDot"
             android:layout_row="4"
-            android:layout_column="2"
+            android:layout_column="1"
             android:layout_width="0dp"
             android:layout_height="80dp"
             android:layout_gravity="fill"
