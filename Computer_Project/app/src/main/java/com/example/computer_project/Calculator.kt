@@ -6,6 +6,7 @@ import kotlin.math.abs
 import kotlin.math.floor
 
 internal const val ERROR_TEXT = "錯誤"
+internal const val NOTICE_NEED_NUMBER = "請先輸入數字再按 ="
 private const val MAX_DIGITS = 15
 
 /** 單一次四則運算 */
@@ -60,9 +61,13 @@ class Calculator {
     private var lastOperand: Double? = null
     private var frozen: String? = null     // 按下 = 後定格的算式
     private var error = false
+    private var noticeText: String? = null
 
     /** 下方結果區要顯示的文字 */
     val display: String get() = current
+
+    /** 提示區要顯示的文字；沒有要提醒的事就留白 */
+    val notice: String get() = noticeText.orEmpty()
 
     /** 上方算式區要顯示的文字；還沒按運算子時留白，不跟結果區重複 */
     val expression: String
@@ -96,6 +101,7 @@ class Calculator {
 
     /** 按下運算子；連按時只換符號，不重算（有優先權，中途也算不出部分結果） */
     fun operator(op: Char) {
+        noticeText = null
         if (error) return clear()
         frozen = null
         if (freshInput && ops.isNotEmpty()) {
@@ -105,10 +111,12 @@ class Calculator {
         if (!freshInput || nums.isEmpty()) nums += current.toDoubleOrNull() ?: return clear()
         ops += op
         freshInput = true
+        current = "0" // 結果區歸零，免得把已經推進算式的前一個運算元誤讀成還在輸入的數字
     }
 
     /** 按下 =。算式為空時重複上一次的運算（5 + 3 = → 8，再按 = → 11） */
     fun equal() {
+        noticeText = null
         if (error) return clear()
         if (ops.isEmpty()) {
             val op = lastOp ?: return
@@ -118,8 +126,11 @@ class Calculator {
             finish(applyOp(x, op, operand))
             return
         }
-        // 「2 + =」這種右運算元從缺的情況，沿用左運算元（2 + 2）
-        nums += if (freshInput) nums.last() else current.toDoubleOrNull() ?: return clear()
+        if (freshInput) { // 運算子後面還沒輸入數字，算式不完整 → 不運算，只提醒
+            noticeText = NOTICE_NEED_NUMBER
+            return
+        }
+        nums += current.toDoubleOrNull() ?: return clear()
         lastOp = ops.last()
         lastOperand = nums.last()
         frozen = joinExpression(formatNumber(nums.last())) + " ="
@@ -128,6 +139,7 @@ class Calculator {
 
     /** ±：切換正負號。剛按完運算子時不作用 */
     fun negate() {
+        noticeText = null
         if (error) return clear()
         if (freshInput && ops.isNotEmpty()) return
         // ponytail: 不支援直接輸入負的運算元（2 + −3），要的話得讓 current 能在 freshInput 下帶符號
@@ -137,6 +149,7 @@ class Calculator {
 
     /** %：加減取「前段結果的百分比」（200 + 10% = 220），乘除單純除以 100（200 × 10% = 20） */
     fun percent() {
+        noticeText = null
         if (error) return clear()
         if (freshInput && ops.isNotEmpty()) return
         val x = current.toDoubleOrNull() ?: return clear()
@@ -157,10 +170,12 @@ class Calculator {
         lastOperand = null
         frozen = null
         error = false
+        noticeText = null
     }
 
     /** ⌫：刪一個字元；剛按完運算子時改成退掉那個運算子，取回前一個運算元繼續編輯 */
     fun backspace() {
+        noticeText = null
         if (error) return clear()
         frozen = null
         if (freshInput) {
@@ -185,6 +200,7 @@ class Calculator {
         lastOperand?.toString().orEmpty(),
         frozen.orEmpty(),
         if (error) "1" else "0",
+        noticeText.orEmpty(),
     ).joinToString("\n")
 
     /** 還原 [snapshot] 的內容；格式不符就整個忽略，維持現狀 */
@@ -201,10 +217,12 @@ class Calculator {
         lastOperand = f[5].toDoubleOrNull()
         frozen = f[6].ifEmpty { null }
         error = f[7] == "1"
+        noticeText = f[8].ifEmpty { null }
     }
 
     /** 開始新一輪輸入：清掉錯誤狀態與定格的算式 */
     private fun beginInput() {
+        noticeText = null
         if (error) clear()
         frozen = null
     }
@@ -236,6 +254,6 @@ class Calculator {
     }
 
     private companion object {
-        const val FIELD_COUNT = 8
+        const val FIELD_COUNT = 9
     }
 }

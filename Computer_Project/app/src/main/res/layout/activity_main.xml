@@ -37,11 +37,19 @@
         android:ellipsize="start"
         android:text="0" />
 
-    <!-- 彈性空白：吸收剩餘高度，把鍵盤推到畫面底部 -->
-    <Space
+    <!-- 提示區：兼原本的彈性空白，吸收剩餘高度把鍵盤推到底部；平時留白，有事才顯示訊息 -->
+    <TextView
+        android:id="@+id/tvNotice"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:textColor="@color/btn_operator"
+        android:text=""
+        tools:text="請先輸入數字再按 =" />
 
     <!-- 按鍵區：4 欄 5 列
          AC ⌫ ±  %

@@ -53,9 +53,10 @@ class MainActivity : ComponentActivity() {
         updateDisplay()
     }
 
-    /** 更新顯示：上方算式、下方結果 */
+    /** 更新顯示：上方算式、下方結果、中間提示 */
     private fun updateDisplay() {
         binding.tvExpression.text = calc.expression
         binding.tvResult.text = calc.display
+        binding.tvNotice.text = calc.notice
     }
 }

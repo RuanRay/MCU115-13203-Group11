@@ -62,6 +62,35 @@ class CalculatorLogicTest {
     }
 
     @Test
+    fun 按下運算子後_結果區歸零() {
+        val c = keys("12+")
+        assertEquals("12 +", c.expression)
+        assertEquals("0", c.display)                   // 不留著 12，避免誤讀成還在輸入
+        assertEquals("0", keys("2+3×").display)
+        assertEquals("0", keys("2+3=×").display)       // 算完再接運算子也一樣
+        assertEquals("14", keys("2+3×4=").display)     // 歸零不影響實際運算
+    }
+
+    @Test
+    fun 算式不完整時_按等號不運算只提醒() {
+        val c = keys("2+=")
+        assertEquals(NOTICE_NEED_NUMBER, c.notice)
+        assertEquals("0", c.display)                   // 沒有偷算成 2 + 2
+        assertEquals("2 +", c.expression)              // 算式原封不動，可以接著輸入
+
+        c.digit('3')
+        assertEquals("", c.notice)                     // 一輸入就收掉提示
+        c.equal()
+        assertEquals("5", c.display)
+        assertEquals("", c.notice)
+
+        assertEquals(NOTICE_NEED_NUMBER, keys("2+3×=").notice)
+        assertEquals("", keys("2+3=").notice)          // 算式完整時不提醒
+        assertEquals("", keys("2+=C").notice)          // AC 也收掉提示
+        assertEquals("", keys("2+=<").notice)          // 退格也收掉提示
+    }
+
+    @Test
     fun 連按等號_重複上次運算() {
         val c = keys("5+3=")
         assertEquals("8", c.display)
@@ -125,6 +154,9 @@ class CalculatorLogicTest {
         restored.equal()
         assertEquals("24", restored.display)           // 12 + 3 × 4
         assertEquals("12 + 3 × 4 =", restored.expression)
+
+        val warned = keys("2+=")                       // 提示也要撐過旋轉
+        assertEquals(NOTICE_NEED_NUMBER, Calculator().apply { restore(warned.snapshot()) }.notice)
     }
 
     @Test
