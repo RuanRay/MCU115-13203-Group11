@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  計算機按鍵底圖。
+  系統預設的 btn_default_material 本身含有透明 inset（約 4dp），
+  會在按鍵四周留下白邊；改用自訂 shape 可讓灰色填滿整個按鍵範圍。
+  外層 ripple 用來保留按壓回饋。
+-->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="#BDBDBD">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#E0E0E0" />
+            <corners android:radius="6dp" />
+        </shape>
+    </item>
+</ripple>
