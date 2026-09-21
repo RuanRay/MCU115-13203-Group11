@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="8dp"
+    android:fitsSystemWindows="true"
     tools:ignore="HardcodedText">
 
     <!-- 運算式顯示區：置頂，顯示目前輸入的算式，過長時從左側省略 -->
@@ -16,7 +17,7 @@
         android:paddingStart="12dp"
         android:paddingEnd="12dp"
         android:gravity="end|top"
-        android:textSize="32sp"
+        android:textSize="36sp"
         android:textColor="#757575"
         android:maxLines="1"
         android:ellipsize="start"
@@ -60,6 +61,8 @@
             android:layout_columnWeight="1"
             android:layout_margin="3dp"
             android:background="@drawable/btn_calc"
+            android:backgroundTint="@color/btn_function"
+            android:textColor="@color/btn_function_text"
             android:textSize="32sp"
             android:text="AC" />
 
@@ -73,6 +76,8 @@
             android:layout_columnWeight="1"
             android:layout_margin="3dp"
             android:background="@drawable/btn_calc"
+            android:backgroundTint="@color/btn_operator"
+            android:textColor="@color/btn_operator_text"
             android:textSize="32sp"
             android:text="÷" />
 
@@ -86,6 +91,8 @@
             android:layout_columnWeight="1"
             android:layout_margin="3dp"
             android:background="@drawable/btn_calc"
+            android:backgroundTint="@color/btn_operator"
+            android:textColor="@color/btn_operator_text"
             android:textSize="32sp"
             android:text="×" />
 
@@ -99,6 +106,8 @@
             android:layout_columnWeight="1"
             android:layout_margin="3dp"
             android:background="@drawable/btn_calc"
+            android:backgroundTint="@color/btn_function"
+            android:textColor="@color/btn_function_text"
             android:textSize="32sp"
             android:text="⌫" />
 
@@ -113,6 +122,8 @@
             android:layout_columnWeight="1"
             android:layout_margin="3dp"
             android:background="@drawable/btn_calc"
+            android:backgroundTint="@color/btn_number"
+            android:textColor="@color/btn_number_text"
             android:textSize="32sp"
             android:text="7" />
 
@@ -126,6 +137,8 @@
             android:layout_columnWeight="1"
             android:layout_margin="3dp"
             android:background="@drawable/btn_calc"
+            android:backgroundTint="@color/btn_number"
+            android:textColor="@color/btn_number_text"
             android:textSize="32sp"
             android:text="8" />
 
@@ -139,6 +152,8 @@
             android:layout_columnWeight="1"
             android:layout_margin="3dp"
             android:background="@drawable/btn_calc"
+            android:backgroundTint="@color/btn_number"
+            android:textColor="@color/btn_number_text"
             android:textSize="32sp"
             android:text="9" />
 
@@ -152,6 +167,8 @@
             android:layout_columnWeight="1"
             android:layout_margin="3dp"
             android:background="@drawable/btn_calc"
+            android:backgroundTint="@color/btn_operator"
+            android:textColor="@color/btn_operator_text"
             android:textSize="32sp"
             android:text="−" />
 
@@ -166,6 +183,8 @@
             android:layout_columnWeight="1"
             android:layout_margin="3dp"
             android:background="@drawable/btn_calc"
+            android:backgroundTint="@color/btn_number"
+            android:textColor="@color/btn_number_text"
             android:textSize="32sp"
             android:text="4" />
 
@@ -179,6 +198,8 @@
             android:layout_columnWeight="1"
             android:layout_margin="3dp"
             android:background="@drawable/btn_calc"
+            android:backgroundTint="@color/btn_number"
+            android:textColor="@color/btn_number_text"
             android:textSize="32sp"
             android:text="5" />
 
@@ -192,6 +213,8 @@
             android:layout_columnWeight="1"
             android:layout_margin="3dp"
             android:background="@drawable/btn_calc"
+            android:backgroundTint="@color/btn_number"
+            android:textColor="@color/btn_number_text"
             android:textSize="32sp"
             android:text="6" />
 
@@ -205,6 +228,8 @@
             android:layout_columnWeight="1"
             android:layout_margin="3dp"
             android:background="@drawable/btn_calc"
+            android:backgroundTint="@color/btn_operator"
+            android:textColor="@color/btn_operator_text"
             android:textSize="32sp"
             android:text="+" />
 
@@ -219,6 +244,8 @@
             android:layout_columnWeight="1"
             android:layout_margin="3dp"
             android:background="@drawable/btn_calc"
+            android:backgroundTint="@color/btn_number"
+            android:textColor="@color/btn_number_text"
             android:textSize="32sp"
             android:text="1" />
 
@@ -232,6 +259,8 @@
             android:layout_columnWeight="1"
             android:layout_margin="3dp"
             android:background="@drawable/btn_calc"
+            android:backgroundTint="@color/btn_number"
+            android:textColor="@color/btn_number_text"
             android:textSize="32sp"
             android:text="2" />
 
@@ -245,6 +274,8 @@
             android:layout_columnWeight="1"
             android:layout_margin="3dp"
             android:background="@drawable/btn_calc"
+            android:backgroundTint="@color/btn_number"
+            android:textColor="@color/btn_number_text"
             android:textSize="32sp"
             android:text="3" />
 
@@ -260,6 +291,8 @@
             android:layout_columnWeight="1"
             android:layout_margin="3dp"
             android:background="@drawable/btn_calc"
+            android:backgroundTint="@color/btn_equals"
+            android:textColor="@color/btn_equals_text"
             android:textSize="32sp"
             android:text="=" />
 
@@ -275,6 +308,8 @@
             android:layout_columnWeight="1"
             android:layout_margin="3dp"
             android:background="@drawable/btn_calc"
+            android:backgroundTint="@color/btn_number"
+            android:textColor="@color/btn_number_text"
             android:textSize="32sp"
             android:text="0" />
 
@@ -288,6 +323,8 @@
             android:layout_columnWeight="1"
             android:layout_margin="3dp"
             android:background="@drawable/btn_calc"
+            android:backgroundTint="@color/btn_number"
+            android:textColor="@color/btn_number_text"
             android:textSize="32sp"
             android:text="." />
     </GridLayout>
