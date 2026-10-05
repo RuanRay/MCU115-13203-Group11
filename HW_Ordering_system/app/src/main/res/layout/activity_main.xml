@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Screen"
+    tools:context=".MainActivity">
+
+    <LinearLayout style="@style/ScreenContent">
+
+        <TextView
+            style="@style/Title"
+            android:text="@string/main_title" />
+
+        <TextView
+            style="@style/Subtitle"
+            android:text="@string/main_subtitle" />
+
+        <Button
+            android:id="@+id/btnMainMeal"
+            style="@style/Row.Entry"
+            android:text="@string/choose_main_meal" />
+
+        <Button
+            android:id="@+id/btnSideDishes"
+            style="@style/Row.Entry"
+            android:text="@string/choose_side_dishes" />
+
+        <Button
+            android:id="@+id/btnDrink"
+            style="@style/Row.Entry"
+            android:text="@string/choose_drink" />
+
+        <!-- 目前選擇；提交後標題改為「已送出的訂單」 -->
+        <LinearLayout
+            style="@style/Card"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:id="@+id/tvSummaryTitle"
+                style="@style/CardTitle"
+                android:text="@string/current_selection" />
+
+            <TextView
+                android:id="@+id/tvSummary"
+                style="@style/CardBody"
+                tools:text="@string/order_summary" />
+        </LinearLayout>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/btnOrder"
+            style="@style/PrimaryButton"
+            android:text="@string/order" />
+    </LinearLayout>
+</ScrollView>

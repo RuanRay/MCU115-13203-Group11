@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Screen"
+    tools:context=".DrinkActivity">
+
+    <LinearLayout style="@style/ScreenContent">
+
+        <TextView
+            style="@style/Title"
+            android:text="@string/drink_title" />
+
+        <TextView
+            style="@style/Subtitle"
+            android:text="@string/drink_subtitle" />
+
+        <!-- 飲料為單選 -->
+        <RadioGroup
+            android:id="@+id/rgDrink"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/rbCola"
+                style="@style/Row"
+                android:text="@string/cola" />
+
+            <RadioButton
+                android:id="@+id/rbIcedTea"
+                style="@style/Row"
+                android:text="@string/iced_tea" />
+
+            <RadioButton
+                android:id="@+id/rbWater"
+                style="@style/Row"
+                android:text="@string/water" />
+        </RadioGroup>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/btnDone"
+            style="@style/PrimaryButton"
+            android:text="@string/done" />
+    </LinearLayout>
+</ScrollView>

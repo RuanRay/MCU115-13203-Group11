@@ -1,0 +1,47 @@
+<resources>
+    <string name="app_name">HW_Ordering_system</string>
+
+    <!-- 主畫面；<small> 讓英文以較小字級排在中文下方 -->
+    <string name="main_title">速食點餐</string>
+    <string name="main_subtitle">FastFood Order Wizard</string>
+    <string name="choose_main_meal">選擇主餐\n<small>Choose Main Meal</small></string>
+    <string name="choose_side_dishes">選擇副餐\n<small>Choose Side Dishes</small></string>
+    <string name="choose_drink">選擇飲料\n<small>Choose Drink</small></string>
+    <string name="current_selection">目前選擇 Current Selection</string>
+    <string name="submitted_order">已送出的訂單 Submitted Order</string>
+    <string name="order">點餐 Order</string>
+
+    <!-- 主餐 -->
+    <string name="main_meal_title">選擇主餐</string>
+    <string name="main_meal_subtitle">Select Main Meal</string>
+    <string name="burger">漢堡\n<small>Burger</small></string>
+    <string name="fried_chicken">炸雞\n<small>Fried Chicken</small></string>
+    <string name="chicken_nuggets">雞塊\n<small>Chicken Nuggets</small></string>
+
+    <!-- 副餐 -->
+    <string name="side_dishes_title">選擇副餐</string>
+    <string name="side_dishes_subtitle">Select Side Dishes (choose at least one)</string>
+    <string name="fries">薯條\n<small>Fries</small></string>
+    <string name="salad">沙拉\n<small>Salad</small></string>
+    <string name="corn_cup">玉米杯\n<small>Corn Cup</small></string>
+
+    <!-- 飲料 -->
+    <string name="drink_title">選擇飲料</string>
+    <string name="drink_subtitle">Select Drink</string>
+    <string name="cola">可樂\n<small>Cola</small></string>
+    <string name="iced_tea">冰紅茶\n<small>Iced Tea</small></string>
+    <string name="water">礦泉水\n<small>Water</small></string>
+
+    <string name="done">完成 Done</string>
+
+    <!-- 確認頁 -->
+    <string name="confirm_title">確認訂單</string>
+    <string name="confirm_subtitle">Confirm Order</string>
+    <string name="order_summary_title">訂單摘要 Order Summary</string>
+    <string name="confirm">確認 Confirm</string>
+    <string name="order_summary">主餐 Main：%1$s\n副餐 Sides：%2$s\n飲料 Drink：%3$s</string>
+    <string name="order_incomplete">請選擇主餐、至少一項副餐與飲料\nPlease select a main meal, at least one side dish, and a drink.</string>
+    <string name="submit_order">送出訂單 Submit Order</string>
+    <string name="submit">提交 Submit</string>
+    <string name="cancel">取消 Cancel</string>
+</resources>

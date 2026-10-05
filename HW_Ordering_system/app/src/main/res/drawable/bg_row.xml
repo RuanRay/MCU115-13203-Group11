@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 選項列背景：勾選或按下時改為綠框淺綠底 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true" android:drawable="@drawable/bg_row_on" />
+    <item android:state_pressed="true" android:drawable="@drawable/bg_row_on" />
+    <item android:drawable="@drawable/bg_card" />
+</selector>

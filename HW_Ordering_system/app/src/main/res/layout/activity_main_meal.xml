@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Screen"
+    tools:context=".MainMealActivity">
+
+    <LinearLayout style="@style/ScreenContent">
+
+        <TextView
+            style="@style/Title"
+            android:text="@string/main_meal_title" />
+
+        <TextView
+            style="@style/Subtitle"
+            android:text="@string/main_meal_subtitle" />
+
+        <!-- 主餐為單選 -->
+        <RadioGroup
+            android:id="@+id/rgMainMeal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/rbBurger"
+                style="@style/Row"
+                android:text="@string/burger" />
+
+            <RadioButton
+                android:id="@+id/rbFriedChicken"
+                style="@style/Row"
+                android:text="@string/fried_chicken" />
+
+            <RadioButton
+                android:id="@+id/rbChickenNuggets"
+                style="@style/Row"
+                android:text="@string/chicken_nuggets" />
+        </RadioGroup>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/btnDone"
+            style="@style/PrimaryButton"
+            android:text="@string/done" />
+    </LinearLayout>
+</ScrollView>

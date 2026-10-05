@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Screen"
+    tools:context=".SideDishesActivity">
+
+    <LinearLayout style="@style/ScreenContent">
+
+        <TextView
+            style="@style/Title"
+            android:text="@string/side_dishes_title" />
+
+        <TextView
+            style="@style/Subtitle"
+            android:text="@string/side_dishes_subtitle" />
+
+        <!-- 副餐可複選 -->
+        <LinearLayout
+            android:id="@+id/llSideDishes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <CheckBox
+                android:id="@+id/cbFries"
+                style="@style/Row"
+                android:text="@string/fries" />
+
+            <CheckBox
+                android:id="@+id/cbSalad"
+                style="@style/Row"
+                android:text="@string/salad" />
+
+            <CheckBox
+                android:id="@+id/cbCornCup"
+                style="@style/Row"
+                android:text="@string/corn_cup" />
+        </LinearLayout>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/btnDone"
+            style="@style/PrimaryButton"
+            android:text="@string/done" />
+    </LinearLayout>
+</ScrollView>
