@@ -22,6 +22,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Computer_Project"
+rootProject.name = "HW_Calculator_Project"
 include(":app")
  
