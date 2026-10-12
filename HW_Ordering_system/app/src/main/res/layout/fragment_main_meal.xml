@@ -2,40 +2,39 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/Screen"
-    tools:context=".SideDishesActivity">
+    tools:context=".MainMealFragment">
 
     <LinearLayout style="@style/ScreenContent">
 
         <TextView
             style="@style/Title"
-            android:text="@string/side_dishes_title" />
+            android:text="@string/main_meal_title" />
 
         <TextView
             style="@style/Subtitle"
-            android:text="@string/side_dishes_subtitle" />
+            android:text="@string/main_meal_subtitle" />
 
-        <!-- 副餐可複選 -->
-        <LinearLayout
-            android:id="@+id/llSideDishes"
+        <!-- 主餐為單選 -->
+        <RadioGroup
+            android:id="@+id/rgMainMeal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
 
-            <CheckBox
-                android:id="@+id/cbFries"
+            <RadioButton
+                android:id="@+id/rbBurger"
                 style="@style/Row"
-                android:text="@string/fries" />
+                android:text="@string/burger" />
 
-            <CheckBox
-                android:id="@+id/cbSalad"
+            <RadioButton
+                android:id="@+id/rbFriedChicken"
                 style="@style/Row"
-                android:text="@string/salad" />
+                android:text="@string/fried_chicken" />
 
-            <CheckBox
-                android:id="@+id/cbCornCup"
+            <RadioButton
+                android:id="@+id/rbChickenNuggets"
                 style="@style/Row"
-                android:text="@string/corn_cup" />
-        </LinearLayout>
+                android:text="@string/chicken_nuggets" />
+        </RadioGroup>
 
         <Space
             android:layout_width="0dp"

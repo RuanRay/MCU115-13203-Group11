@@ -1,8 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    style="@style/Screen"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     tools:context=".MainActivity">
+
+    <!-- 四個副畫面（Fragment）；開啟時蓋掉主畫面 -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <ScrollView
+        android:id="@+id/mainScreen"
+        style="@style/Screen">
 
     <LinearLayout style="@style/ScreenContent">
 
@@ -55,4 +68,5 @@
             style="@style/PrimaryButton"
             android:text="@string/order" />
     </LinearLayout>
-</ScrollView>
+    </ScrollView>
+</FrameLayout>

@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/Screen"
-    tools:context=".ConfirmActivity">
+    tools:context=".ConfirmFragment">
 
     <LinearLayout style="@style/ScreenContent">
 
@@ -32,5 +32,17 @@
             android:id="@+id/btnConfirm"
             style="@style/PrimaryButton"
             android:text="@string/confirm" />
+
+        <!-- 不提交、直接回主畫面 -->
+        <Button
+            android:id="@+id/btnBack"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/back"
+            android:textAllCaps="false"
+            android:textColor="@color/green_dark"
+            android:textSize="16sp" />
     </LinearLayout>
 </ScrollView>

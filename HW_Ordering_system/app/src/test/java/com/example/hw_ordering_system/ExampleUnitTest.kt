@@ -7,9 +7,9 @@ import org.junit.Assert.*
 class ExampleUnitTest {
     @Test
     fun orderIsCompleteOnlyWhenAllThreeArePicked() {
-        assertTrue(isOrderComplete("Burger", listOf("Fries"), "Cola"))
-        assertFalse(isOrderComplete(null, listOf("Fries"), "Cola"))
-        assertFalse(isOrderComplete("Burger", emptyList(), "Cola"))
-        assertFalse(isOrderComplete("Burger", listOf("Fries"), null))
+        assertTrue(Order("Burger", listOf("Fries"), "Cola").isComplete())
+        assertFalse(Order(null, listOf("Fries"), "Cola").isComplete())
+        assertFalse(Order("Burger", emptyList(), "Cola").isComplete())
+        assertFalse(Order("Burger", listOf("Fries"), null).isComplete())
     }
 }

@@ -39,6 +39,7 @@
     <string name="confirm_subtitle">Confirm Order</string>
     <string name="order_summary_title">訂單摘要 Order Summary</string>
     <string name="confirm">確認 Confirm</string>
+    <string name="back">返回 Back</string>
     <string name="order_summary">主餐 Main：%1$s\n副餐 Sides：%2$s\n飲料 Drink：%3$s</string>
     <string name="order_incomplete">請選擇主餐、至少一項副餐與飲料\nPlease select a main meal, at least one side dish, and a drink.</string>
     <string name="submit_order">送出訂單 Submit Order</string>

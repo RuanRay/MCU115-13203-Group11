@@ -10,11 +10,10 @@
         <item name="android:windowLightStatusBar">true</item>
     </style>
 
-    <!-- 每個畫面的最外層（ScrollView，橫向放不下時可捲動）：fitsSystemWindows 會蓋掉自身 padding，所以留白放在內層 -->
+    <!-- 每個畫面的最外層（ScrollView，橫向放不下時可捲動）；系統列的避讓由 activity_main 的根 FrameLayout 統一處理 -->
     <style name="Screen">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
-        <item name="android:fitsSystemWindows">true</item>
         <item name="android:fillViewport">true</item>
     </style>
 

@@ -23,10 +23,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainMealActivity" />
-        <activity android:name=".SideDishesActivity" />
-        <activity android:name=".DrinkActivity" />
-        <activity android:name=".ConfirmActivity" />
     </application>
 
 </manifest>
