@@ -67,7 +67,7 @@ class WorkViewModel : ViewModel() {
     }
 
     companion object {
-        const val PREPARE_MS = 3000L
-        const val STEP_MS = 80L
+        const val PREPARE_MS = 10000L
+        const val STEP_MS = 3500L
     }
 }
