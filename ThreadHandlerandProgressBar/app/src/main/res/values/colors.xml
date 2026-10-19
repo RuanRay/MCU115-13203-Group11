@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#FFFFFFFF</color>
+    <color name="brand">#FF5B2EE8</color>
+    <color name="teal">#FF00C2C7</color>
+    <color name="ink">#FF1E1B2E</color>
+    <color name="muted">#FF7B7890</color>
+    <color name="track">#FFE8E5F3</color>
+    <color name="surface">#FFF7F6FB</color>
+    <color name="amber">#FFD98B00</color>
+    <color name="green">#FF1F8A4C</color>
+    <color name="red">#FFD0353F</color>
+</resources>
