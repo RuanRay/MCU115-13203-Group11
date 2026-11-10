@@ -34,6 +34,9 @@
     <integer name="stamp_rotation_status">-12</integer>
     <integer name="stamp_rotation_date">-3</integer>
 
+    <!-- 動畫時間（毫秒，規格 5.4） -->
+    <integer name="anim_nav_switch_ms">250</integer>
+
     <!-- 分隔線（底部導覽列上緣，1-5 實作者確認） -->
     <dimen name="divider_width">1dp</dimen>
 

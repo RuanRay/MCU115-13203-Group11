@@ -32,13 +32,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- 主頁：五個分頁（查詢、下一班、國道、我的路線、個人）以 Fragment 切換 -->
+        <activity android:name=".ui.main.MainActivity" android:exported="false" android:screenOrientation="portrait" />
         <activity android:name=".ui.auth.RegisterActivity" android:exported="false" android:screenOrientation="portrait" />
-        <activity android:name=".ui.search.SearchActivity" android:exported="false" android:screenOrientation="portrait" />
-        <activity android:name=".ui.next.NextTrainActivity" android:exported="false" android:screenOrientation="portrait" />
-        <activity android:name=".ui.highway.HighwayActivity" android:exported="false" android:screenOrientation="portrait" />
         <activity android:name=".ui.result.ResultActivity" android:exported="false" android:screenOrientation="portrait" />
-        <activity android:name=".ui.routes.MyRoutesActivity" android:exported="false" android:screenOrientation="portrait" />
-        <activity android:name=".ui.profile.ProfileActivity" android:exported="false" android:screenOrientation="portrait" />
         <activity android:name=".ui.feedback.FeedbackActivity" android:exported="false" android:screenOrientation="portrait" />
         <!-- SyncService、ReminderReceiver、BootReceiver、StationProvider（規格 10.4）於第 5、7 週實作時再宣告 -->
     </application>

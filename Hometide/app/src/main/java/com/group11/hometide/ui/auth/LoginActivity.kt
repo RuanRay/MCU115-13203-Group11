@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import com.group11.hometide.databinding.ActivityLoginBinding
 import com.group11.hometide.ui.base.BaseActivity
-import com.group11.hometide.ui.search.SearchActivity
+import com.group11.hometide.ui.main.MainActivity
 
 class LoginActivity : BaseActivity() {
 
@@ -21,10 +21,10 @@ class LoginActivity : BaseActivity() {
         binding.btnGuest.setOnClickListener { goToSearch() } // FR-AUTH-04
     }
 
-    /** P1 → P3，清除堆疊（規格 4.10）。 */
+    /** P1 → P3（主頁的查詢分頁），清除堆疊（規格 4.10）。 */
     private fun goToSearch() {
         startActivity(
-            Intent(this, SearchActivity::class.java)
+            Intent(this, MainActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK),
         )
     }
