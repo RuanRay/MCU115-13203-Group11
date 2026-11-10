@@ -2,6 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
     <application
         android:name=".HometideApp"
         android:allowBackup="true"
@@ -17,21 +24,23 @@
             android:resource="@array/preloaded_fonts" />
         <activity
             android:name=".ui.auth.LoginActivity"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.auth.RegisterActivity" android:exported="false" />
-        <activity android:name=".ui.search.SearchActivity" android:exported="false" />
-        <activity android:name=".ui.next.NextTrainActivity" android:exported="false" />
-        <activity android:name=".ui.highway.HighwayActivity" android:exported="false" />
-        <activity android:name=".ui.result.ResultActivity" android:exported="false" />
-        <activity android:name=".ui.routes.MyRoutesActivity" android:exported="false" />
-        <activity android:name=".ui.profile.ProfileActivity" android:exported="false" />
-        <activity android:name=".ui.feedback.FeedbackActivity" android:exported="false" />
+        <activity android:name=".ui.auth.RegisterActivity" android:exported="false" android:screenOrientation="portrait" />
+        <activity android:name=".ui.search.SearchActivity" android:exported="false" android:screenOrientation="portrait" />
+        <activity android:name=".ui.next.NextTrainActivity" android:exported="false" android:screenOrientation="portrait" />
+        <activity android:name=".ui.highway.HighwayActivity" android:exported="false" android:screenOrientation="portrait" />
+        <activity android:name=".ui.result.ResultActivity" android:exported="false" android:screenOrientation="portrait" />
+        <activity android:name=".ui.routes.MyRoutesActivity" android:exported="false" android:screenOrientation="portrait" />
+        <activity android:name=".ui.profile.ProfileActivity" android:exported="false" android:screenOrientation="portrait" />
+        <activity android:name=".ui.feedback.FeedbackActivity" android:exported="false" android:screenOrientation="portrait" />
+        <!-- SyncService、ReminderReceiver、BootReceiver、StationProvider（規格 10.4）於第 5、7 週實作時再宣告 -->
     </application>
 
 </manifest>
