@@ -610,6 +610,18 @@ model: sonnet
 
 以下為 App 與 Worker 之間的回應格式約定。欄位以 TDX 查證結果為準可微調，但調整時須同時更新本附錄與 App 的 DTO（3.4 第 8 點）。時間一律為當地時間字串 `HH:mm`，日期 `yyyy-MM-dd`，`updatedAt` 為 Unix 毫秒。
 
+### E-0 `GET /api/health`
+
+服務存活檢查（第 8 節第 1 週任務 1-7）。不呼叫 TDX、不快取（回應標頭 `Cache-Control: no-store`）。
+
+```json
+{
+  "updatedAt": 1762495500000,
+  "source": "hometide-api",
+  "data": { "status": "ok" }
+}
+```
+
 ### E-1 `GET /api/timetable?operator=TRA&from=1080&to=4220&date=2026-11-07`
 
 ```json

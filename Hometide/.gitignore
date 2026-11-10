@@ -24,3 +24,6 @@ tools/tdx_api_test.py
 # repo 目前為公開，google-services.json 暫不提交（GUIDE 2.2：只能進私人 repo）
 app/google-services.json
 .claude/google-services.json
+
+# Wrangler 本機快取
+worker/.wrangler/
