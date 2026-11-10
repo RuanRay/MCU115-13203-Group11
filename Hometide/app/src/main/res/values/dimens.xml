@@ -18,14 +18,14 @@
     <dimen name="tear_line_width">2dp</dimen>
     <dimen name="tear_notch_radius">8dp</dimen>
 
-    <!-- 以下為規格未定義、依畫面圖量測（1-4）。ticket_outline_width 與 date_stamp_padding_* 尚待實作者確認 -->
+    <!-- 以下為規格未定義、依畫面圖量測（1-4），2026-11-10 實作者確認 -->
     <dimen name="tear_dash_length">6dp</dimen>
     <dimen name="tear_dash_gap">4dp</dimen>
     <dimen name="ticket_outline_width">1dp</dimen>
     <dimen name="stamp_size">64dp</dimen>
     <dimen name="stamp_stroke">2dp</dimen>
     <dimen name="stamp_text_size">13sp</dimen>
-    <dimen name="date_stamp_stroke">2dp</dimen>
+    <dimen name="date_stamp_stroke">1dp</dimen>
     <dimen name="date_stamp_corner">4dp</dimen>
     <dimen name="date_stamp_padding_horizontal">8dp</dimen>
     <dimen name="date_stamp_padding_vertical">2dp</dimen>

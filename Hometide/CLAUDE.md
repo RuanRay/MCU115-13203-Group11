@@ -30,5 +30,5 @@ Android App，Kotlin + XML Layout + ViewBinding，MVVM，套件 com.group11.home
 10. 不得修改 docs/spec/；發現問題寫進當日 devlog 並告知我。
 11. 編譯：./gradlew assembleDebug；Worker：cd worker && npx wrangler dev／deploy；只回報錯誤摘要。
 12. 任務完成前請 spec-reviewer 審查，並在 docs/devlog/ 當日檔案追加紀錄（GUIDE 第 10 節格式）。
-13. Commit：<feat|fix|ui|test|docs|chore>(<FR編號>): <中文說明>，在 feature/ 分支上進行。
+13. Commit：<feat|fix|ui|test|docs|chore>(<FR編號>): <中文說明>，在 feature/ 分支上進行；每完成一個任務就 commit 並 push 到 origin（repo 為公開，google-services.json 與任何金鑰不得提交）。
 14. 回覆一律使用繁體中文。
