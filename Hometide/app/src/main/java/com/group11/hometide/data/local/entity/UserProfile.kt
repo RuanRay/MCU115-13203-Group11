@@ -10,6 +10,6 @@ data class UserProfile(
     @PrimaryKey val uid: String,
     val email: String,
     val nickname: String, // 1–20 字
-    @ColumnInfo(name = "default_operator") val defaultOperator: Operator, // TRA／THSR
+    @ColumnInfo(name = "default_operator") val defaultOperator: Operator, // TRA／THSR／BUS（實作者決定，規格 7.1 只列 TRA／THSR）
     @ColumnInfo(name = "created_at") val createdAt: Long,
 )
