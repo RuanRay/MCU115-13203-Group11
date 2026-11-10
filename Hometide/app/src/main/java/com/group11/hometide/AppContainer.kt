@@ -1,6 +1,8 @@
 package com.group11.hometide
 
 import android.content.Context
+import com.group11.hometide.data.local.AppDatabase
+import com.group11.hometide.data.local.SettingsStore
 
 /**
  * 手動 DI（規格 6.1、6.2），由 HometideApp 持有，全 App 共用單例。
@@ -11,4 +13,7 @@ import android.content.Context
  * - Repository：TransitRepository、AuthRepository、FavoriteRepository、ReminderRepository、
  *   UsageRepository、FeedbackRepository、AiRepository、HighwayRepository
  */
-class AppContainer(private val context: Context)
+class AppContainer(private val context: Context) {
+    val database: AppDatabase by lazy { AppDatabase.create(context) }
+    val settingsStore: SettingsStore by lazy { SettingsStore(context) }
+}
