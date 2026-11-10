@@ -26,6 +26,7 @@
         <item name="android:textColorTertiary">@color/color_on_surface_muted</item>
         <!-- 預設字體走 textViewStyle：主題層 fontFamily 會蓋過各元件的 textAppearance -->
         <item name="android:textViewStyle">@style/Widget.Hometide.TextView</item>
+        <item name="bottomNavigationStyle">@style/Widget.Hometide.BottomNav</item>
         <item name="android:windowLightStatusBar">true</item>
     </style>
 
@@ -33,6 +34,21 @@
 
     <style name="Widget.Hometide.TextView" parent="Widget.MaterialComponents.TextView">
         <item name="android:textAppearance">@style/TextAppearance.Hometide.Body</item>
+    </style>
+
+    <!-- 底部導覽列（規格 4.1）：選中藏青粗體、未選中次要文字色，上緣分隔線 -->
+    <style name="Widget.Hometide.BottomNav" parent="Widget.Material3.BottomNavigationView">
+        <item name="android:background">@drawable/bg_bottom_nav</item>
+        <item name="itemIconTint">@color/nav_item</item>
+        <item name="itemTextColor">@color/nav_item</item>
+        <item name="itemTextAppearanceInactive">@style/TextAppearance.Hometide.Caption.Large</item>
+        <item name="itemTextAppearanceActive">@style/TextAppearance.Hometide.NavLabel.Active</item>
+        <item name="labelVisibilityMode">labeled</item>
+    </style>
+
+    <style name="TextAppearance.Hometide.NavLabel.Active" parent="TextAppearance.Hometide.Caption.Large">
+        <item name="fontFamily">@font/noto_sans_tc_bold</item>
+        <item name="android:fontFamily">@font/noto_sans_tc_bold</item>
     </style>
 
     <!-- 文字樣式（規格 5.2）。parent 用 AppCompat，不繼承 M3 的固定 lineHeight（避免 40sp 倒數被裁切） -->

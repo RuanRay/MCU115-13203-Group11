@@ -16,15 +16,22 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
         <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:windowSoftInputMode="adjustResize">
+            android:name=".ui.auth.LoginActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.auth.RegisterActivity" android:exported="false" />
+        <activity android:name=".ui.search.SearchActivity" android:exported="false" />
+        <activity android:name=".ui.next.NextTrainActivity" android:exported="false" />
+        <activity android:name=".ui.highway.HighwayActivity" android:exported="false" />
+        <activity android:name=".ui.result.ResultActivity" android:exported="false" />
+        <activity android:name=".ui.routes.MyRoutesActivity" android:exported="false" />
+        <activity android:name=".ui.profile.ProfileActivity" android:exported="false" />
+        <activity android:name=".ui.feedback.FeedbackActivity" android:exported="false" />
     </application>
 
 </manifest>

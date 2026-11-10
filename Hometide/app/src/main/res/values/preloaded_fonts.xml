@@ -5,5 +5,6 @@
         <item>@font/noto_serif_tc_bold</item>
         <item>@font/noto_sans_tc_regular</item>
         <item>@font/noto_sans_tc_medium</item>
+        <item>@font/noto_sans_tc_bold</item>
     </array>
 </resources>
