@@ -1,0 +1,26 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Worker（GUIDE 2.2）
+worker/.dev.vars
+worker/node_modules/
+
+# 含 TDX 金鑰的本機測試腳本，不得提交
+tools/tdx_api_test.py
+
+# repo 目前為公開，google-services.json 暫不提交（GUIDE 2.2：只能進私人 repo）
+app/google-services.json
+.claude/google-services.json
