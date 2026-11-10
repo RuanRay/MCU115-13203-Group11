@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Hometide</string>
+
+    <!-- 日期章：民國日期＋星期，例：115.11.07（六） -->
+    <string name="date_with_weekday">%1$s（%2$s）</string>
+
+    <!-- 1-4 元件展示用（暫時），1-5 換掉 activity_main 時一併刪除 -->
+    <string name="demo_ticket_main_caption">台鐵・學校回家</string>
+    <string name="demo_ticket_paper_caption">高鐵・連假返鄉</string>
+    <string name="demo_ticket_blank_caption">空白車票・手動查詢</string>
+    <string name="demo_ticket_route">桃園 → 臺南</string>
+    <string name="demo_ticket_stub_main">一鍵\n查詢</string>
+    <string name="demo_ticket_stub_paper">$739</string>
+    <string name="demo_ticket_stub_blank">查詢\n班次</string>
+    <string name="demo_stamp_red">會員\n限定</string>
+    <string name="demo_stamp_gray">已使用</string>
+    <string name="demo_stamp_green">一致</string>
+    <string name="demo_stamp_mustard">已驗證</string>
+</resources>
