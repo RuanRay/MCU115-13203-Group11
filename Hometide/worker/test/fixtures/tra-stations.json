@@ -1,0 +1,11 @@
+{
+  "UpdateTime": "2026-11-01T00:00:00+08:00",
+  "UpdateInterval": 86400,
+  "SrcUpdateTime": "2026-11-01T00:00:00+08:00",
+  "SrcUpdateInterval": 86400,
+  "AuthorityCode": "TRA",
+  "Stations": [
+    { "StationID": "0900", "StationName": { "Zh_tw": "基隆", "En": "Keelung" }, "StationAddress": "203001基隆市中山區中山一路 16 之 1 號" },
+    { "StationID": "4220", "StationName": { "Zh_tw": "台南", "En": "Tainan" }, "StationAddress": "701001台南市東區北門路二段 4 號" }
+  ]
+}
