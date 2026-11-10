@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 語意色票（規格 5.1）深色 -->
+<resources>
+    <color name="color_background">#12161F</color>
+    <color name="color_surface">#1B2231</color>
+    <color name="color_surface_variant">#232C3E</color>
+    <color name="color_ticket">#2B3448</color>
+    <color name="color_outline">#36415A</color>
+    <color name="color_on_background">#EFE6D2</color>
+    <color name="color_on_surface_muted">#A9A08C</color>
+    <color name="color_primary">#E0A526</color>
+    <color name="color_on_primary">#1B1B1B</color>
+    <color name="color_accent">#EDBE57</color>
+    <color name="color_stamp">#E27C6E</color>
+    <color name="color_success">#8CC79A</color>
+    <color name="color_facility">#7FC1B8</color>
+</resources>

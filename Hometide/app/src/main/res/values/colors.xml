@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 語意色票（規格 5.1）淺色；深色見 values-night/colors.xml -->
+<resources>
+    <color name="color_background">#F5EEDC</color>
+    <color name="color_surface">#FFFBF1</color>
+    <color name="color_surface_variant">#EFE3C6</color>
+    <color name="color_ticket">#F2E3BF</color>
+    <color name="color_outline">#D9C9A3</color>
+    <color name="color_on_background">#2A2A2A</color>
+    <color name="color_on_surface_muted">#7A6E58</color>
+    <color name="color_primary">#23395B</color>
+    <color name="color_on_primary">#F5EEDC</color>
+    <color name="color_accent">#E0A526</color>
+    <color name="color_stamp">#B23A2E</color>
+    <color name="color_success">#3E7A4A</color>
+    <color name="color_facility">#2F6E6A</color>
+</resources>

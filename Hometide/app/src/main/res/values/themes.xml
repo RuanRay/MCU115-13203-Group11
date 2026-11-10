@@ -1,0 +1,87 @@
+<resources>
+    <!-- 色票由 values／values-night 的 colors.xml 切換，兩種模式共用本主題 -->
+    <style name="Base.Theme.Hometide" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:colorBackground">@color/color_background</item>
+        <item name="colorPrimary">@color/color_primary</item>
+        <item name="colorOnPrimary">@color/color_on_primary</item>
+        <item name="colorSecondary">@color/color_accent</item>
+        <item name="colorError">@color/color_stamp</item>
+        <item name="colorSurface">@color/color_surface</item>
+        <item name="colorOnSurface">@color/color_on_background</item>
+        <item name="colorOnBackground">@color/color_on_background</item>
+        <item name="colorSurfaceVariant">@color/color_surface_variant</item>
+        <item name="colorOnSurfaceVariant">@color/color_on_surface_muted</item>
+        <item name="colorOutline">@color/color_outline</item>
+        <!-- M3 底部導覽選中底塊取 secondaryContainer（5.1：選中的導覽項目用 surface_variant；圖示色照 home.png 用主色） -->
+        <item name="colorSecondaryContainer">@color/color_surface_variant</item>
+        <item name="colorOnSecondaryContainer">@color/color_primary</item>
+        <!-- M3 元件（底部導覽、卡片、Bottom Sheet）預設取 surfaceContainer*，統一成 color_surface -->
+        <item name="colorSurfaceContainerLowest">@color/color_surface</item>
+        <item name="colorSurfaceContainerLow">@color/color_surface</item>
+        <item name="colorSurfaceContainer">@color/color_surface</item>
+        <item name="colorSurfaceContainerHigh">@color/color_surface</item>
+        <item name="colorSurfaceContainerHighest">@color/color_surface</item>
+        <item name="android:textColorPrimary">@color/color_on_background</item>
+        <item name="android:textColorSecondary">@color/color_on_surface_muted</item>
+        <item name="android:textColorTertiary">@color/color_on_surface_muted</item>
+        <!-- 預設字體走 textViewStyle：主題層 fontFamily 會蓋過各元件的 textAppearance -->
+        <item name="android:textViewStyle">@style/Widget.Hometide.TextView</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <style name="Theme.Hometide" parent="Base.Theme.Hometide" />
+
+    <style name="Widget.Hometide.TextView" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textAppearance">@style/TextAppearance.Hometide.Body</item>
+    </style>
+
+    <!-- 文字樣式（規格 5.2）。parent 用 AppCompat，不繼承 M3 的固定 lineHeight（避免 40sp 倒數被裁切） -->
+    <style name="TextAppearance.Hometide.Display" parent="TextAppearance.AppCompat">
+        <item name="fontFamily">@font/noto_serif_tc_black</item>
+        <item name="android:fontFamily">@font/noto_serif_tc_black</item>
+        <item name="android:textSize">22sp</item>
+    </style>
+
+    <style name="TextAppearance.Hometide.TicketRoute.Large" parent="TextAppearance.Hometide.Display">
+        <item name="android:textSize">22sp</item>
+    </style>
+
+    <style name="TextAppearance.Hometide.TicketRoute.Small" parent="TextAppearance.Hometide.Display">
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="TextAppearance.Hometide.TicketTime.Large" parent="TextAppearance.Hometide.Display">
+        <item name="android:textSize">17sp</item>
+    </style>
+
+    <style name="TextAppearance.Hometide.TicketTime.Small" parent="TextAppearance.Hometide.Display">
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="TextAppearance.Hometide.Countdown" parent="TextAppearance.Hometide.Display">
+        <item name="android:textSize">40sp</item>
+    </style>
+
+    <style name="TextAppearance.Hometide.Body" parent="TextAppearance.AppCompat">
+        <item name="fontFamily">@font/noto_sans_tc_regular</item>
+        <item name="android:fontFamily">@font/noto_sans_tc_regular</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="TextAppearance.Hometide.Caption.Large" parent="TextAppearance.AppCompat">
+        <item name="fontFamily">@font/noto_sans_tc_medium</item>
+        <item name="android:fontFamily">@font/noto_sans_tc_medium</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="TextAppearance.Hometide.Caption.Small" parent="TextAppearance.Hometide.Caption.Large">
+        <item name="android:textSize">10sp</item>
+    </style>
+
+    <style name="TextAppearance.Hometide.Button" parent="TextAppearance.AppCompat">
+        <item name="fontFamily">@font/noto_serif_tc_bold</item>
+        <item name="android:fontFamily">@font/noto_serif_tc_bold</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:letterSpacing">0.2</item>
+    </style>
+</resources>
