@@ -1,0 +1,12 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "0"
+  },
+  "permissions": {
+    "deny": [
+      "Read(./local.properties)",
+      "Read(./**/local.properties)",
+      "Read(./worker/.dev.vars)"
+    ]
+  }
+}
