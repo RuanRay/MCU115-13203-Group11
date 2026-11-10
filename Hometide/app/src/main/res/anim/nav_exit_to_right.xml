@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AN-02 底部導覽列切換（規格 5.4）：250 ms -->
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="@integer/anim_nav_switch_ms">
+    <translate android:fromXDelta="0%" android:toXDelta="100%" />
+    <alpha android:fromAlpha="1" android:toAlpha="0" />
+</set>

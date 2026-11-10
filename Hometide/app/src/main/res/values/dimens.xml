@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 間距、圓角、撕線、印章（規格 5.2；GUIDE 11.2 暫定項目，2026-11-10 實作者確認照規格） -->
+<resources>
+    <!-- 間距（以 4dp 為單位） -->
+    <dimen name="space_unit">4dp</dimen>
+    <dimen name="page_horizontal_margin">14dp</dimen>
+    <dimen name="ticket_gap">8dp</dimen>
+    <dimen name="ticket_padding">10dp</dimen>
+
+    <!-- 圓角 -->
+    <dimen name="corner_ticket">6dp</dimen>
+    <dimen name="corner_control_large">6dp</dimen>
+    <dimen name="corner_control_small">4dp</dimen>
+    <dimen name="corner_bottom_sheet">16dp</dimen>
+    <dimen name="corner_floating_input">24dp</dimen>
+
+    <!-- 撕線 -->
+    <dimen name="tear_line_width">2dp</dimen>
+    <dimen name="tear_notch_radius">8dp</dimen>
+
+    <!-- 以下為規格未定義、依畫面圖量測（1-4），2026-11-10 實作者確認 -->
+    <dimen name="tear_dash_length">6dp</dimen>
+    <dimen name="tear_dash_gap">4dp</dimen>
+    <dimen name="ticket_outline_width">1dp</dimen>
+    <dimen name="stamp_size">64dp</dimen>
+    <dimen name="stamp_stroke">2dp</dimen>
+    <dimen name="stamp_text_size">13sp</dimen>
+    <dimen name="date_stamp_stroke">1dp</dimen>
+    <dimen name="date_stamp_corner">4dp</dimen>
+    <dimen name="date_stamp_padding_horizontal">8dp</dimen>
+    <dimen name="date_stamp_padding_vertical">2dp</dimen>
+
+    <!-- 印章旋轉角度（度）：狀態章照規格，日期章照 home.png -->
+    <integer name="stamp_rotation_status">-12</integer>
+    <integer name="stamp_rotation_date">-3</integer>
+
+    <!-- 動畫時間（毫秒，規格 5.4） -->
+    <integer name="anim_nav_switch_ms">250</integer>
+
+    <!-- 分隔線（底部導覽列上緣，1-5 實作者確認） -->
+    <dimen name="divider_width">1dp</dimen>
+
+    <!-- 可點擊元件最小尺寸 -->
+    <dimen name="min_touch_target">48dp</dimen>
+</resources>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/navSearch" android:icon="@drawable/ic_nav_search" android:title="@string/nav_search" />
+    <item android:id="@+id/navNext" android:icon="@drawable/ic_nav_next" android:title="@string/nav_next" />
+    <item android:id="@+id/navHighway" android:icon="@drawable/ic_nav_highway" android:title="@string/nav_highway" />
+    <item android:id="@+id/navRoutes" android:icon="@drawable/ic_nav_routes" android:title="@string/nav_routes" />
+    <item android:id="@+id/navProfile" android:icon="@drawable/ic_nav_profile" android:title="@string/nav_profile" />
+</menu>

@@ -1,0 +1,6 @@
+<resources>
+    <!-- 深色：色票由 values-night/colors.xml 提供，這裡只改狀態列圖示為淺色 -->
+    <style name="Theme.Hometide" parent="Base.Theme.Hometide">
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

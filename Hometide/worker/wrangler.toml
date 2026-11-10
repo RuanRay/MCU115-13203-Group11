@@ -1,0 +1,6 @@
+# 歸潮 Hometide 後端（規格 6.5、8.2）。不得寫入任何金鑰：TDX 金鑰用 `wrangler secret put`，本機放 .dev.vars
+name = "hometide-api"
+main = "src/index.ts"
+compatibility_date = "2026-10-27"
+
+# KV 綁定（客運路線索引）與 Cron Trigger 於第 3 週加入

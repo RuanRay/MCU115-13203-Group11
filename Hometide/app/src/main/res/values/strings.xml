@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Hometide</string>
+
+    <!-- 日期章：民國日期＋星期，例：115.11.07（六） -->
+    <string name="date_with_weekday">%1$s（%2$s）</string>
+
+    <!-- 底部導覽列（規格 4.1） -->
+    <string name="nav_search">查詢</string>
+    <string name="nav_next">下一班</string>
+    <string name="nav_highway">國道</string>
+    <string name="nav_routes">我的路線</string>
+    <string name="nav_profile">個人</string>
+
+    <!-- 通知頻道（規格 10.5） -->
+    <string name="channel_trip_reminder">出發提醒</string>
+    <string name="channel_sync">資料同步</string>
+
+    <!-- P1 登入頁（規格 4.2） -->
+    <string name="btn_login">登　入</string>
+    <string name="btn_guest">先不登入，直接查詢</string>
+</resources>
