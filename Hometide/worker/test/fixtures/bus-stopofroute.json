@@ -1,0 +1,440 @@
+[
+  {
+    "RouteUID": "THB1610",
+    "RouteID": "1610",
+    "RouteName": {
+      "Zh_tw": "1610",
+      "En": "1610"
+    },
+    "Operators": [
+      {
+        "OperatorID": "34",
+        "OperatorName": {
+          "Zh_tw": "統聯客運",
+          "En": "United Highway Bus Co., Ltd."
+        },
+        "OperatorCode": "UnitedHighwayBus",
+        "OperatorNo": "1201"
+      }
+    ],
+    "SubRouteUID": "THB161001",
+    "SubRouteID": "161001",
+    "SubRouteName": {
+      "Zh_tw": "1610",
+      "En": "1610"
+    },
+    "Direction": 0,
+    "Stops": [
+      {
+        "StopUID": "THB289792",
+        "StopID": "289792",
+        "StopName": {
+          "Zh_tw": "臺北轉運站",
+          "En": "Taipei Bus Station"
+        },
+        "StopBoarding": 1,
+        "StopSequence": 1,
+        "StopPosition": {
+          "PositionLon": 121.51761,
+          "PositionLat": 25.04887,
+          "GeoHash": "wsqqt0n2j"
+        },
+        "StationID": "107352",
+        "StationGroupID": "103－050",
+        "LocationCityCode": "TPE"
+      },
+      {
+        "StopUID": "THB310063",
+        "StopID": "310063",
+        "StopName": {
+          "Zh_tw": "經國轉運站",
+          "En": "Jing Guo Bus Station"
+        },
+        "StopBoarding": 0,
+        "StopSequence": 2,
+        "StopPosition": {
+          "PositionLon": 121.30022,
+          "PositionLat": 25.02877,
+          "GeoHash": "wsqq2k255"
+        },
+        "StationID": "138362",
+        "StationGroupID": "330－151",
+        "LocationCityCode": "TAO"
+      },
+      {
+        "StopUID": "THB301900",
+        "StopID": "301900",
+        "StopName": {
+          "Zh_tw": "中壢服務區",
+          "En": "Zhongli Service Area"
+        },
+        "StopBoarding": 1,
+        "StopSequence": 3,
+        "StopPosition": {
+          "PositionLon": 121.25254,
+          "PositionLat": 25.00428,
+          "GeoHash": "wsqnppvkk"
+        },
+        "StationID": "137549",
+        "StationGroupID": "320－129",
+        "LocationCityCode": "TAO"
+      },
+      {
+        "StopUID": "THB266076",
+        "StopID": "266076",
+        "StopName": {
+          "Zh_tw": "中港轉運站",
+          "En": "Zhonggang Bus Station"
+        },
+        "StopBoarding": 0,
+        "StopSequence": 4,
+        "StopPosition": {
+          "PositionLon": 120.622159,
+          "PositionLat": 24.179464,
+          "GeoHash": "wsmc8cdrs"
+        },
+        "StationID": "124215",
+        "StationGroupID": "407－054",
+        "LocationCityCode": "TXG"
+      },
+      {
+        "StopUID": "THB266161",
+        "StopID": "266161",
+        "StopName": {
+          "Zh_tw": "岡山站",
+          "En": "Gangshan Station"
+        },
+        "StopBoarding": 0,
+        "StopSequence": 5,
+        "StopPosition": {
+          "PositionLon": 120.322713,
+          "PositionLat": 22.7886,
+          "GeoHash": "wsj9dh834"
+        },
+        "StationID": "22008",
+        "StationGroupID": "824－020",
+        "LocationCityCode": "KHH"
+      },
+      {
+        "StopUID": "THB268482",
+        "StopID": "268482",
+        "StopName": {
+          "Zh_tw": "楠梓站",
+          "En": "Nanzi"
+        },
+        "StopBoarding": 0,
+        "StopSequence": 6,
+        "StopPosition": {
+          "PositionLon": 120.33369,
+          "PositionLat": 22.72976,
+          "GeoHash": "wsj963b66"
+        },
+        "StationID": "120411",
+        "StationGroupID": "811－024",
+        "LocationCityCode": "KHH"
+      },
+      {
+        "StopUID": "THB310062",
+        "StopID": "310062",
+        "StopName": {
+          "Zh_tw": "捷運苓雅運動園區站",
+          "En": "MRT Lingya Sports Park Station"
+        },
+        "StopBoarding": -1,
+        "StopSequence": 7,
+        "StopPosition": {
+          "PositionLon": 120.333919,
+          "PositionLat": 22.627563,
+          "GeoHash": "wsj8dr0rp"
+        },
+        "StationID": "109796",
+        "StationGroupID": "802－002",
+        "LocationCityCode": "KHH"
+      },
+      {
+        "StopUID": "THB305496",
+        "StopID": "305496",
+        "StopName": {
+          "Zh_tw": "大順三路口",
+          "En": "Dashun 3 rd. Intersection"
+        },
+        "StopBoarding": -1,
+        "StopSequence": 8,
+        "StopPosition": {
+          "PositionLon": 120.323921,
+          "PositionLat": 22.629858,
+          "GeoHash": "wsj8dp9hq"
+        },
+        "StationID": "139997",
+        "StationGroupID": "802－040",
+        "LocationCityCode": "KHH"
+      },
+      {
+        "StopUID": "THB308696",
+        "StopID": "308696",
+        "StopName": {
+          "Zh_tw": "建國客運站",
+          "En": "TRA Kaohsiung Station"
+        },
+        "StopBoarding": -1,
+        "StopSequence": 9,
+        "StopPosition": {
+          "PositionLon": 120.29971,
+          "PositionLat": 22.63793,
+          "GeoHash": "wsj8c3ped"
+        },
+        "StationID": "139552",
+        "StationGroupID": "807－056",
+        "LocationCityCode": "KHH"
+      }
+    ],
+    "UpdateTime": "2026-11-11T22:37:05+08:00",
+    "VersionID": 8000
+  },
+  {
+    "RouteUID": "THB1610",
+    "RouteID": "1610",
+    "RouteName": {
+      "Zh_tw": "1610",
+      "En": "1610"
+    },
+    "Operators": [
+      {
+        "OperatorID": "34",
+        "OperatorName": {
+          "Zh_tw": "統聯客運",
+          "En": "United Highway Bus Co., Ltd."
+        },
+        "OperatorCode": "UnitedHighwayBus",
+        "OperatorNo": "1201"
+      }
+    ],
+    "SubRouteUID": "THB161002",
+    "SubRouteID": "161002",
+    "SubRouteName": {
+      "Zh_tw": "1610",
+      "En": "1610"
+    },
+    "Direction": 1,
+    "Stops": [
+      {
+        "StopUID": "THB266029",
+        "StopID": "266029",
+        "StopName": {
+          "Zh_tw": "建國客運站",
+          "En": "Jianguo Station"
+        },
+        "StopBoarding": 1,
+        "StopSequence": 1,
+        "StopPosition": {
+          "PositionLon": 120.30392,
+          "PositionLat": 22.63753,
+          "GeoHash": "wsj8c949h"
+        },
+        "StationID": "120832",
+        "StationGroupID": "807－037",
+        "LocationCityCode": "KHH"
+      },
+      {
+        "StopUID": "THB290823",
+        "StopID": "290823",
+        "StopName": {
+          "Zh_tw": "中正站",
+          "En": "JhongJheng Station"
+        },
+        "StopBoarding": 1,
+        "StopSequence": 2,
+        "StopPosition": {
+          "PositionLon": 120.33187,
+          "PositionLat": 22.628077,
+          "GeoHash": "wsj8dpqfp"
+        },
+        "StationID": "139456",
+        "StationGroupID": "802－041",
+        "LocationCityCode": "KHH"
+      },
+      {
+        "StopUID": "THB268481",
+        "StopID": "268481",
+        "StopName": {
+          "Zh_tw": "楠梓站",
+          "En": "Nanzi Station"
+        },
+        "StopBoarding": 0,
+        "StopSequence": 3,
+        "StopPosition": {
+          "PositionLon": 120.33369,
+          "PositionLat": 22.72976,
+          "GeoHash": "wsj963b66"
+        },
+        "StationID": "120413",
+        "StationGroupID": "811－024",
+        "LocationCityCode": "KHH"
+      },
+      {
+        "StopUID": "THB266161",
+        "StopID": "266161",
+        "StopName": {
+          "Zh_tw": "岡山站",
+          "En": "Gangshan Station"
+        },
+        "StopBoarding": 0,
+        "StopSequence": 4,
+        "StopPosition": {
+          "PositionLon": 120.322713,
+          "PositionLat": 22.7886,
+          "GeoHash": "wsj9dh834"
+        },
+        "StationID": "22008",
+        "StationGroupID": "824－020",
+        "LocationCityCode": "KHH"
+      },
+      {
+        "StopUID": "THB266076",
+        "StopID": "266076",
+        "StopName": {
+          "Zh_tw": "中港轉運站",
+          "En": "Zhonggang Bus Station"
+        },
+        "StopBoarding": 0,
+        "StopSequence": 5,
+        "StopPosition": {
+          "PositionLon": 120.622159,
+          "PositionLat": 24.179464,
+          "GeoHash": "wsmc8cdrs"
+        },
+        "StationID": "124215",
+        "StationGroupID": "407－054",
+        "LocationCityCode": "TXG"
+      },
+      {
+        "StopUID": "THB301900",
+        "StopID": "301900",
+        "StopName": {
+          "Zh_tw": "中壢服務區",
+          "En": "Zhongli Service Area"
+        },
+        "StopBoarding": -1,
+        "StopSequence": 6,
+        "StopPosition": {
+          "PositionLon": 121.25254,
+          "PositionLat": 25.00428,
+          "GeoHash": "wsqnppvkk"
+        },
+        "StationID": "137549",
+        "StationGroupID": "320－129",
+        "LocationCityCode": "TAO"
+      },
+      {
+        "StopUID": "THB310063",
+        "StopID": "310063",
+        "StopName": {
+          "Zh_tw": "經國轉運站",
+          "En": "Jing Guo Bus Station"
+        },
+        "StopBoarding": 0,
+        "StopSequence": 7,
+        "StopPosition": {
+          "PositionLon": 121.30022,
+          "PositionLat": 25.02877,
+          "GeoHash": "wsqq2k255"
+        },
+        "StationID": "138362",
+        "StationGroupID": "330－151",
+        "LocationCityCode": "TAO"
+      },
+      {
+        "StopUID": "THB168129",
+        "StopID": "168129",
+        "StopName": {
+          "Zh_tw": "啟聰學校",
+          "En": "Taipei School for the Hearing Impaired"
+        },
+        "StopBoarding": -1,
+        "StopSequence": 8,
+        "StopPosition": {
+          "PositionLon": 121.51378,
+          "PositionLat": 25.07456,
+          "GeoHash": "wsqqthetu"
+        },
+        "StationID": "25077",
+        "StationGroupID": "103－016",
+        "LocationCityCode": "TPE"
+      },
+      {
+        "StopUID": "THB266034",
+        "StopID": "266034",
+        "StopName": {
+          "Zh_tw": "庫倫街口",
+          "En": "Kulun Street Intersection"
+        },
+        "StopBoarding": -1,
+        "StopSequence": 9,
+        "StopPosition": {
+          "PositionLon": 121.51825,
+          "PositionLat": 25.06995,
+          "GeoHash": "wsqqt5ygh"
+        },
+        "StationID": "125032",
+        "StationGroupID": "103－028",
+        "LocationCityCode": "TPE"
+      },
+      {
+        "StopUID": "THB266193",
+        "StopID": "266193",
+        "StopName": {
+          "Zh_tw": "大同國小",
+          "En": "Datong Elementary School"
+        },
+        "StopBoarding": -1,
+        "StopSequence": 10,
+        "StopPosition": {
+          "PositionLon": 121.518177,
+          "PositionLat": 25.064979,
+          "GeoHash": "wsqqt4yy4"
+        },
+        "StationID": "125033",
+        "StationGroupID": "103－029",
+        "LocationCityCode": "TPE"
+      },
+      {
+        "StopUID": "THB188130",
+        "StopID": "188130",
+        "StopName": {
+          "Zh_tw": "成淵高中",
+          "En": "Cheng Yuan High School"
+        },
+        "StopBoarding": -1,
+        "StopSequence": 11,
+        "StopPosition": {
+          "PositionLon": 121.518159,
+          "PositionLat": 25.061178,
+          "GeoHash": "wsqqt4nzf"
+        },
+        "StationID": "103803",
+        "StationGroupID": "103－021",
+        "LocationCityCode": "TPE"
+      },
+      {
+        "StopUID": "THB289792",
+        "StopID": "289792",
+        "StopName": {
+          "Zh_tw": "臺北轉運站",
+          "En": "Taipei Bus Station"
+        },
+        "StopBoarding": -1,
+        "StopSequence": 12,
+        "StopPosition": {
+          "PositionLon": 121.51761,
+          "PositionLat": 25.04887,
+          "GeoHash": "wsqqt0n2j"
+        },
+        "StationID": "107352",
+        "StationGroupID": "103－050",
+        "LocationCityCode": "TPE"
+      }
+    ],
+    "UpdateTime": "2026-11-11T22:37:05+08:00",
+    "VersionID": 8000
+  }
+]

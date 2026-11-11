@@ -1,0 +1,247 @@
+[
+  {
+    "TrainDate": "2026-11-12",
+    "DailyTrainInfo": {
+      "TrainNo": "0803",
+      "Direction": 0,
+      "StartingStationID": "0990",
+      "StartingStationName": {
+        "Zh_tw": "南港",
+        "En": "Nangang",
+        "Ja": null,
+        "Ko": null
+      },
+      "EndingStationID": "1070",
+      "EndingStationName": {
+        "Zh_tw": "左營",
+        "En": "Zuoying",
+        "Ja": null,
+        "Ko": null
+      },
+      "Note": {},
+      "Overnight": false
+    },
+    "OriginStopTime": {
+      "StopSequence": 2,
+      "StationID": "1000",
+      "StationName": {
+        "Zh_tw": "台北",
+        "En": "Taipei",
+        "Ja": "台北",
+        "Ko": "타이페이"
+      },
+      "ArrivalTime": "06:23",
+      "DepartureTime": "06:26"
+    },
+    "DestinationStopTime": {
+      "StopSequence": 11,
+      "StationID": "1060",
+      "StationName": {
+        "Zh_tw": "台南",
+        "En": "Tainan",
+        "Ja": "台南",
+        "Ko": "타이난"
+      },
+      "ArrivalTime": "08:26",
+      "DepartureTime": "08:28"
+    },
+    "UpdateTime": "2026-10-15T04:52:58+08:00",
+    "VersionID": 1
+  },
+  {
+    "TrainDate": "2026-11-12",
+    "DailyTrainInfo": {
+      "TrainNo": "0203",
+      "Direction": 0,
+      "StartingStationID": "1000",
+      "StartingStationName": {
+        "Zh_tw": "台北",
+        "En": "Taipei",
+        "Ja": null,
+        "Ko": null
+      },
+      "EndingStationID": "1070",
+      "EndingStationName": {
+        "Zh_tw": "左營",
+        "En": "Zuoying",
+        "Ja": null,
+        "Ko": null
+      },
+      "Note": {},
+      "Overnight": false
+    },
+    "OriginStopTime": {
+      "StopSequence": 1,
+      "StationID": "1000",
+      "StationName": {
+        "Zh_tw": "台北",
+        "En": "Taipei",
+        "Ja": "台北",
+        "Ko": "타이페이"
+      },
+      "ArrivalTime": "06:30",
+      "DepartureTime": "06:30"
+    },
+    "DestinationStopTime": {
+      "StopSequence": 5,
+      "StationID": "1060",
+      "StationName": {
+        "Zh_tw": "台南",
+        "En": "Tainan",
+        "Ja": "台南",
+        "Ko": "타이난"
+      },
+      "ArrivalTime": "08:01",
+      "DepartureTime": "08:03"
+    },
+    "UpdateTime": "2026-10-15T04:52:58+08:00",
+    "VersionID": 1
+  },
+  {
+    "TrainDate": "2026-11-12",
+    "DailyTrainInfo": {
+      "TrainNo": "0603",
+      "Direction": 0,
+      "StartingStationID": "0990",
+      "StartingStationName": {
+        "Zh_tw": "南港",
+        "En": "Nangang",
+        "Ja": null,
+        "Ko": null
+      },
+      "EndingStationID": "1070",
+      "EndingStationName": {
+        "Zh_tw": "左營",
+        "En": "Zuoying",
+        "Ja": null,
+        "Ko": null
+      },
+      "Note": {},
+      "Overnight": false
+    },
+    "OriginStopTime": {
+      "StopSequence": 2,
+      "StationID": "1000",
+      "StationName": {
+        "Zh_tw": "台北",
+        "En": "Taipei",
+        "Ja": "台北",
+        "Ko": "타이페이"
+      },
+      "ArrivalTime": "06:48",
+      "DepartureTime": "06:51"
+    },
+    "DestinationStopTime": {
+      "StopSequence": 8,
+      "StationID": "1060",
+      "StationName": {
+        "Zh_tw": "台南",
+        "En": "Tainan",
+        "Ja": "台南",
+        "Ko": "타이난"
+      },
+      "ArrivalTime": "08:37",
+      "DepartureTime": "08:38"
+    },
+    "UpdateTime": "2026-10-15T04:52:58+08:00",
+    "VersionID": 1
+  },
+  {
+    "TrainDate": "2026-11-12",
+    "DailyTrainInfo": {
+      "TrainNo": "0805",
+      "Direction": 0,
+      "StartingStationID": "0990",
+      "StartingStationName": {
+        "Zh_tw": "南港",
+        "En": "Nangang",
+        "Ja": null,
+        "Ko": null
+      },
+      "EndingStationID": "1070",
+      "EndingStationName": {
+        "Zh_tw": "左營",
+        "En": "Zuoying",
+        "Ja": null,
+        "Ko": null
+      },
+      "Note": {},
+      "Overnight": false
+    },
+    "OriginStopTime": {
+      "StopSequence": 2,
+      "StationID": "1000",
+      "StationName": {
+        "Zh_tw": "台北",
+        "En": "Taipei",
+        "Ja": "台北",
+        "Ko": "타이페이"
+      },
+      "ArrivalTime": "07:08",
+      "DepartureTime": "07:11"
+    },
+    "DestinationStopTime": {
+      "StopSequence": 11,
+      "StationID": "1060",
+      "StationName": {
+        "Zh_tw": "台南",
+        "En": "Tainan",
+        "Ja": "台南",
+        "Ko": "타이난"
+      },
+      "ArrivalTime": "09:11",
+      "DepartureTime": "09:13"
+    },
+    "UpdateTime": "2026-10-15T04:52:58+08:00",
+    "VersionID": 1
+  },
+  {
+    "TrainDate": "2026-11-12",
+    "DailyTrainInfo": {
+      "TrainNo": "0609",
+      "Direction": 0,
+      "StartingStationID": "0990",
+      "StartingStationName": {
+        "Zh_tw": "南港",
+        "En": "Nangang",
+        "Ja": null,
+        "Ko": null
+      },
+      "EndingStationID": "1070",
+      "EndingStationName": {
+        "Zh_tw": "左營",
+        "En": "Zuoying",
+        "Ja": null,
+        "Ko": null
+      },
+      "Note": {},
+      "Overnight": false
+    },
+    "OriginStopTime": {
+      "StopSequence": 2,
+      "StationID": "1000",
+      "StationName": {
+        "Zh_tw": "台北",
+        "En": "Taipei",
+        "Ja": "台北",
+        "Ko": "타이페이"
+      },
+      "ArrivalTime": "07:43",
+      "DepartureTime": "07:46"
+    },
+    "DestinationStopTime": {
+      "StopSequence": 8,
+      "StationID": "1060",
+      "StationName": {
+        "Zh_tw": "台南",
+        "En": "Tainan",
+        "Ja": "台南",
+        "Ko": "타이난"
+      },
+      "ArrivalTime": "09:32",
+      "DepartureTime": "09:33"
+    },
+    "UpdateTime": "2026-10-15T04:52:58+08:00",
+    "VersionID": 1
+  }
+]

@@ -1,0 +1,75 @@
+{
+  "UpdateTime": "2026-11-11T23:19:06+08:00",
+  "UpdateInterval": 60,
+  "SrcUpdateTime": "2026-11-11T23:17:00+08:00",
+  "SrcUpdateInterval": 60,
+  "AuthorityCode": "NFB",
+  "LinkVersion": "25.06.1",
+  "LiveTraffics": [
+    {
+      "SectionID": "0001",
+      "LinkIDs": [
+        {
+          "LinkID": "0000100000000C"
+        },
+        {
+          "LinkID": "0000100000040C"
+        },
+        {
+          "LinkID": "0000100000080C"
+        },
+        {
+          "LinkID": "0000100000110C"
+        }
+      ],
+      "TravelTime": 52,
+      "TravelSpeed": 71,
+      "CongestionLevelID": "A",
+      "CongestionLevel": "2",
+      "DataSources": {
+        "HasHistorical": 0,
+        "HasVD": 1,
+        "HasAVI": 0,
+        "HasETAG": 0,
+        "HasGVP": 0,
+        "HasCVP": 0,
+        "HasOthers": 0
+      },
+      "DataCollectTime": "2026-11-11T23:18:00+08:00"
+    },
+    {
+      "SectionID": "0003",
+      "LinkIDs": [
+        {
+          "LinkID": "0000100000080C"
+        },
+        {
+          "LinkID": "0000100000110C"
+        },
+        {
+          "LinkID": "0000100000130C"
+        },
+        {
+          "LinkID": "0000100000200C"
+        },
+        {
+          "LinkID": "0000100000260C"
+        }
+      ],
+      "TravelTime": 57,
+      "TravelSpeed": 90,
+      "CongestionLevelID": "A",
+      "CongestionLevel": "1",
+      "DataSources": {
+        "HasHistorical": 0,
+        "HasVD": 1,
+        "HasAVI": 0,
+        "HasETAG": 0,
+        "HasGVP": 0,
+        "HasCVP": 0,
+        "HasOthers": 0
+      },
+      "DataCollectTime": "2026-11-11T23:18:00+08:00"
+    }
+  ]
+}
