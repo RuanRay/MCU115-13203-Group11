@@ -29,6 +29,11 @@ android {
         buildConfigField("String", "WORKER_BASE_URL", "\"$workerBaseUrl\"")
     }
 
+    // JVM 單元測試中 android.util.Log 等回傳預設值（不拋 "not mocked"）
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
+
     buildFeatures {
         viewBinding = true
         buildConfig = true

@@ -40,6 +40,17 @@
     <!-- 分隔線（底部導覽列上緣，1-5 實作者確認） -->
     <dimen name="divider_width">1dp</dimen>
 
+    <!-- 按鈕與插圖（2-2，依 login.png、register.png 量測） -->
+    <dimen name="button_height">56dp</dimen>
+    <dimen name="button_stroke_width">1.5dp</dimen>
+    <dimen name="hero_height">250dp</dimen>
+    <dimen name="hero_back_ticket_width">230dp</dimen>
+    <dimen name="hero_front_ticket_width">270dp</dimen>
+    <dimen name="ticket_stub_min">56dp</dimen>
+    <dimen name="dialog_stamp_margin">24dp</dimen>
+    <dimen name="member_card_ring_size">180dp</dimen>
+    <dimen name="member_card_ring_stroke">16dp</dimen>
+
     <!-- 可點擊元件最小尺寸 -->
     <dimen name="min_touch_target">48dp</dimen>
 </resources>

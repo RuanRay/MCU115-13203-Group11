@@ -51,6 +51,48 @@
         <item name="android:fontFamily">@font/noto_sans_tc_bold</item>
     </style>
 
+    <!-- 輸入框（P1、P2；畫面圖：紙色底、框線、6dp 圓角） -->
+    <style name="Widget.Hometide.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxBackgroundColor">@color/color_surface</item>
+        <item name="boxStrokeColor">@color/text_input_stroke</item>
+        <item name="boxStrokeErrorColor">@color/color_stamp</item>
+        <item name="errorTextColor">@color/color_stamp</item>
+        <item name="errorIconDrawable">@null</item>
+        <item name="hintTextColor">@color/color_on_surface_muted</item>
+        <item name="android:textColorHint">@color/color_on_surface_muted</item>
+        <item name="boxCornerRadiusTopStart">@dimen/corner_control_large</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/corner_control_large</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/corner_control_large</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/corner_control_large</item>
+    </style>
+
+    <style name="Widget.Hometide.TextInputLayout.Dropdown" parent="Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+        <item name="boxBackgroundColor">@color/color_surface</item>
+        <item name="boxStrokeColor">@color/text_input_stroke</item>
+        <item name="hintTextColor">@color/color_on_surface_muted</item>
+        <item name="android:textColorHint">@color/color_on_surface_muted</item>
+        <item name="boxCornerRadiusTopStart">@dimen/corner_control_large</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/corner_control_large</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/corner_control_large</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/corner_control_large</item>
+    </style>
+
+    <!-- 按鈕：主色實心、藏青外框（P1、P2、對話框） -->
+    <style name="Widget.Hometide.Button" parent="Widget.Material3.Button">
+        <item name="android:minHeight">@dimen/button_height</item>
+        <item name="android:textAppearance">@style/TextAppearance.Hometide.Button</item>
+        <item name="cornerRadius">@dimen/corner_control_large</item>
+    </style>
+
+    <style name="Widget.Hometide.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:minHeight">@dimen/button_height</item>
+        <item name="android:textAppearance">@style/TextAppearance.Hometide.Button</item>
+        <item name="android:textColor">@color/color_primary</item>
+        <item name="cornerRadius">@dimen/corner_control_large</item>
+        <item name="strokeColor">@color/color_primary</item>
+        <item name="strokeWidth">@dimen/button_stroke_width</item>
+    </style>
+
     <!-- 文字樣式（規格 5.2）。parent 用 AppCompat，不繼承 M3 的固定 lineHeight（避免 40sp 倒數被裁切） -->
     <style name="TextAppearance.Hometide.Display" parent="TextAppearance.AppCompat">
         <item name="fontFamily">@font/noto_serif_tc_black</item>

@@ -37,7 +37,12 @@
         <activity android:name=".ui.auth.RegisterActivity" android:exported="false" android:screenOrientation="portrait" />
         <activity android:name=".ui.result.ResultActivity" android:exported="false" android:screenOrientation="portrait" />
         <activity android:name=".ui.feedback.FeedbackActivity" android:exported="false" android:screenOrientation="portrait" />
-        <!-- SyncService、ReminderReceiver、BootReceiver、StationProvider（規格 10.4）於第 5、7 週實作時再宣告 -->
+        <!-- 車站查詢（規格 10.3）：唯讀，只供本 App 使用 -->
+        <provider
+            android:name=".provider.StationProvider"
+            android:authorities="com.group11.hometide.stations"
+            android:exported="false" />
+        <!-- SyncService、ReminderReceiver、BootReceiver（規格 10.4）於第 5、7 週實作時再宣告 -->
     </application>
 
 </manifest>

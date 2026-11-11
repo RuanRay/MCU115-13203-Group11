@@ -147,7 +147,7 @@
 1. 語言 TypeScript（`strict: true`），檔案分工照規格 6.5；每個端點的處理函式放在對應檔案（rail／bus／freeway／compare），`index.ts` 只做路由。
 2. 所有回應使用統一格式（規格 8.3）：成功 `{updatedAt, source, data}`，失敗 `{error: {code, message}}`，HTTP 狀態碼與 `code` 對應（NOT_FOUND→404、QUOTA→429、AUTH→502、其他→500）。
 3. 呼叫 TDX 一律經過 `tdx.ts`：自動帶 Token、逾時 8 秒、收到 401 更新 Token 後重試一次、收到 429 回傳 `QUOTA`。
-4. 每個端點都必須設定快取，時間照規格 8.5；快取鍵包含所有查詢參數。
+4. 每個端點都必須設定快取，時間照規格 8.5；快取鍵包含所有**驗證過的**查詢參數，無關參數不納入（避免附加任意參數繞過快取）。
 5. 能用 `$filter`／`$select`／`$top` 讓 TDX 先篩選的一律使用；單次請求子請求數不得超過 10 個（平台上限 50）。
 6. 需要掃描大量資料的工作（客運路線索引）不得放在請求處理中，只能放在 `scripts/build-index.ts` 由 GitHub Actions 執行。
 7. 不得在 log、錯誤訊息、回應中輸出金鑰或 Token；`console.log` 只記錄端點、參數、耗時與錯誤代碼。
@@ -619,6 +619,23 @@ model: sonnet
   "updatedAt": 1762495500000,
   "source": "hometide-api",
   "data": { "status": "ok" }
+}
+```
+
+### E-7 `GET /api/stations?operator=TRA`
+
+車站清單（任務 2-3；`operator`＝TRA／THSR，BUS 第 3 週接客運路線索引後提供，目前回 404 `NOT_FOUND`）。快取 7 天，快取鍵只含 `operator`。`nameZh`、`city` 已把「台」轉成「臺」；`sortKey` 為 TDX 回傳順序；`nameEn`、`city` 可能為 `null`；`updatedAt` 為 Worker 向 TDX 取得資料的時間。
+
+```json
+{
+  "updatedAt": 1762495500000,
+  "source": "TDX",
+  "data": {
+    "operator": "TRA",
+    "stations": [
+      { "id": "1000", "nameZh": "臺北", "nameEn": "Taipei", "city": "臺北市", "sortKey": 0 }
+    ]
+  }
 }
 ```
 

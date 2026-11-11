@@ -1,0 +1,4 @@
+[
+  { "StationID": "1000", "StationName": { "Zh_tw": "台北", "En": "Taipei" }, "LocationCity": "臺北市" },
+  { "StationID": "1070", "StationName": { "Zh_tw": "臺南", "En": "Tainan" } }
+]

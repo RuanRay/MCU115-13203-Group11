@@ -1,5 +1,163 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 第 1 週空版面：頁面內容依規格第 4 章於後續任務實作 -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- P2 註冊頁（規格 4.3、register.png） -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/page_horizontal_margin"
+        android:paddingBottom="24dp">
+
+        <!-- 1. 返回（標題另起一行，實作者確認） -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/min_touch_target"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            app:contentInsetStart="0dp"
+            app:navigationContentDescription="@string/btn_back"
+            app:navigationIcon="@drawable/ic_back"
+            app:navigationIconTint="@color/color_on_surface_muted"
+            app:title="@string/btn_back"
+            app:titleTextAppearance="@style/TextAppearance.Hometide.Body"
+            app:titleTextColor="@color/color_on_surface_muted" />
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title_register"
+            android:textAppearance="@style/TextAppearance.Hometide.Display"
+            android:textColor="@color/color_on_background" />
+
+        <!-- 2. 註冊資料（空白票外框） -->
+        <com.group11.hometide.ui.widget.TicketView
+            android:id="@+id/tkForm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:ticketStyle="blank">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/ticket_padding">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:text="@string/label_register_form"
+                    android:textAppearance="@style/TextAppearance.Hometide.Caption.Large"
+                    android:textColor="@color/color_on_surface_muted" />
+
+                <!-- 3. 暱稱 -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/etNickname"
+                    style="@style/Widget.Hometide.TextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_nickname">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etNicknameInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:autofillHints="nickname"
+                        android:imeOptions="actionNext"
+                        android:inputType="textPersonName" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- 4. Email -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/etEmail"
+                    style="@style/Widget.Hometide.TextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/ticket_gap"
+                    android:hint="@string/hint_email">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etEmailInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:autofillHints="emailAddress"
+                        android:imeOptions="actionNext"
+                        android:inputType="textEmailAddress" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- 5. 密碼 -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/etPassword"
+                    style="@style/Widget.Hometide.TextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/ticket_gap"
+                    android:hint="@string/hint_password_min"
+                    app:endIconMode="password_toggle">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etPasswordInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:autofillHints="newPassword"
+                        android:imeOptions="actionNext"
+                        android:inputType="textPassword" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- 6. 確認密碼（TODO 第 7 週：不一致時 AN-16 抖動） -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/etConfirm"
+                    style="@style/Widget.Hometide.TextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/ticket_gap"
+                    android:hint="@string/hint_confirm"
+                    app:endIconMode="password_toggle">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etConfirmInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:autofillHints="newPassword"
+                        android:imeOptions="actionDone"
+                        android:inputType="textPassword" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- 7. 預設運具（Material 下拉，實作者確認） -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/spOperatorLayout"
+                    style="@style/Widget.Hometide.TextInputLayout.Dropdown"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/ticket_gap"
+                    android:hint="@string/hint_operator">
+
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/spOperator"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+        </com.group11.hometide.ui.widget.TicketView>
+
+        <!-- 8. 註冊並登入 -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRegister"
+            style="@style/Widget.Hometide.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/btn_register" />
+    </LinearLayout>
+</ScrollView>
