@@ -641,6 +641,11 @@ model: sonnet
 
 ### E-1 `GET /api/timetable?operator=TRA&from=1080&to=4220&date=2026-11-07`
 
+任務 3-2 實作補充：快取 2 小時，快取鍵含 operator、from、to、date。`operator`＝TRA／THSR；站碼須為 4 位數字、起訖不同，日期 `yyyy-MM-dd`，不合法回 404 `NOT_FOUND`。班次依出發時間排序。
+- 台鐵：`typeCode` 為 TDX `TrainTypeCode`（1 太魯閣、2 普悠瑪、3 自強、4 莒光、5 復興、6 區間、7 普快、10 區間快、11 自強3000），`typeName` 為簡稱；`reservedSeat` 依車種推定（1～5、11 對號）；`bikeAllowed` 取 `BikeFlag`；`line` 取 `TripLine`（0 不經山海線、1 山線、2 海線，同 7.1.4；App 只在 1、2 時顯示）。
+- 高鐵：`typeCode`＝`"THSR"`、`typeName`＝「高鐵」、`line`＝`null`、`reservedSeat`＝`true`、`bikeAllowed`＝`false`。
+- `durationMin` 跨午夜時加 24 小時。
+
 ```json
 {
   "updatedAt": 1762495500000,
@@ -650,7 +655,7 @@ model: sonnet
     "trips": [
       {
         "tripId": "139",
-        "typeCode": "1100", "typeName": "自強",
+        "typeCode": "3", "typeName": "自強",
         "line": 1,
         "departTime": "14:12", "arriveTime": "17:20", "durationMin": 188,
         "arriveEstimated": false,
@@ -685,10 +690,25 @@ model: sonnet
 
 ### E-3 `GET /api/live?operator=TRA&from=…&to=…`／`operator=BUS`
 
+任務 3-2 實作補充：快取 60 秒，只查臺灣時間的今天。台鐵以今天時刻的車次篩選 TDX `TrainLiveBoard`，只輸出對應得到的車次（對應不到視為準點）；高鐵沒有誤點資料，固定回 `{"items": []}`。
+
 ```json
 { "updatedAt": 1762495500000, "source": "TDX",
   "data": { "items": [ { "tripId": "143", "delayMin": 5 },
                        { "tripId": "1610-14:30", "etaMin": 25 } ] } }
+```
+
+### E-8 `GET /api/fare?operator=TRA&from=1000&to=4220`
+
+任務 3-2 新增。快取 7 天，快取鍵含 operator、from、to。每個車種一筆全票，App 以班次的 `typeCode` 對應。
+- 台鐵：取「單程（TicketType 1）＋全票（FareClass 1）＋標準座（CabinClass 1）」；同一車種有兩個方向（西部直達與繞東部環島）時取里程最短者。非對號車種（6、7、10）一律取區間車（6）價格；對號車種沒有票價時以自強（3）代替並設 `approximate: true`（App 顯示「約」）；都取不到的車種不輸出。
+- 高鐵：一筆 `typeCode: "THSR"`，取標準車廂全票。
+
+```json
+{ "updatedAt": 1762495500000, "source": "TDX",
+  "data": { "operator": "TRA",
+    "fares": [ { "typeCode": "3", "adultPrice": 891, "approximate": false },
+               { "typeCode": "6", "adultPrice": 574, "approximate": false } ] } }
 ```
 
 ### E-4 `GET /api/freeway/traffic?freeway=1&dir=S&from=<交流道>&to=<交流道>`

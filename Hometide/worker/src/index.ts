@@ -1,6 +1,6 @@
 // 路由（規格 6.5：index.ts 只做路由；回應格式見規格 8.3、GUIDE 附錄 E）
 
-import { handleStations } from "./rail";
+import { handleFare, handleLive, handleStations, handleTimetable } from "./rail";
 import { ApiError, errorResponse, json, type Env } from "./tdx";
 
 async function route(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
@@ -16,6 +16,12 @@ async function route(request: Request, env: Env, ctx: ExecutionContext): Promise
 
     case "/api/stations":
       return handleStations(url, env, ctx);
+    case "/api/timetable":
+      return handleTimetable(url, env, ctx);
+    case "/api/fare":
+      return handleFare(url, env, ctx);
+    case "/api/live":
+      return handleLive(url, env, ctx);
   }
   throw new ApiError("NOT_FOUND", "Not found");
 }
