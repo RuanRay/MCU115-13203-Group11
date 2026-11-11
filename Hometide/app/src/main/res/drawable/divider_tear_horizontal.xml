@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 水平撕線（虛線），用於直式車票造型的對話框 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="line">
+    <stroke
+        android:width="@dimen/tear_line_width"
+        android:color="@color/color_outline"
+        android:dashWidth="@dimen/tear_dash_length"
+        android:dashGap="@dimen/tear_dash_gap" />
+</shape>

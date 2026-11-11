@@ -1,30 +1,213 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 第 1 週臨時版面：只有跳轉 P3 的兩個按鈕；正式版面（插圖、輸入框、註冊）第 2 週依規格 4.2 實作 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- P1 登入頁（規格 4.2、login.png） -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:paddingHorizontal="@dimen/page_horizontal_margin">
+    android:fillViewport="true">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnLogin"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="@dimen/min_touch_target"
-        android:text="@string/btn_login"
-        android:textAppearance="@style/TextAppearance.Hometide.Button"
-        app:cornerRadius="@dimen/corner_control_large" />
+        android:orientation="vertical">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnGuest"
-        style="@style/Widget.Material3.Button.OutlinedButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/ticket_gap"
-        android:minHeight="@dimen/min_touch_target"
-        android:text="@string/btn_guest"
-        android:textAppearance="@style/TextAppearance.Hometide.Button"
-        app:cornerRadius="@dimen/corner_control_large" />
-</LinearLayout>
+        <!-- 1. 插圖：以 TicketView＋StampView 組成（實作者確認），深色模式隨色票切換 -->
+        <FrameLayout
+            android:id="@+id/ivHero"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/hero_height"
+            android:background="@color/color_surface_variant"
+            android:clipChildren="false"
+            android:importantForAccessibility="noHideDescendants">
+
+            <com.group11.hometide.ui.widget.TicketView
+                android:layout_width="@dimen/hero_back_ticket_width"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|top"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="24dp"
+                android:rotation="-8"
+                app:ticketStyle="paper">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:padding="@dimen/ticket_padding">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/hero_back_brand"
+                        android:textAppearance="@style/TextAppearance.Hometide.Caption.Large"
+                        android:textColor="@color/color_on_surface_muted" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/hero_back_route"
+                        android:textAppearance="@style/TextAppearance.Hometide.TicketRoute.Large"
+                        android:textColor="@color/color_on_background" />
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="@dimen/ticket_stub_min"
+                    android:layout_height="match_parent" />
+            </com.group11.hometide.ui.widget.TicketView>
+
+            <com.group11.hometide.ui.widget.TicketView
+                android:layout_width="@dimen/hero_front_ticket_width"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|top"
+                android:layout_marginTop="124dp"
+                android:layout_marginEnd="24dp"
+                android:rotation="3"
+                app:ticketStyle="main">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:padding="@dimen/ticket_padding">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:letterSpacing="0.2"
+                        android:text="@string/hero_front_brand"
+                        android:textAppearance="@style/TextAppearance.Hometide.Caption.Large"
+                        android:textColor="@color/color_on_primary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/hero_front_route"
+                        android:textAppearance="@style/TextAppearance.Hometide.TicketRoute.Large"
+                        android:textColor="@color/color_on_primary" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="@dimen/ticket_stub_min"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/hero_front_price"
+                    android:textAppearance="@style/TextAppearance.Hometide.TicketTime.Small"
+                    android:textColor="@color/color_accent" />
+            </com.group11.hometide.ui.widget.TicketView>
+
+            <com.group11.hometide.ui.widget.StampView
+                android:id="@+id/heroStamp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|bottom"
+                android:layout_marginEnd="24dp"
+                android:layout_marginBottom="36dp"
+                app:stampColor="red" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/page_horizontal_margin"
+            android:paddingTop="24dp"
+            android:paddingBottom="24dp">
+
+            <!-- 2. 標語 -->
+            <TextView
+                android:id="@+id/tvSlogan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:letterSpacing="0.1"
+                android:text="@string/slogan"
+                android:textAppearance="@style/TextAppearance.Hometide.Display"
+                android:textColor="@color/color_primary" />
+
+            <TextView
+                android:id="@+id/tvSloganSub"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center"
+                android:letterSpacing="0.15"
+                android:text="@string/slogan_sub"
+                android:textAppearance="@style/TextAppearance.Hometide.Caption.Large"
+                android:textColor="@color/color_on_surface_muted" />
+
+            <!-- 3. Email -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/etEmail"
+                style="@style/Widget.Hometide.TextInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:hint="@string/hint_email">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etEmailInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="emailAddress"
+                    android:imeOptions="actionNext"
+                    android:inputType="textEmailAddress" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- 4. 密碼 -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/etPassword"
+                style="@style/Widget.Hometide.TextInputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/ticket_gap"
+                android:hint="@string/hint_password"
+                app:endIconMode="password_toggle">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etPasswordInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="password"
+                    android:imeOptions="actionDone"
+                    android:inputType="textPassword" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- 5. 登入 -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnLogin"
+                style="@style/Widget.Hometide.Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/btn_login" />
+
+            <!-- 6. 先不登入 -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnGuest"
+                style="@style/Widget.Hometide.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/ticket_gap"
+                android:text="@string/btn_guest" />
+
+            <!-- 7. 註冊 -->
+            <TextView
+                android:id="@+id/tvRegister"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:minHeight="@dimen/min_touch_target"
+                android:paddingHorizontal="12dp"
+                android:text="@string/link_register"
+                android:textColor="@color/color_on_surface_muted"
+                tools:ignore="TouchTargetSizeCheck" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

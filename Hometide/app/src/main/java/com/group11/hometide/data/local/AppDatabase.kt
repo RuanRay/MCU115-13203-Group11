@@ -12,6 +12,7 @@ import com.group11.hometide.data.local.dao.ReminderDao
 import com.group11.hometide.data.local.dao.StationDao
 import com.group11.hometide.data.local.dao.TimetableDao
 import com.group11.hometide.data.local.dao.UsageDao
+import com.group11.hometide.data.local.dao.UserProfileDao
 import com.group11.hometide.data.local.entity.AiQueryLog
 import com.group11.hometide.data.local.entity.AppSession
 import com.group11.hometide.data.local.entity.DriveRoute
@@ -26,7 +27,7 @@ import com.group11.hometide.data.local.entity.TimetableCache
 import com.group11.hometide.data.local.entity.TripReminder
 import com.group11.hometide.data.local.entity.UserProfile
 
-/** 13 張表（7.1）。user_profile、search_history、fare_cache、ai_query_log 的 DAO 於使用到的任務再加。 */
+/** 13 張表（7.1）。search_history、fare_cache、ai_query_log 的 DAO 於使用到的任務再加。 */
 @Database(
     entities = [
         UserProfile::class, Station::class, SearchHistory::class, TimetableCache::class,
@@ -37,6 +38,7 @@ import com.group11.hometide.data.local.entity.UserProfile
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
+    abstract fun userProfileDao(): UserProfileDao
     abstract fun stationDao(): StationDao
     abstract fun timetableDao(): TimetableDao
     abstract fun favoriteDao(): FavoriteDao

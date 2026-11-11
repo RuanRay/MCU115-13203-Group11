@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 會員證右上角的裝飾圓環（profile.png） -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <stroke android:width="@dimen/member_card_ring_stroke" android:color="@color/color_on_surface_muted" />
+</shape>

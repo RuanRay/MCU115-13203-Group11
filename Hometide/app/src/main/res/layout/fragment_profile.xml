@@ -1,5 +1,122 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 第 1 週空版面：頁面內容依規格第 4 章於後續任務實作 -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- P6 個人（規格 4.8、profile.png）。2-2 只做會員證與登出；乘車紀錄、外觀、意見回饋於第 7 週 -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/page_horizontal_margin"
+        android:paddingTop="16dp"
+        android:paddingBottom="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title_profile"
+            android:textAppearance="@style/TextAppearance.Hometide.Display"
+            android:textColor="@color/color_on_background" />
+
+        <!-- 1. 乘車會員證 -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardMember"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="@color/color_primary"
+            app:cardCornerRadius="@dimen/corner_ticket"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp">
+
+            <View
+                android:layout_width="@dimen/member_card_ring_size"
+                android:layout_height="@dimen/member_card_ring_size"
+                android:layout_gravity="end|top"
+                android:layout_marginTop="-56dp"
+                android:layout_marginEnd="-56dp"
+                android:alpha="0.6"
+                android:background="@drawable/bg_member_ring"
+                android:importantForAccessibility="no" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:alpha="0.8"
+                    android:letterSpacing="0.2"
+                    android:text="@string/member_card_title"
+                    android:textAppearance="@style/TextAppearance.Hometide.Caption.Large"
+                    android:textColor="@color/color_on_primary" />
+
+                <!-- 會員 -->
+                <LinearLayout
+                    android:id="@+id/layoutMember"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvNickname"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:textAppearance="@style/TextAppearance.Hometide.Display"
+                        android:textColor="@color/color_on_primary" />
+
+                    <TextView
+                        android:id="@+id/tvEmail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:alpha="0.8"
+                        android:textColor="@color/color_on_primary" />
+
+                    <TextView
+                        android:id="@+id/tvDefaultOperator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:alpha="0.8"
+                        android:textColor="@color/color_on_primary" />
+                </LinearLayout>
+
+                <!-- 訪客：登入／註冊（FR-AUTH-04、06） -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnMemberLogin"
+                    style="@style/Widget.Hometide.Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/btn_member_login"
+                    android:textColor="@color/color_primary"
+                    android:visibility="gone"
+                    app:backgroundTint="@color/color_on_primary" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- TODO(第 7 週)：spRange、tvOpenCount、tvTotalTime、layoutPageBars、spTheme、btnFeedback -->
+
+        <!-- 7. 登出 -->
+        <TextView
+            android:id="@+id/btnLogout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="24dp"
+            android:background="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:minHeight="@dimen/min_touch_target"
+            android:paddingHorizontal="16dp"
+            android:text="@string/btn_logout"
+            android:textColor="@color/color_on_surface_muted"
+            android:visibility="gone" />
+    </LinearLayout>
+</ScrollView>

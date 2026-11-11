@@ -15,7 +15,65 @@
     <string name="channel_trip_reminder">出發提醒</string>
     <string name="channel_sync">資料同步</string>
 
+    <!-- 共用 -->
+    <string name="btn_back">返回</string>
+    <string name="btn_cancel">取消</string>
+    <string name="btn_confirm">確定</string>
+    <string name="operator_tra">台鐵</string>
+    <string name="operator_thsr">高鐵</string>
+    <string name="operator_bus">國道客運</string>
+
     <!-- P1 登入頁（規格 4.2） -->
     <string name="btn_login">登　入</string>
     <string name="btn_guest">先不登入，直接查詢</string>
+    <string name="slogan">回家的車，一鍵就到</string>
+    <string name="slogan_sub">歸潮 HOMETIDE・返鄉交通助手</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">密碼</string>
+    <string name="link_register">還沒有帳號？<b>註冊</b></string>
+    <!-- P1 插圖（ivHero）上的示意文字 -->
+    <string name="hero_back_brand">臺灣鐵路</string>
+    <string name="hero_back_route">臺北→臺南</string>
+    <string name="hero_front_brand">HOMETIDE</string>
+    <string name="hero_front_route">桃園→臺南</string>
+    <string name="hero_front_price">$739</string>
+    <string name="hero_stamp">%1$s\n桃園站</string>
+
+    <!-- P2 註冊頁（規格 4.3） -->
+    <string name="title_register">建立帳號</string>
+    <string name="label_register_form">註冊資料</string>
+    <string name="hint_nickname">暱稱</string>
+    <string name="hint_password_min">密碼（至少 6 碼）</string>
+    <string name="hint_confirm">確認密碼</string>
+    <string name="hint_operator">預設運具</string>
+    <string name="btn_register">註冊並登入</string>
+
+    <!-- 帳號驗證與錯誤（FR-AUTH-01、02；11.2） -->
+    <string name="error_nickname_required">請輸入暱稱</string>
+    <string name="error_nickname_too_long">暱稱最多 20 字</string>
+    <string name="error_email_required">請輸入 Email</string>
+    <string name="error_email_invalid">Email 格式不正確</string>
+    <string name="error_password_required">請輸入密碼</string>
+    <string name="error_password_length">密碼需為 6～32 字元</string>
+    <string name="error_password_mismatch">兩次輸入的密碼不一致</string>
+    <string name="error_email_in_use">此 Email 已註冊，請直接登入</string>
+    <string name="error_invalid_credentials">Email 或密碼不正確</string>
+    <string name="error_too_many_attempts">嘗試次數過多，請稍後再試</string>
+    <string name="error_network">無法連線，請檢查網路後再試</string>
+    <string name="error_unknown">發生錯誤，請稍後再試</string>
+
+    <!-- 登入提示對話框（FR-AUTH-06） -->
+    <string name="stamp_members_only">會員\n限定</string>
+    <string name="login_prompt_title">登入後就能收藏</string>
+    <string name="login_prompt_body">收藏路線、設定出發提醒都需要帳號，登入後資料也不會因換手機而消失。</string>
+    <string name="btn_later">稍後再說</string>
+    <string name="btn_go_login">去登入</string>
+
+    <!-- P6 個人（規格 4.8） -->
+    <string name="title_profile">個人</string>
+    <string name="member_card_title">HOMETIDE 乘車會員證</string>
+    <string name="member_default_operator">預設運具：%1$s</string>
+    <string name="btn_member_login">登入／註冊</string>
+    <string name="btn_logout">登出</string>
+    <string name="logout_confirm">確定要登出嗎？已設定的提醒會被取消</string>
 </resources>

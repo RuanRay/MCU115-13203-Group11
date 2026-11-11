@@ -8,4 +8,9 @@ sealed interface AppError {
     data object NotFound : AppError
     data object ParseError : AppError
     data object Unknown : AppError
+
+    // 11.2「Firebase 帳號錯誤」（FR-AUTH-01、02）
+    data object EmailInUse : AppError
+    data object InvalidCredentials : AppError
+    data object TooManyAttempts : AppError
 }
