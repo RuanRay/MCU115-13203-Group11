@@ -68,6 +68,26 @@ class DaoTest {
     }
 
     @Test
+    fun searchCursor_englishPrefixFirstAndLimit20() = runBlocking {
+        val dao = db.stationDao()
+        dao.upsertAll(
+            listOf(
+                Station(Operator.TRA, "1", "新臺南", "New Tainan", 1, 100),
+                Station(Operator.TRA, "2", "臺南", "Tainan", 9, 100),
+            ) + (10..40).map { Station(Operator.TRA, "$it", "南站$it", null, it, 100) },
+        )
+        fun names(k: String) = dao.searchCursor(Operator.TRA, k).use { c ->
+            buildList { while (c.moveToNext()) add(c.getString(c.getColumnIndexOrThrow("name_zh"))) }
+        }
+        // 前綴相符（臺南）排在只是包含（新臺南）前面，即使 sort_key 較大
+        assertEquals(listOf("臺南", "新臺南"), names("臺南"))
+        // 英文不分大小寫
+        assertEquals(listOf("臺南", "新臺南"), names("tainan"))
+        // 最多 20 筆
+        assertEquals(20, names("南").size)
+    }
+
+    @Test
     fun upsertAll_replacesAndLastUpdated() = runBlocking {
         val dao = db.stationDao()
         assertNull(dao.lastUpdated(Operator.TRA))
