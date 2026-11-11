@@ -63,6 +63,14 @@ describe("tdxGet", () => {
     expect(tokenCalls()).toHaveLength(1);
   });
 
+  it("Cache API 的 Token 損壞時重新換取", async () => {
+    const cache = await caches.open("tdx");
+    await cache.put("https://hometide-api.internal/tdx-token", new Response("{not json"));
+    fetchMock.mockImplementation(async (url: string) => (isToken(url) ? tokenRes("T") : Response.json({})));
+    await expect(tdxGet(env, "/a")).resolves.toEqual({});
+    expect(tokenCalls()).toHaveLength(1);
+  });
+
   it("加上 $format=JSON 與查詢參數", async () => {
     fetchMock.mockImplementation(async (url: string) => (isToken(url) ? tokenRes("T") : Response.json({})));
     await tdxGet(env, "/v2/Rail/THSR/Station", { $select: "StationID" });

@@ -11,6 +11,7 @@ import com.group11.hometide.data.remote.dto.StationDto
 import com.group11.hometide.util.AppError
 import com.group11.hometide.util.Result
 import com.group11.hometide.util.StationNameNormalizer
+import kotlin.coroutines.cancellation.CancellationException
 
 /** 車站、時刻、票價、即時（規格 6.1）。目前只有車站清單（FR-SRCH-02）。 */
 class TransitRepository(
@@ -25,7 +26,19 @@ class TransitRepository(
      * BUS 站牌於第 3 週 Worker 支援後再加。
      */
     suspend fun refreshStations(operator: Operator, force: Boolean = false): Result<Int> {
-        require(operator != Operator.BUS) { "BUS stations not supported yet" }
+        if (operator == Operator.BUS) return Result.Failure(AppError.NotFound)
+        // 6.3：Repository 回傳 Result，資料庫等例外不拋到呼叫端
+        return try {
+            download(operator, force)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Log.w(TAG, "Station refresh failed: $operator ${e.javaClass.simpleName}")
+            Result.Failure(AppError.Unknown)
+        }
+    }
+
+    private suspend fun download(operator: Operator, force: Boolean): Result<Int> {
         val last = stationDao.lastUpdated(operator)
         if (!force && last != null && now() - last < STATIONS_STALE_MS) return Result.Success(0)
 

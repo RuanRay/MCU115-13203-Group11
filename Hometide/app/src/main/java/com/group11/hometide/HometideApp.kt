@@ -5,6 +5,7 @@ import android.util.Log
 import com.group11.hometide.data.local.entity.Operator
 import com.group11.hometide.util.NotificationChannels
 import com.group11.hometide.util.Result
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -15,8 +16,11 @@ class HometideApp : Application() {
     lateinit var container: AppContainer
         private set
 
-    /** App 存活期間的背景工作 */
-    val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    /** App 存活期間的背景工作；未預期的例外只記 log，不讓 App 閃退 */
+    val appScope = CoroutineScope(
+        SupervisorJob() + Dispatchers.IO +
+            CoroutineExceptionHandler { _, e -> Log.e(TAG, "Background task failed: ${e.javaClass.simpleName}") },
+    )
 
     override fun onCreate() {
         super.onCreate()

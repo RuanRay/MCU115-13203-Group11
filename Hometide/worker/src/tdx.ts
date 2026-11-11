@@ -66,8 +66,9 @@ async function getToken(env: Env, forceRefresh: boolean): Promise<string> {
     if (memToken && memToken.expiresAt > now) return memToken.value;
     const hit = await cache.match(TOKEN_CACHE_KEY);
     if (hit) {
-      const t = (await hit.json()) as Token;
-      if (t.expiresAt > now) return (memToken = t).value;
+      // 快取內容損壞時當作沒命中，重新換 Token
+      const t = (await hit.json().catch(() => null)) as Token | null;
+      if (t && typeof t.value === "string" && t.expiresAt > now) return (memToken = t).value;
     }
   }
 

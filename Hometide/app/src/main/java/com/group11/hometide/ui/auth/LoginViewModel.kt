@@ -27,11 +27,12 @@ class LoginViewModel(private val repo: AuthRepository) : ViewModel() {
         viewModelScope.launch { _state.value = repo.login(trimmedEmail, password).toUiState() }
     }
 
-    /** FR-AUTH-04 */
-    fun enterGuest(onDone: () -> Unit) {
+    /** FR-AUTH-04：寫入訪客旗標後以 Success 通知畫面進 P3（不持有 Activity 回呼） */
+    fun enterGuest() {
+        if (_state.value == AuthUiState.Loading) return
         viewModelScope.launch {
             repo.enterGuest()
-            onDone()
+            _state.value = AuthUiState.Success
         }
     }
 

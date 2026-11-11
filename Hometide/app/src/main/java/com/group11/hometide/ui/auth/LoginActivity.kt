@@ -58,7 +58,7 @@ class LoginActivity : BaseActivity() {
         }
         binding.btnGuest.setOnClickListener {
             // 從對話框進來時本來就是訪客，直接回原頁
-            if (returnResult) finish() else vm.enterGuest(::goToSearch)
+            if (returnResult) finish() else vm.enterGuest()
         }
         binding.tvRegister.setOnClickListener {
             registerLauncher.launch(RegisterActivity.intent(this, returnResult))

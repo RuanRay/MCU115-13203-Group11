@@ -53,7 +53,7 @@ class AuthRepository(
 
     /** FR-AUTH-01：Auth 成功即算註冊成功；本機與 Firestore 寫入失敗不影響（Firestore 離線時 SDK 排隊重送） */
     suspend fun register(nickname: String, email: String, password: String, operator: Operator): Result<UserProfile> =
-        runAuth {
+        runAuth(isRegister = true) {
             val uid = requireNotNull(auth.createUserWithEmailAndPassword(email, password).await().user).uid
             val profile = UserProfile(uid, email, nickname, operator, System.currentTimeMillis())
             userDoc(uid).set(profile.toFirestore())
@@ -106,9 +106,10 @@ class AuthRepository(
     /** FR-AUTH-05：本地收藏與紀錄保留（以 uid 區分） */
     suspend fun logout() {
         // TODO(第 5 週，FR-AUTH-05)：取消該使用者所有 SCHEDULED 提醒的 AlarmManager 排程（ReminderScheduler）
-        auth.signOut()
+        // 先清本地旗標再登出 Firebase：中途被取消時頂多是「旗標已清、仍登入」，重開 App 仍是一致狀態
         settings.setLoggedIn(false)
         settings.setGuestMode(false)
+        auth.signOut()
     }
 
     private suspend fun markLoggedIn() {
@@ -118,19 +119,21 @@ class AuthRepository(
 
     private fun userDoc(uid: String) = firestore.collection("users").document(uid)
 
-    private inline fun <T> runAuth(block: () -> T): Result<T> = try {
+    private inline fun <T> runAuth(isRegister: Boolean = false, block: () -> T): Result<T> = try {
         Result.Success(block())
     } catch (e: CancellationException) {
         throw e
     } catch (e: Exception) {
-        Result.Failure(e.toAppError())
+        Result.Failure(e.toAppError(isRegister))
     }
 
-    private fun Exception.toAppError(): AppError = when (this) {
-        is FirebaseAuthUserCollisionException -> AppError.EmailInUse
-        is FirebaseAuthInvalidCredentialsException, is FirebaseAuthInvalidUserException -> AppError.InvalidCredentials
-        is FirebaseTooManyRequestsException -> AppError.TooManyAttempts
-        is FirebaseNetworkException -> AppError.NetworkError
+    /** 「Email 或密碼不正確」只用於登入；註冊時的同類例外（格式已在本機驗證過）視為未知錯誤 */
+    private fun Exception.toAppError(isRegister: Boolean): AppError = when {
+        this is FirebaseAuthUserCollisionException -> AppError.EmailInUse
+        !isRegister && (this is FirebaseAuthInvalidCredentialsException || this is FirebaseAuthInvalidUserException) ->
+            AppError.InvalidCredentials
+        this is FirebaseTooManyRequestsException -> AppError.TooManyAttempts
+        this is FirebaseNetworkException -> AppError.NetworkError
         else -> AppError.Unknown.also { Log.w(TAG, "Auth failed: ${javaClass.simpleName}") }
     }
 

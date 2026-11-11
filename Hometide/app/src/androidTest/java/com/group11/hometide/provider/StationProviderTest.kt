@@ -13,7 +13,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * TC-06 端到端：從正式 Worker 下載台鐵車站 → 經 StationProvider 查「台南」→ 出現「臺南」。
+ * 【整合測試】TC-06 端到端：從正式 Worker 下載台鐵車站 → 經 StationProvider 查「台南」→ 出現「臺南」。
+ * 會連到正式 Worker 並寫入 App 的資料庫（與 App 啟動時的背景下載相同），網路不穩時可能失敗。
  * 需要網路與 local.properties 的 WORKER_BASE_URL。
  */
 @RunWith(AndroidJUnit4::class)

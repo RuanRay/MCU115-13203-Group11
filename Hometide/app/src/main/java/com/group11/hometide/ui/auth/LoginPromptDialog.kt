@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Dialog
 import android.graphics.Color
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.Window
 import androidx.activity.result.contract.ActivityResultContracts
@@ -23,7 +24,7 @@ import com.group11.hometide.databinding.DialogLoginPromptBinding
 class LoginPromptDialog : DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val binding = DialogLoginPromptBinding.inflate(layoutInflater)
+        val binding = DialogLoginPromptBinding.inflate(LayoutInflater.from(requireContext()))
         binding.btnLater.setOnClickListener { dismiss() }
         binding.btnGoLogin.setOnClickListener {
             setFragmentResult(REQUEST_KEY, Bundle.EMPTY)
