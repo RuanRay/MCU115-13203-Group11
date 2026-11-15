@@ -16,7 +16,6 @@ const DATE = /^\d{4}-\d{2}-\d{2}$/;
 /** 驗證 operator、from、to（台鐵、高鐵站碼皆為 4 位數字）；不合法一律 NOT_FOUND（錯誤代碼表沒有參數錯誤） */
 function railQuery(url: URL): { op: RailOperator; from: string; to: string } {
   const op = url.searchParams.get("operator");
-  if (op === "BUS") throw new ApiError("NOT_FOUND", "BUS not supported yet");
   if (op !== "TRA" && op !== "THSR") throw new ApiError("NOT_FOUND", "Unknown operator");
   const from = url.searchParams.get("from") ?? "";
   const to = url.searchParams.get("to") ?? "";

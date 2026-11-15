@@ -1,12 +1,13 @@
 // 路由（規格 6.5：index.ts 只做路由；回應格式見規格 8.3、GUIDE 附錄 E）
 
-import { handleBusStations } from "./bus";
+import { handleBusFare, handleBusLive, handleBusStations, handleBusTimetable } from "./bus";
 import { handleFare, handleLive, handleStations, handleTimetable } from "./rail";
 import { ApiError, errorResponse, json, type Env } from "./tdx";
 
 async function route(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   const url = new URL(request.url);
   if (request.method !== "GET") throw new ApiError("NOT_FOUND", "Not found");
+  const bus = url.searchParams.get("operator") === "BUS"; // 國道客運見 bus.ts，其餘見 rail.ts
 
   switch (url.pathname) {
     case "/api/health":
@@ -16,13 +17,13 @@ async function route(request: Request, env: Env, ctx: ExecutionContext): Promise
       });
 
     case "/api/stations":
-      return url.searchParams.get("operator") === "BUS" ? handleBusStations(env, ctx) : handleStations(url, env, ctx);
+      return bus ? handleBusStations(env, ctx) : handleStations(url, env, ctx);
     case "/api/timetable":
-      return handleTimetable(url, env, ctx);
+      return bus ? handleBusTimetable(url, env, ctx) : handleTimetable(url, env, ctx);
     case "/api/fare":
-      return handleFare(url, env, ctx);
+      return bus ? handleBusFare(url, env, ctx) : handleFare(url, env, ctx);
     case "/api/live":
-      return handleLive(url, env, ctx);
+      return bus ? handleBusLive(url, env, ctx) : handleLive(url, env, ctx);
   }
   throw new ApiError("NOT_FOUND", "Not found");
 }
