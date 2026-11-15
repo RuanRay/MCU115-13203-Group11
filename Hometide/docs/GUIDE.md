@@ -670,6 +670,11 @@ model: sonnet
 
 ### E-2 `GET /api/timetable?operator=BUS&from=<站牌代碼>&to=<站牌代碼>&date=…`
 
+任務 3-4 實作補充：`from`／`to` 為站名（E-7 BUS 的 `id`，需 URL 編碼）；站名不在索引、起訖相同、日期不合法回 404 `NOT_FOUND`；有站但沒有路線回空 `trips`。快取 2 小時。
+- 以 KV 索引找出「起站可上車、迄站可下車且順序正確」的路線，再以一次 TDX `Schedule`（`$filter` 路線名）取班表；依 `ServiceDay` 過濾當天星期，在每班的站序中以站名找起訖。
+- `tripId`＝`<路線號>-<起站發車 HH:mm>`，同一路線同一發車時間只輸出一筆；`typeCode`＝路線號；`typeName`＝業者**全名**（例：「統聯客運」，實作者確認不簡稱；聯營取第一家）；`line`＝`null`；`reservedSeat`、`bikeAllowed`＝`false`。
+- 抵達時間優先用班表；缺值時以同路線其他班次的平均行車時間推算並設 `arriveEstimated: true`。班次依出發時間排序。
+
 ```json
 {
   "updatedAt": 1762495500000,
@@ -679,7 +684,7 @@ model: sonnet
     "trips": [
       {
         "tripId": "1610-14:30",
-        "typeCode": "1610", "typeName": "統聯",
+        "typeCode": "1610", "typeName": "統聯客運",
         "line": null,
         "departTime": "14:30", "arriveTime": "18:40", "durationMin": 250,
         "arriveEstimated": true,
@@ -694,6 +699,8 @@ model: sonnet
 
 任務 3-2 實作補充：快取 60 秒，只查臺灣時間的今天。台鐵以今天時刻的車次篩選 TDX `TrainLiveBoard`，只輸出對應得到的車次（對應不到視為準點）；高鐵沒有誤點資料，固定回 `{"items": []}`。
 
+任務 3-4 實作補充（BUS）：共用今天的時刻快取，再查一次 TDX `EstimatedTimeOfArrival`（`$filter` 路線名）。只用起站、`StopStatus` 0 且有 `EstimateTime` 的資料；在**同一子路線**的班次中，指派給表定發車最接近「現在＋預估」且相差 ≤ 60 分鐘的那一班（實作者確認的「子路線＋時間最近」方案）。`etaMin`＝`ceil(EstimateTime/60)`。沒有對應的班次不輸出（App 顯示「依班表」）。
+
 ```json
 { "updatedAt": 1762495500000, "source": "TDX",
   "data": { "items": [ { "tripId": "143", "delayMin": 5 },
@@ -703,6 +710,7 @@ model: sonnet
 ### E-8 `GET /api/fare?operator=TRA&from=1000&to=4220`
 
 任務 3-2 新增。快取 7 天，快取鍵含 operator、from、to。每個車種一筆全票，App 以班次的 `typeCode` 對應。
+- 國道客運（任務 3-4）：`route` **可省略**（實作者確認；省略時回傳所有經過兩站的路線，帶 `route` 時只回該路線），每條路線一筆，`typeCode`＝路線號。TDX `RouteFare` 為分段計價：起站往前找最近的分段起點、迄站往後找最近的分段終點（分段吸附）；只收名稱以「全票_」開頭的票種，有「優惠」價時取最低優惠價，否則取原價／不分時段的最低價。吸附或取優惠價時 `approximate: true`。對不到分段的路線不輸出（App 顯示「—」）。
 - 台鐵：取「單程（TicketType 1）＋全票（FareClass 1）＋標準座（CabinClass 1）」；同一車種有兩個方向（西部直達與繞東部環島）時取里程最短者。非對號車種（6、7、10）一律取區間車（6）價格；對號車種沒有票價時以自強（3）代替並設 `approximate: true`（App 顯示「約」）；都取不到的車種不輸出。
 - 高鐵：一筆 `typeCode: "THSR"`，取標準車廂全票。
 

@@ -40,9 +40,9 @@ export interface BusStation {
   sortKey: number;
 }
 
-/** 子路線（SubRouteUID）→ 路線資訊；站名 → 經過的 [SubRouteUID, StopSequence, StopBoarding] */
+/** 子路線（SubRouteUID）→ 路線資訊與依站序排列的 [站名, StopBoarding]；站名 → 經過的 [SubRouteUID, StopSequence, StopBoarding] */
 export interface BusIndex {
-  routes: Record<string, { route: string; direction: number; operators: string[] }>;
+  routes: Record<string, { route: string; direction: number; operators: string[]; stops: [string, number][] }>;
   stops: Record<string, [string, number, number][]>;
 }
 
@@ -58,12 +58,14 @@ export function buildIndex(routes: TdxRoute[], stopOfRoutes: TdxStopOfRoute[]): 
     const sub = sr.SubRouteUID;
     const route = sr.RouteName?.Zh_tw;
     if (!national.has(sr.RouteUID) || !sub || !route || !sr.Stops?.length) continue;
+    const ordered: [string, number][] = [];
     index.routes[sub] = {
       route,
       direction: sr.Direction ?? 0,
       operators: (sr.Operators ?? []).map((o) => o.OperatorName?.Zh_tw).filter((n): n is string => !!n),
+      stops: ordered,
     };
-    for (const s of sr.Stops) {
+    for (const s of [...sr.Stops].sort((a, b) => (a.StopSequence ?? 0) - (b.StopSequence ?? 0))) {
       const raw = s.StopName?.Zh_tw?.trim();
       if (!raw || typeof s.StopSequence !== "number") continue;
       const name = zh(raw);
@@ -73,6 +75,7 @@ export function buildIndex(routes: TdxRoute[], stopOfRoutes: TdxStopOfRoute[]): 
         stations.set(name, { id: name, nameZh: name, nameEn: s.StopName?.En?.trim() || null, city, sortKey: stations.size });
       }
       (index.stops[name] ??= []).push([sub, s.StopSequence, s.StopBoarding ?? 0]);
+      ordered.push([name, s.StopBoarding ?? 0]);
     }
   }
   return { stations: [...stations.values()], index };

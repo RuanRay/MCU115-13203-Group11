@@ -203,7 +203,7 @@ describe("端點", () => {
     "/api/timetable?operator=TRA&from=100&to=4220&date=2026-11-12",
     "/api/timetable?operator=TRA&from=1000&to=1000&date=2026-11-12",
     "/api/fare?operator=XYZ&from=1000&to=4220",
-    "/api/live?operator=BUS&from=1000&to=4220",
+    "/api/live?operator=XYZ&from=1000&to=4220",
   ])("參數不合法回 404 且不呼叫 TDX：%s", async (path) => {
     const { res, body } = await get(path);
     expect(res.status).toBe(404);
