@@ -768,7 +768,7 @@ model: sonnet
 
 `.github/workflows/build-index.yml`。以下為範例，Wrangler 指令旗標以實作當時的官方文件為準。
 
-> 任務 3-3 實作：實際檔案為 `.github/workflows/build-bus-index.yml`（Node 24 直接執行 TS，以 KV bulk REST API 寫入）。Repository Secrets 名稱為 `TDX_CLIENT_ID`、`TDX_CLIENT_SECRET`、`CF_API_TOKEN`、`CF_ACCOUNT_ID`，以實作為準。GitHub 會自動停用 60 天沒有 repo 活動的排程 workflow，停用後到 Actions 頁面手動重新啟用。
+> 任務 3-3 實作：實際檔案為 repo 根目錄（`AndroidStudioProjects/`）的 `.github/workflows/build-bus-index.yml`（Node 24 直接執行 TS，以 KV bulk REST API 寫入）。Repository Secrets 名稱為 `TDX_CLIENT_ID`、`TDX_CLIENT_SECRET`、`CF_API_TOKEN`、`CF_ACCOUNT_ID`，以實作為準。GitHub 會自動停用 60 天沒有 repo 活動的排程 workflow，停用後到 Actions 頁面手動重新啟用。
 
 ```yaml
 name: build-bus-index

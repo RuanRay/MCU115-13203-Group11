@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 10
     defaults:
       run:
-        working-directory: worker
+        working-directory: Hometide/worker
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
