@@ -97,10 +97,9 @@ export async function handleLive(url: URL, env: Env, ctx: ExecutionContext): Pro
   });
 }
 
-/** GET /api/stations?operator=TRA|THSR（附錄 E-7）；BUS 站牌於第 3 週接客運路線索引 */
+/** GET /api/stations?operator=TRA|THSR（附錄 E-7）；BUS 見 bus.ts */
 export async function handleStations(url: URL, env: Env, ctx: ExecutionContext): Promise<Response> {
   const op = url.searchParams.get("operator");
-  if (op === "BUS") throw new ApiError("NOT_FOUND", "BUS stations not supported yet");
   if (op !== "TRA" && op !== "THSR") throw new ApiError("NOT_FOUND", "Unknown operator");
   return cached(`/api/stations?operator=${op}`, STATIONS_TTL_S, ctx, () => stations(env, op));
 }

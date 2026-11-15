@@ -4,6 +4,7 @@
 export interface Env {
   TDX_CLIENT_ID: string;
   TDX_CLIENT_SECRET: string;
+  BUS_INDEX: KVNamespace; // 客運路線索引（8.6）
 }
 
 export type ErrorCode = "NETWORK" | "AUTH" | "QUOTA" | "NOT_FOUND" | "PARSE" | "UNKNOWN";

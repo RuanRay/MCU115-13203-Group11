@@ -79,7 +79,7 @@ describe("GET /api/stations", () => {
     expect(res.headers.get("X-Cache")).toBe("MISS");
   });
 
-  it.each(["BUS", "XYZ", ""])("operator=%s 回 404 NOT_FOUND，不呼叫 TDX", async (op) => {
+  it.each(["XYZ", ""])("operator=%s 回 404 NOT_FOUND，不呼叫 TDX", async (op) => {
     const res = await get(`/api/stations?operator=${op}`);
     expect(res.status).toBe(404);
     expect(((await res.json()) as { error: { code: string } }).error.code).toBe("NOT_FOUND");

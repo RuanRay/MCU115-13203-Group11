@@ -624,7 +624,7 @@ model: sonnet
 
 ### E-7 `GET /api/stations?operator=TRA`
 
-車站清單（任務 2-3；`operator`＝TRA／THSR，BUS 第 3 週接客運路線索引後提供，目前回 404 `NOT_FOUND`）。快取 7 天，快取鍵只含 `operator`。`nameZh`、`city` 已把「台」轉成「臺」；`sortKey` 為 TDX 回傳順序；`nameEn`、`city` 可能為 `null`；`updatedAt` 為 Worker 向 TDX 取得資料的時間。
+車站清單（任務 2-3；`operator`＝TRA／THSR／BUS）。快取 7 天，快取鍵只含 `operator`。`nameZh`、`city` 已把「台」轉成「臺」；`sortKey` 為 TDX 回傳順序；`nameEn`、`city` 可能為 `null`；`updatedAt` 為 Worker 向 TDX 取得資料的時間。
 
 ```json
 {
@@ -638,6 +638,8 @@ model: sonnet
   }
 }
 ```
+
+任務 3-3 實作補充（BUS）：只收國道客運（TDX `BusRouteType` 13）。站牌清單以站名去重，**`id` 即站名**（例：`"臺北轉運站"`，3-4 的 `from`／`to` 也傳站名）；`city` 由 TDX `LocationCityCode` 對應；`sortKey` 為索引中首次出現的順序。資料由 `worker/scripts/build-index.ts`（GitHub Actions 每日）寫入 KV `BUS_INDEX` 的 `bus:stations`，Worker 只讀取；索引尚未建立時回 404 `NOT_FOUND`。同時寫入的 `bus:index` 供 3-4 使用：`routes`（子路線 → 路線名、方向、業者）、`stops`（站名 → `[子路線, 站序, StopBoarding]`）。
 
 ### E-1 `GET /api/timetable?operator=TRA&from=1080&to=4220&date=2026-11-07`
 
@@ -765,6 +767,8 @@ model: sonnet
 ## 附錄 F：GitHub Actions 範例（客運路線索引）
 
 `.github/workflows/build-index.yml`。以下為範例，Wrangler 指令旗標以實作當時的官方文件為準。
+
+> 任務 3-3 實作：實際檔案為 `.github/workflows/build-bus-index.yml`（Node 24 直接執行 TS，以 KV bulk REST API 寫入）。Repository Secrets 名稱為 `TDX_CLIENT_ID`、`TDX_CLIENT_SECRET`、`CF_API_TOKEN`、`CF_ACCOUNT_ID`，以實作為準。GitHub 會自動停用 60 天沒有 repo 活動的排程 workflow，停用後到 Actions 頁面手動重新啟用。
 
 ```yaml
 name: build-bus-index
