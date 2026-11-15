@@ -1,0 +1,524 @@
+[
+  {
+    "RouteUID": "THB1610",
+    "RouteID": "1610",
+    "RouteName": {
+      "Zh_tw": "1610",
+      "En": "1610"
+    },
+    "SubRouteUID": "THB1610A1",
+    "SubRouteID": "1610A1",
+    "SubRouteName": {
+      "Zh_tw": "1610A",
+      "En": "1610A"
+    },
+    "Direction": 0,
+    "OperatorID": "34",
+    "OperatorCode": "UnitedHighwayBus",
+    "OperatorNo": "1201",
+    "Timetables": [
+      {
+        "TripID": "1",
+        "IsLowFloor": false,
+        "ServiceDay": {
+          "Sunday": 1,
+          "Monday": 1,
+          "Tuesday": 1,
+          "Wednesday": 1,
+          "Thursday": 1,
+          "Friday": 1,
+          "Saturday": 1
+        },
+        "StopTimes": [
+          {
+            "StopSequence": 1,
+            "StopUID": "THB289792",
+            "StopID": "289792",
+            "StopName": {
+              "Zh_tw": "臺北轉運站",
+              "En": "Taipei Bus Station"
+            },
+            "ArrivalTime": "00:30",
+            "DepartureTime": "00:30"
+          },
+          {
+            "StopSequence": 2,
+            "StopUID": "THB267760",
+            "StopID": "267760",
+            "StopName": {
+              "Zh_tw": "重陽站",
+              "En": "Chongyang Station"
+            },
+            "ArrivalTime": "00:41",
+            "DepartureTime": "00:41"
+          },
+          {
+            "StopSequence": 3,
+            "StopUID": "THB310063",
+            "StopID": "310063",
+            "StopName": {
+              "Zh_tw": "經國轉運站",
+              "En": "Jing Guo Bus Station"
+            },
+            "ArrivalTime": "01:05",
+            "DepartureTime": "01:05"
+          },
+          {
+            "StopSequence": 4,
+            "StopUID": "THB301900",
+            "StopID": "301900",
+            "StopName": {
+              "Zh_tw": "中壢服務區",
+              "En": "Zhongli Service Area"
+            },
+            "ArrivalTime": "01:16",
+            "DepartureTime": "01:16"
+          },
+          {
+            "StopSequence": 5,
+            "StopUID": "THB266076",
+            "StopID": "266076",
+            "StopName": {
+              "Zh_tw": "中港轉運站",
+              "En": "Zhonggang Bus Station"
+            },
+            "ArrivalTime": "02:40",
+            "DepartureTime": "02:40"
+          },
+          {
+            "StopSequence": 6,
+            "StopUID": "THB266161",
+            "StopID": "266161",
+            "StopName": {
+              "Zh_tw": "岡山站",
+              "En": "Gangshan Station"
+            },
+            "ArrivalTime": "04:40",
+            "DepartureTime": "04:40"
+          },
+          {
+            "StopSequence": 7,
+            "StopUID": "THB268482",
+            "StopID": "268482",
+            "StopName": {
+              "Zh_tw": "楠梓站",
+              "En": "Nanzi"
+            },
+            "ArrivalTime": "04:49",
+            "DepartureTime": "04:49"
+          },
+          {
+            "StopSequence": 8,
+            "StopUID": "THB310062",
+            "StopID": "310062",
+            "StopName": {
+              "Zh_tw": "捷運苓雅運動園區站",
+              "En": "MRT Lingya Sports Park Station"
+            },
+            "ArrivalTime": "04:59",
+            "DepartureTime": "04:59"
+          },
+          {
+            "StopSequence": 9,
+            "StopUID": "THB305496",
+            "StopID": "305496",
+            "StopName": {
+              "Zh_tw": "大順三路口",
+              "En": "Dashun 3 rd. Intersection"
+            },
+            "ArrivalTime": "05:02",
+            "DepartureTime": "05:02"
+          },
+          {
+            "StopSequence": 10,
+            "StopUID": "THB308696",
+            "StopID": "308696",
+            "StopName": {
+              "Zh_tw": "建國客運站",
+              "En": "TRA Kaohsiung Station"
+            },
+            "ArrivalTime": "05:10",
+            "DepartureTime": "05:10"
+          }
+        ]
+      },
+      {
+        "TripID": "10",
+        "IsLowFloor": false,
+        "ServiceDay": {
+          "Sunday": 1,
+          "Monday": 1,
+          "Tuesday": 1,
+          "Wednesday": 1,
+          "Thursday": 1,
+          "Friday": 1,
+          "Saturday": 1
+        },
+        "StopTimes": [
+          {
+            "StopSequence": 1,
+            "StopUID": "THB289792",
+            "StopID": "289792",
+            "StopName": {
+              "Zh_tw": "臺北轉運站",
+              "En": "Taipei Bus Station"
+            },
+            "ArrivalTime": "09:30",
+            "DepartureTime": "09:30"
+          },
+          {
+            "StopSequence": 2,
+            "StopUID": "THB267760",
+            "StopID": "267760",
+            "StopName": {
+              "Zh_tw": "重陽站",
+              "En": "Chongyang Station"
+            },
+            "ArrivalTime": "09:44",
+            "DepartureTime": "09:44"
+          },
+          {
+            "StopSequence": 3,
+            "StopUID": "THB310063",
+            "StopID": "310063",
+            "StopName": {
+              "Zh_tw": "經國轉運站",
+              "En": "Jing Guo Bus Station"
+            },
+            "ArrivalTime": "10:12",
+            "DepartureTime": "10:12"
+          },
+          {
+            "StopSequence": 4,
+            "StopUID": "THB301900",
+            "StopID": "301900",
+            "StopName": {
+              "Zh_tw": "中壢服務區",
+              "En": "Zhongli Service Area"
+            },
+            "ArrivalTime": "10:27",
+            "DepartureTime": "10:27"
+          },
+          {
+            "StopSequence": 5,
+            "StopUID": "THB266076",
+            "StopID": "266076",
+            "StopName": {
+              "Zh_tw": "中港轉運站",
+              "En": "Zhonggang Bus Station"
+            },
+            "ArrivalTime": "12:10",
+            "DepartureTime": "12:10"
+          },
+          {
+            "StopSequence": 6,
+            "StopUID": "THB266161",
+            "StopID": "266161",
+            "StopName": {
+              "Zh_tw": "岡山站",
+              "En": "Gangshan Station"
+            },
+            "ArrivalTime": "14:22",
+            "DepartureTime": "14:22"
+          },
+          {
+            "StopSequence": 7,
+            "StopUID": "THB268482",
+            "StopID": "268482",
+            "StopName": {
+              "Zh_tw": "楠梓站",
+              "En": "Nanzi"
+            },
+            "ArrivalTime": "14:36",
+            "DepartureTime": "14:36"
+          },
+          {
+            "StopSequence": 8,
+            "StopUID": "THB310062",
+            "StopID": "310062",
+            "StopName": {
+              "Zh_tw": "捷運苓雅運動園區站",
+              "En": "MRT Lingya Sports Park Station"
+            },
+            "ArrivalTime": "14:49",
+            "DepartureTime": "14:49"
+          },
+          {
+            "StopSequence": 9,
+            "StopUID": "THB305496",
+            "StopID": "305496",
+            "StopName": {
+              "Zh_tw": "大順三路口",
+              "En": "Dashun 3 rd. Intersection"
+            },
+            "ArrivalTime": "14:53",
+            "DepartureTime": "14:53"
+          },
+          {
+            "StopSequence": 10,
+            "StopUID": "THB308696",
+            "StopID": "308696",
+            "StopName": {
+              "Zh_tw": "建國客運站",
+              "En": "TRA Kaohsiung Station"
+            },
+            "ArrivalTime": "15:03",
+            "DepartureTime": "15:03"
+          }
+        ]
+      }
+    ],
+    "UpdateTime": "2026-11-11T22:37:05+08:00",
+    "VersionID": 8000
+  },
+  {
+    "RouteUID": "THB1610",
+    "RouteID": "1610",
+    "RouteName": {
+      "Zh_tw": "1610",
+      "En": "1610"
+    },
+    "SubRouteUID": "THB1610A2",
+    "SubRouteID": "1610A2",
+    "SubRouteName": {
+      "Zh_tw": "1610A",
+      "En": "1610A"
+    },
+    "Direction": 1,
+    "OperatorID": "34",
+    "OperatorCode": "UnitedHighwayBus",
+    "OperatorNo": "1201",
+    "Timetables": [
+      {
+        "TripID": "1",
+        "IsLowFloor": false,
+        "ServiceDay": {
+          "Sunday": 1,
+          "Monday": 1,
+          "Tuesday": 1,
+          "Wednesday": 1,
+          "Thursday": 1,
+          "Friday": 1,
+          "Saturday": 1
+        },
+        "StopTimes": [
+          {
+            "StopSequence": 1,
+            "StopUID": "THB266029",
+            "StopID": "266029",
+            "StopName": {
+              "Zh_tw": "建國客運站",
+              "En": "Jianguo Station"
+            },
+            "ArrivalTime": "07:40",
+            "DepartureTime": "07:40"
+          },
+          {
+            "StopSequence": 2,
+            "StopUID": "THB290823",
+            "StopID": "290823",
+            "StopName": {
+              "Zh_tw": "中正站",
+              "En": "JhongJheng Station"
+            },
+            "ArrivalTime": "07:51",
+            "DepartureTime": "07:51"
+          },
+          {
+            "StopSequence": 3,
+            "StopUID": "THB268481",
+            "StopID": "268481",
+            "StopName": {
+              "Zh_tw": "楠梓站",
+              "En": "Nanzi Station"
+            },
+            "ArrivalTime": "08:12",
+            "DepartureTime": "08:12"
+          },
+          {
+            "StopSequence": 4,
+            "StopUID": "THB266161",
+            "StopID": "266161",
+            "StopName": {
+              "Zh_tw": "岡山站",
+              "En": "Gangshan Station"
+            },
+            "ArrivalTime": "08:28",
+            "DepartureTime": "08:28"
+          },
+          {
+            "StopSequence": 5,
+            "StopUID": "THB266076",
+            "StopID": "266076",
+            "StopName": {
+              "Zh_tw": "中港轉運站",
+              "En": "Zhonggang Bus Station"
+            },
+            "ArrivalTime": "10:35",
+            "DepartureTime": "10:35"
+          },
+          {
+            "StopSequence": 6,
+            "StopUID": "THB301900",
+            "StopID": "301900",
+            "StopName": {
+              "Zh_tw": "中壢服務區",
+              "En": "Zhongli Service Area"
+            },
+            "ArrivalTime": "12:16",
+            "DepartureTime": "12:16"
+          },
+          {
+            "StopSequence": 7,
+            "StopUID": "THB310063",
+            "StopID": "310063",
+            "StopName": {
+              "Zh_tw": "經國轉運站",
+              "En": "Jing Guo Bus Station"
+            },
+            "ArrivalTime": "12:23",
+            "DepartureTime": "12:23"
+          },
+          {
+            "StopSequence": 8,
+            "StopUID": "THB267759",
+            "StopID": "267759",
+            "StopName": {
+              "Zh_tw": "重陽站",
+              "En": "Chongyang Station"
+            },
+            "ArrivalTime": "12:49",
+            "DepartureTime": "12:49"
+          },
+          {
+            "StopSequence": 9,
+            "StopUID": "THB289792",
+            "StopID": "289792",
+            "StopName": {
+              "Zh_tw": "臺北轉運站",
+              "En": "Taipei Bus Station"
+            },
+            "ArrivalTime": "13:09",
+            "DepartureTime": "13:09"
+          }
+        ]
+      },
+      {
+        "TripID": "10",
+        "IsLowFloor": false,
+        "ServiceDay": {
+          "Sunday": 0,
+          "Monday": 0,
+          "Tuesday": 0,
+          "Wednesday": 0,
+          "Thursday": 0,
+          "Friday": 1,
+          "Saturday": 0
+        },
+        "StopTimes": [
+          {
+            "StopSequence": 1,
+            "StopUID": "THB266029",
+            "StopID": "266029",
+            "StopName": {
+              "Zh_tw": "建國客運站",
+              "En": "Jianguo Station"
+            },
+            "ArrivalTime": "16:40",
+            "DepartureTime": "16:40"
+          },
+          {
+            "StopSequence": 2,
+            "StopUID": "THB290823",
+            "StopID": "290823",
+            "StopName": {
+              "Zh_tw": "中正站",
+              "En": "JhongJheng Station"
+            },
+            "ArrivalTime": "16:54",
+            "DepartureTime": "16:54"
+          },
+          {
+            "StopSequence": 3,
+            "StopUID": "THB268481",
+            "StopID": "268481",
+            "StopName": {
+              "Zh_tw": "楠梓站",
+              "En": "Nanzi Station"
+            },
+            "ArrivalTime": "17:12",
+            "DepartureTime": "17:12"
+          },
+          {
+            "StopSequence": 4,
+            "StopUID": "THB266161",
+            "StopID": "266161",
+            "StopName": {
+              "Zh_tw": "岡山站",
+              "En": "Gangshan Station"
+            },
+            "ArrivalTime": "17:27",
+            "DepartureTime": "17:27"
+          },
+          {
+            "StopSequence": 5,
+            "StopUID": "THB266076",
+            "StopID": "266076",
+            "StopName": {
+              "Zh_tw": "中港轉運站",
+              "En": "Zhonggang Bus Station"
+            },
+            "ArrivalTime": "19:35",
+            "DepartureTime": "19:35"
+          },
+          {
+            "StopSequence": 6,
+            "StopUID": "THB301900",
+            "StopID": "301900",
+            "StopName": {
+              "Zh_tw": "中壢服務區",
+              "En": "Zhongli Service Area"
+            },
+            "ArrivalTime": "21:16",
+            "DepartureTime": "21:16"
+          },
+          {
+            "StopSequence": 7,
+            "StopUID": "THB310063",
+            "StopID": "310063",
+            "StopName": {
+              "Zh_tw": "經國轉運站",
+              "En": "Jing Guo Bus Station"
+            },
+            "ArrivalTime": "21:23",
+            "DepartureTime": "21:23"
+          },
+          {
+            "StopSequence": 8,
+            "StopUID": "THB267759",
+            "StopID": "267759",
+            "StopName": {
+              "Zh_tw": "重陽站",
+              "En": "Chongyang Station"
+            },
+            "ArrivalTime": "21:47",
+            "DepartureTime": "21:47"
+          },
+          {
+            "StopSequence": 9,
+            "StopUID": "THB289792",
+            "StopID": "289792",
+            "StopName": {
+              "Zh_tw": "臺北轉運站",
+              "En": "Taipei Bus Station"
+            },
+            "ArrivalTime": "22:05",
+            "DepartureTime": "22:05"
+          }
+        ]
+      }
+    ],
+    "UpdateTime": "2026-11-11T22:37:05+08:00",
+    "VersionID": 8000
+  }
+]

@@ -1,0 +1,88 @@
+[
+  {
+    "RouteUID": "THB1610",
+    "RouteID": "1610",
+    "HasSubRoutes": true,
+    "Operators": [
+      {
+        "OperatorID": "34",
+        "OperatorName": {
+          "Zh_tw": "統聯客運",
+          "En": "United Highway Bus Co., Ltd."
+        },
+        "OperatorCode": "UnitedHighwayBus",
+        "OperatorNo": "1201"
+      }
+    ],
+    "AuthorityID": "010",
+    "ProviderID": "010",
+    "SubRoutes": [
+      {
+        "SubRouteUID": "THB161001",
+        "SubRouteID": "161001",
+        "OperatorIDs": [
+          "34"
+        ],
+        "SubRouteName": {
+          "Zh_tw": "1610",
+          "En": "1610"
+        },
+        "Headsign": "臺北→高雄[經環北交流道]",
+        "HeadsignEn": "Taipei→Kaohsiung(Via Huanbei Interchange)",
+        "Direction": 0,
+        "DepartureStopNameZh": "臺北轉運站",
+        "DepartureStopNameEn": "Taipei Bus Station",
+        "DestinationStopNameZh": "建國客運站",
+        "DestinationStopNameEn": "TRA Kaohsiung Station"
+      },
+      {
+        "SubRouteUID": "THB161002",
+        "SubRouteID": "161002",
+        "OperatorIDs": [
+          "34"
+        ],
+        "SubRouteName": {
+          "Zh_tw": "1610",
+          "En": "1610"
+        },
+        "Headsign": "高雄→臺北[經臺北交流道]",
+        "HeadsignEn": "Kaohsiung→Taipei(Via Taipei Interchange)",
+        "Direction": 1,
+        "DepartureStopNameZh": "建國客運站",
+        "DepartureStopNameEn": "Jianguo Station",
+        "DestinationStopNameZh": "臺北轉運站",
+        "DestinationStopNameEn": "Taipei Bus Station"
+      },
+      {
+        "SubRouteUID": "THB1610A1",
+        "SubRouteID": "1610A1",
+        "OperatorIDs": [
+          "34"
+        ],
+        "SubRouteName": {
+          "Zh_tw": "1610A",
+          "En": "1610A"
+        },
+        "Headsign": "臺北→高雄[經三重交流道]",
+        "HeadsignEn": "Taipei→Kaohsiung(Via Sanchong Interchange)",
+        "Direction": 0,
+        "DepartureStopNameZh": "臺北轉運站",
+        "DepartureStopNameEn": "Taipei Bus Station",
+        "DestinationStopNameZh": "建國客運站",
+        "DestinationStopNameEn": "TRA Kaohsiung Station"
+      }
+    ],
+    "BusRouteType": 13,
+    "RouteName": {
+      "Zh_tw": "1610",
+      "En": "1610"
+    },
+    "DepartureStopNameZh": "臺北轉運站",
+    "DepartureStopNameEn": "Taipei Bus Station",
+    "DestinationStopNameZh": "建國客運站",
+    "DestinationStopNameEn": "TRA Kaohsiung Station",
+    "RouteMapImageUrl": "https://web.taiwanbus.tw/MISUploadData/Schematic/file/1610.jpg",
+    "UpdateTime": "2026-11-11T22:37:05+08:00",
+    "VersionID": 8000
+  }
+]

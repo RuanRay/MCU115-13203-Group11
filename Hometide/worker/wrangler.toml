@@ -3,4 +3,7 @@ name = "hometide-api"
 main = "src/index.ts"
 compatibility_date = "2026-10-27"
 
-# KV 綁定（客運路線索引）與 Cron Trigger 於第 3 週加入
+# 客運路線索引（規格 8.6）：由 GitHub Actions 執行 scripts/build-index.ts 每日寫入
+[[kv_namespaces]]
+binding = "BUS_INDEX"
+id = "76ed0323095945cf8c062f43bcb68a39"

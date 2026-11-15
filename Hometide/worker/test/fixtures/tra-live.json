@@ -1,0 +1,60 @@
+{
+  "UpdateTime": "2026-11-11T23:16:04+08:00",
+  "UpdateInterval": 30,
+  "SrcUpdateTime": "2026-11-11T23:16:00+08:00",
+  "SrcUpdateInterval": 60,
+  "AuthorityCode": "TRA",
+  "TrainLiveBoards": [
+    {
+      "TrainNo": "4248",
+      "TrainTypeID": "1131",
+      "TrainTypeCode": "6",
+      "TrainTypeName": {
+        "Zh_tw": "區間",
+        "En": "Local Train"
+      },
+      "StationID": "7250",
+      "StationName": {
+        "Zh_tw": "龜山",
+        "En": "Guishan"
+      },
+      "TrainStationStatus": 2,
+      "DelayTime": 2,
+      "UpdateTime": "2026-11-11T23:15:58+08:00"
+    },
+    {
+      "TrainNo": "1271",
+      "TrainTypeID": "1131",
+      "TrainTypeCode": "6",
+      "TrainTypeName": {
+        "Zh_tw": "區間",
+        "En": "Local Train"
+      },
+      "StationID": "1110",
+      "StationName": {
+        "Zh_tw": "埔心",
+        "En": "Puxin"
+      },
+      "TrainStationStatus": 2,
+      "DelayTime": 0,
+      "UpdateTime": "2026-11-11T23:15:58+08:00"
+    },
+    {
+      "TrainNo": "4235",
+      "TrainTypeID": "1131",
+      "TrainTypeCode": "6",
+      "TrainTypeName": {
+        "Zh_tw": "區間",
+        "En": "Local Train"
+      },
+      "StationID": "1090",
+      "StationName": {
+        "Zh_tw": "內壢",
+        "En": "Neili"
+      },
+      "TrainStationStatus": 2,
+      "DelayTime": 3,
+      "UpdateTime": "2026-11-11T23:15:58+08:00"
+    }
+  ]
+}
