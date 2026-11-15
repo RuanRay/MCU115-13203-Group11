@@ -21,7 +21,7 @@
 |---|---|---|---|
 | `GET /api/stations` | `operator`＝TRA／THSR／BUS | 車站或站牌清單（代碼、中英文名、縣市） | FR-SRCH-02、FR-BUS-01 |
 | `GET /api/timetable` | `operator`、`from`、`to`、`date` | 當日班次（已轉換成 TrainItem 欄位；BUS 含 `arriveEstimated`） | FR-RES-01、FR-BUS-02 |
-| `GET /api/fare` | `operator`、`from`、`to`（BUS 另加 `route`） | 各車種或路線的全票票價 | FR-RES-02、FR-BUS-03 |
+| `GET /api/fare` | `operator`、`from`、`to`；`route` 可省略（BUS 省略時回傳經過兩站的所有路線） | 該起訖站**所有車種／路線 × 所有票種**的單價與是否為約略值（不新增 ticket 參數；快取鍵維持 operator＋起訖（＋route）） | FR-RES-02、FR-BUS-03 |
 | `GET /api/live` | `operator`、`from`、`to` | 台鐵：各車次誤點分鐘；BUS：各班次預估到站分鐘 | FR-RES-03、FR-BUS-02 |
 | `GET /api/freeway/meta` | — | 國道、方向、交流道清單（依里程排序） | FR-HWY-01、FR-HWY-06 |
 | `GET /api/freeway/traffic` | `freeway`、`dir`、`from`、`to` | 起訖交流道之間各路段的時速、壅塞等級、旅行時間；預估總時間、平常時間、壅塞段數 | FR-HWY-02、03 |
@@ -45,11 +45,13 @@
 | 國道路段基本資料 | `GET /v2/Road/Traffic/Section/Freeway` | 待查證（市區道路版 `/Section/City/{City}` 已有範例） |
 | 國道路段即時路況 | `GET /v2/Road/Traffic/Live/Freeway` | 待查證（同上） |
 | 國道壅塞等級定義 | `GET /v2/Road/Traffic/CongestionLevel/Freeway` | 待查證（同上） |
-| 公路客運路線 | `GET /v2/Bus/Route/InterCity` | 待查證 |
-| 公路客運路線站序 | `GET /v2/Bus/StopOfRoute/InterCity` | 待查證 |
-| 公路客運班表 | `GET /v2/Bus/Schedule/InterCity/{RouteName}` | 待查證 |
-| 公路客運預估到站 | `GET /v2/Bus/EstimatedTimeOfArrival/InterCity/{RouteName}` | 待查證 |
-| 公路客運票價 | `GET /v2/Bus/RouteFare/InterCity/{RouteName}` | 待查證 |
+| 公路客運路線 | `GET /v2/Bus/Route/InterCity`（`$filter=BusRouteType eq 13` 為國道客運） | 已查證（3-1、3-3） |
+| 公路客運路線站序 | `GET /v2/Bus/StopOfRoute/InterCity` | 已查證（3-1、3-3） |
+| 公路客運班表 | `GET /v2/Bus/Schedule/InterCity`（`$filter=RouteName/Zh_tw eq '…' or …`，一次查多條路線） | 已查證（3-1、3-4） |
+| 公路客運預估到站 | `GET /v2/Bus/EstimatedTimeOfArrival/InterCity`（`$filter=RouteName/Zh_tw eq '…' or …`） | 已查證（3-1、3-4） |
+| 公路客運票價 | `GET /v2/Bus/RouteFare/InterCity`（`$filter=RouteName eq '…' or …`；分段計價 `StageFares`） | 已查證（3-1、3-4） |
+
+- 鐵路 ODFare 的 FareClass 對應見 CR-01 第二節（`docs/changes/CR-01-票種與多人.md`）；任務 4-5 開始時先以 Swagger 確認 FareClass 2～5 的實際意義與是否有資料。
 
 ### 8.5 快取策略（Worker Cache API）
 
@@ -74,12 +76,16 @@ App 端另有 Room 快取（timetable_cache、fare_cache、highway_cache）供�
 ### 8.7 回應轉換規則（在 Worker 執行）
 
 - **時刻表 → `TrainItem`：** 車次、車種名稱、起站出發時間、迄站抵達時間、行駛分鐘（跨午夜時加 24 小時計算）、山海線、對號與自行車旗標。
-- **票價：** 從票價陣列中挑選「全票、標準座／對號座」那一筆；台鐵依車種代碼對應（自強、莒光、區間），找不到該車種時以同起訖站最接近車種的價格並標示「約」。
+- **票價：**
+  1. 依票種對應表（CR-01 第二節）把每筆票價標上票種代碼；對應不到的捨棄。
+  2. 同一車種（或路線）＋票種有多筆時：有「優惠」價 → 取最低優惠價並標 `approx=true`；沒有 → 取「原價」或「不分時段」價中的最低者。
+  3. 國道客運起訖站對不到分段時，往前後最近的分段吸附並標 `approx=true`。
+  4. 台鐵依車種代碼對應（自強、莒光、區間）；找不到該車種時以同起訖站最接近車種的價格並標 `approx=true`（沿用現行規則）。
 - **即時誤點：** TrainLiveBoard 以車次（TrainNo）對應時刻表班次，取延誤分鐘數；對應不到視為準點。
 - **站名正規化：** 一律把「台」轉成「臺」後再存入與比對。
 
 - **國道路況：** 依交流道里程排序路段，只保留起訖交流道之間的路段；壅塞等級對應 順暢／車多／壅塞 三級；預估時間＝各路段旅行時間總和，平常時間＝路段長度依速限換算之和。
-- **國道客運：** 同一路線同一班次只輸出一筆；抵達時間有班表時採用，否則以「起站發車時間＋路線平均行車時間」推算並設 `arriveEstimated=true`；業者名稱取中文簡稱（例：統聯）。
+- **國道客運：** 同一路線同一班次只輸出一筆；抵達時間有班表時採用，否則以「起站發車時間＋路線平均行車時間」推算並設 `arriveEstimated=true`；業者名稱用 TDX 業者全名（例：統聯客運；聯營取第一家）。
 
 ### 8.8 呼叫量估算與節流
 

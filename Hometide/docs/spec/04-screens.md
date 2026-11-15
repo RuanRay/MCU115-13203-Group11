@@ -12,6 +12,8 @@
 - **登入提示對話框 `LoginPromptDialog`：** 一張車票造型的對話框，中央紅色「會員限定」章，標題「登入後就能收藏」，說明兩行，撕線下方「稍後再說」「去登入」兩個按鈕（FR-AUTH-06）。
 - **Snackbar：** 顯示於底部導覽列上方，3 秒，藏青底。
 - **骨架車票 `item_ticket_skeleton`：** 載入中使用，閃光動畫 AN-11。
+- **選擇乘客面板 `sheetPassengers`（BottomSheetDialogFragment）：** 標題 `tvPaxTitle`、說明 `tvPaxHint`、五列 `rowPaxAdult`／`rowPaxStudent`／`rowPaxChild`／`rowPaxSenior`／`rowPaxDisabled`（各含 `btnMinus`、`tvCount`、`btnPlus`）、合計 `tvPaxTotal`、文字按鈕 `btnSetDefault`、主要按鈕 `btnPaxConfirm`「確　定」（FR-SRCH-08、FR-SET-02；畫面圖 passenger_sheet.png、passenger_sheet_dark.png）。
+- **票價明細 `layoutFareDetail`：** 位於 `item_timeline_train` 車票下方，預設 GONE；虛線外框、上緣與車票相接（FR-RES-07）。
 
 ### 4.2 P1 登入頁（LoginActivity）
 
@@ -50,13 +52,14 @@
 | 4 | 範例句晶片 ×3 | `chipGroupExamples` | ChipGroup | FR-SRCH-06 |
 | 5 | 「我的車票夾」標題＋「滑動看更多 ›」 | `tvFavTitle` | TextView | — |
 | 6 | 車票夾（橫向） | `rvFavorites` | RecyclerView（水平，item_ticket_route） | FR-SRCH-04；點存根播放 AN-05 |
-| 7 | 空白車票・手動查詢 | `tkManual` | TicketView（空白票） | 內含以下 8–11；存根「查詢班次」為送出按鈕 |
+| 7 | 空白車票・手動查詢 | `tkManual` | TicketView（空白票） | 內含以下 8–12；存根「查詢班次」為送出按鈕 |
 | 8 | 運具 | `spOperator` | Spinner | 台鐵／高鐵／國道客運；切換時清空不屬於該運具的站名（FR-BUS-01） |
 | 9 | 起站／迄站 | `actvOrigin`、`actvDest` | AutoCompleteTextView | FR-SRCH-02；宋體大字 |
 | 10 | 交換起訖站 | `btnSwap` | ImageButton | AN-09 |
 | 11 | 乘車日期 | `btnDate` | 文字按鈕「乘車日期 11/7（六）▾」 | DatePickerDialog |
-| 12 | 最近查詢 ×5 | `rvRecent` | RecyclerView | FR-SRCH-07 |
-| 13 | 底部導覽列 | `bottomNav` | BottomNavigationView | 目前項目：查詢 |
+| 12 | 乘客（空白車票內，乘車日期下方） | `tvPassengers` | TextView（可點） | 「👤 乘客：<組合> ▾」；點擊開 `sheetPassengers`（FR-SRCH-08；畫面圖 home_passenger.png） |
+| 13 | 最近查詢 ×5 | `rvRecent` | RecyclerView | FR-SRCH-07 |
+| 14 | 底部導覽列 | `bottomNav` | BottomNavigationView | 目前項目：查詢 |
 
 - **AI 確認卡（`AiConfirmBottomSheet`）：** 頂端出票口、`tkAiPreview`（主票樣式預覽車票）、`vVerifyStamp`（芥末黃「站名已驗證」章）、`tvOriginal`（原句）、`tvError`（驗證失敗時紅字）、`btnEdit`（修改）、`btnConfirm`（查詢班次）。播放 AN-04。
 - **狀態：** 訪客（車票夾顯示空白提示票）、AI 解析中（AN-15）、AI 失敗（Snackbar）。
@@ -83,14 +86,16 @@
 | 1 | 返回＋運具＋路線標題（宋體） | `toolbar`、`tvRoute` | MaterialToolbar | 由車票夾進入時以共享元素展開（AN-03） |
 | 2 | 收藏 ♥ | `btnFavorite` | ImageButton | FR-RES-05；AN-06 |
 | 3 | 離線橫幅 | `tvOfflineBanner` | TextView | FR-OFF-01，由上滑下（AN-16） |
-| 4 | 民國年日期章（含星期）、班次數、時段晶片 | `vDateStamp`、`tvCount`、`chipTimeRange` | DateStampView、TextView、Chip | 時段晶片可關閉 |
+| 4 | 民國年日期章（含星期）、班次數、時段晶片、乘客晶片 | `vDateStamp`、`tvCount`、`chipTimeRange`、`chipPassengers` | DateStampView、TextView、Chip、Chip | 時段晶片可關閉；`chipPassengers` 在日期章右側「👤 N 人 ▾」，點擊開 `sheetPassengers`（FR-RES-02） |
 | 5 | 排序／篩選 | `spSort` | Spinner | FR-RES-04 |
 | 6 | 時間軸列表 | `rvTimeline` | RecyclerView（item_timeline_train） | FR-RES-01～03 |
 | 7 | 「現在 HH:mm」紅線 | `vNowLine` | ItemDecoration | 每 60 秒移動（AN-14） |
 | 8 | 下拉重新整理 | `swipeRefresh` | SwipeRefreshLayout（自訂小火車指示器） | AN-12 |
 | 9 | 空狀態／錯誤狀態 | `layoutEmpty`、`btnRetry` | include | FR-RES-06 |
 
-**時間軸項目 `item_timeline_train`：** `tvHour`（左側發車時刻，宋體）、`vNode`（狀態色圓點）、`tkTrain`（TicketView 紙票）：`tvTrainMeta`（自強 139 次・山線・3:08）、`tvTime`（14:12 → 17:20）、`chipStatus`、`chipFacilities`、存根 `tvFare`（$739）＋「全票」＋`btnRemind`（🔔 提醒）。已開出的項目另有 `vDepartedStamp`。
+**時間軸項目 `item_timeline_train`：** `tvHour`（左側發車時刻，宋體）、`vNode`（狀態色圓點）、`tkTrain`（TicketView 紙票）：`tvTrainMeta`（自強 139 次・山線・3:08）、`tvTime`（14:12 → 17:20）、`chipStatus`、`chipFacilities`、存根 `tvFare`（總價或單價）＋`tvFareMix`（組合或票種名稱，查無時第二行「<票種>查無」，取代原本固定的「全票」字樣）＋`btnRemind`（🔔 提醒）。已開出的項目另有 `vDepartedStamp`。
+
+**票價明細 `layoutFareDetail`（FR-RES-07）：** `tvDetailTitle`、`rvFareRows`（item_fare_row：`tvClass`、`tvUnit`、`tvSubtotal`）、`tvDetailTotal`、`tvDetailNote`；國道客運版本相同。畫面圖：result_multi.png、result_single.png、result_fare_detail.png、result_fare_detail_dark.png。
 
 - **國道客運：** 運具為國道客運時，車票本體改顯示「業者 路線號」、約略行車時間、狀態（N 分後／依班表／已開出）與「抵達為預估」標籤（FR-BUS-04）；版面示意見報告第 6 節「國道客運結果」。
 
@@ -112,7 +117,7 @@
 
 | 順序 | 元件 | ID | 類型 | 行為／規則 |
 |---|---|---|---|---|
-| 1 | 乘車會員證 | `cardMember` | CardView（藏青底） | 「HOMETIDE 乘車會員證」、暱稱（宋體）、Email、預設運具；不顯示加入日期；訪客顯示「登入／註冊」 |
+| 1 | 乘車會員證 | `cardMember` | CardView（藏青底） | 「HOMETIDE 乘車會員證」、暱稱（宋體）、Email、預設運具；不顯示加入日期；訪客顯示「登入／註冊」。新增 `tvDefaultPassengers`「預設乘客：<組合> ›」，點擊開 `sheetPassengers`（FR-SET-02；畫面圖 profile_passenger.png） |
 | 2 | 「我的乘車紀錄」＋統計區間 | `spRange` | Spinner | 今天／本週（預設）／全部 |
 | 3 | 開啟次數、總使用時間 | `tvOpenCount`、`tvTotalTime` | 兩張小紙票 | FR-USG-04 |
 | 4 | 各頁停留時間 | `layoutPageBars` | LinearLayout + ProgressBar | 前 5 名 |
@@ -149,6 +154,10 @@
 | P3 | 頭像 | P6 | — |
 | 下一班 | 點小車票／查看今天全部班次 | P4 | — |
 | P3 | 運具選「國道客運」→「查詢班次」 | P4（國道客運版本） | FR-BUS-04 |
+| P3 | 點「乘客」 | 選擇乘客面板 | FR-SRCH-08 |
+| P4 | 點「👤 N 人」 | 選擇乘客面板 | 只重算票價 |
+| P4 | 點車票本體 | 展開／收合票價明細 | FR-RES-07，可多張 |
+| P6 | 點「預設乘客」 | 選擇乘客面板 | FR-SET-02 |
 | 國道 | 訪客或尚未收藏 | 國道（空白車票・選擇國道路線） | FR-HWY-06 |
 | 國道（空白車票） | 選好路線按「查看路況」 | 國道（同頁顯示大車票、比較、路線圖） | 不儲存 |
 | 國道 | 訪客或會員按收藏 | 登入提示／收藏 | FR-HWY-06 |

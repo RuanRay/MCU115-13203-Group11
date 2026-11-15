@@ -35,6 +35,7 @@
 | travel_date | TEXT | NOT NULL | yyyy-MM-dd |
 | source | TEXT | NOT NULL | MANUAL／FAVORITE／AI |
 | searched_at | INTEGER | NOT NULL | — |
+| passengers_json | TEXT | NULL | 例：`{"ADULT":2,"CHILD":1}`；舊資料為 NULL 時視為全票 1（FR-SRCH-08） |
 
 #### 7.1.4 timetable_cache
 
@@ -56,9 +57,12 @@
 
 | 欄位 | 型別 | 限制 | 說明 |
 |---|---|---|---|
-| operator、origin_id、dest_id、train_type_code | TEXT | PK（複合） | — |
-| adult_price | INTEGER | NOT NULL | 全票（新臺幣元） |
-| fetched_at | INTEGER | NOT NULL | 超過 7 天重抓 |
+| operator、origin_id、dest_id、train_type_code、fare_class | TEXT | PK（複合） | `fare_class` 為 ADULT／STUDENT／CHILD／SENIOR／DISABLED；BUS 的 train_type_code 存路線號 |
+| price | INTEGER | NOT NULL | 單價（新臺幣元），取代原 `adult_price` |
+| is_approx | INTEGER | NOT NULL 預設 0 | 1＝優惠價或分段吸附，顯示「約」 |
+| fetched_at | INTEGER | NOT NULL | 7 天後過期 |
+
+- CR-01：Room 資料庫版本 +1，提供 Migration（fare_cache 可直接重建，不需保留舊資料）；表格數量不變（13 張）。
 
 #### 7.1.6 favorite_route
 
@@ -189,10 +193,11 @@
 | ai_calls_window | String | 最近 1 分鐘 AI 呼叫時間戳（限流用） |
 | last_next_route | Long | 「下一班」分頁上次選擇的常用路線 id（FR-NEXT-02） |
 | last_drive_route | Long | 「國道」分頁上次選擇的開車路線 id（FR-HWY-01） |
+| default_passengers | String | JSON，預設 `{"ADULT":1}`（FR-SET-02） |
 
 ### 7.4 Firestore 結構與安全規則
 
-- `users/{uid}`：nickname、email、defaultOperator、createdAt
+- `users/{uid}`：nickname、email、defaultOperator、defaultPassengers（map，例 `{ADULT: 1}`，FR-SET-02；安全規則不需修改）、createdAt
 - `feedback/{autoId}`：uid、deviceId、rating、category、content、aiCategory、aiSentiment、aiSummary、appVersion、createdAt、usageSummary（選填）
 - `usage_sessions/{autoId}`：uid、deviceId、startAt、endAt、durationMs、pages（陣列：pageName、durationMs）
 
