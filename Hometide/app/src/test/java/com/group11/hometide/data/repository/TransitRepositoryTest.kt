@@ -3,6 +3,13 @@ package com.group11.hometide.data.repository
 import android.database.Cursor
 import com.google.gson.Gson
 import com.group11.hometide.data.local.dao.StationDao
+import com.group11.hometide.data.local.dao.FareDao
+import com.group11.hometide.data.local.entity.FareCache
+import com.group11.hometide.data.local.entity.FareClass
+import com.group11.hometide.data.remote.dto.FareData
+import com.group11.hometide.data.remote.dto.FareDto
+import com.group11.hometide.data.remote.dto.LiveData
+import com.group11.hometide.data.remote.dto.LiveItemDto
 import com.group11.hometide.data.local.dao.TimetableDao
 import com.group11.hometide.data.local.dao.TimetableQuery
 import com.group11.hometide.data.local.entity.TimetableCache
@@ -69,6 +76,26 @@ class TransitRepositoryTest {
             timetableCalls++
             return trips()
         }
+        var fareCalls = 0
+        var fareResponse: () -> ApiEnvelope<FareData> = { ApiEnvelope(1L, "TDX", FareData("TRA", emptyList())) }
+        override suspend fun fare(operator: String, from: String, to: String): ApiEnvelope<FareData> {
+            fareCalls++
+            return fareResponse()
+        }
+        var liveResponse: () -> ApiEnvelope<LiveData> = { ApiEnvelope(1L, "TDX", LiveData(emptyList())) }
+        override suspend fun live(operator: String, from: String, to: String): ApiEnvelope<LiveData> = liveResponse()
+    }
+
+    private class FakeFareDao : FareDao {
+        val rows = mutableListOf<FareCache>()
+        override suspend fun get(operator: Operator, originId: String, destId: String) =
+            rows.filter { it.operator == operator && it.originId == originId && it.destId == destId }
+        override suspend fun delete(operator: Operator, originId: String, destId: String) {
+            rows.removeAll { it.operator == operator && it.originId == originId && it.destId == destId }
+        }
+        override suspend fun insertAll(fares: List<FareCache>) {
+            rows += fares
+        }
     }
 
     private class FakeTimetableDao : TimetableDao {
@@ -88,8 +115,9 @@ class TransitRepositoryTest {
     private val tainan = StationDto("4220", "台南", "Tainan", "臺南市", 0)
 
     private val timetableDao = FakeTimetableDao()
+    private val fareDao = FakeFareDao()
 
-    private fun repo(api: HometideApi, dao: StationDao) = TransitRepository(api, dao, NoHistory, timetableDao, Gson()) { now }
+    private fun repo(api: HometideApi, dao: StationDao) = TransitRepository(api, dao, NoHistory, timetableDao, fareDao, Gson()) { now }
 
     @Test
     fun downloadsWhenEmpty_andNormalizes() = runBlocking {
@@ -178,6 +206,39 @@ class TransitRepositoryTest {
     }
 
     private fun first(t: TripDto) = t.toEntity(query, now)!!
+
+    @Test
+    fun fares_cachedFor7Days_skipsInvalid_keepsApprox() = runBlocking {
+        val api = FakeApi { ok(tainan) }
+        api.fareResponse = {
+            ApiEnvelope(1L, "TDX", FareData("TRA", listOf(FareDto("3", 891, false), FareDto("4", 687, true), FareDto(null, 1, false), FareDto("6", 0, false))))
+        }
+        val r = repo(api, FakeDao())
+        val fares = (r.fares(Operator.TRA, "1000", "4220") as Result.Success).data
+        assertEquals(listOf("3" to 891, "4" to 687), fares.map { it.trainTypeCode to it.price })
+        assertEquals(listOf(false, true), fares.map { it.isApprox })
+        assertEquals(FareClass.ADULT, fares.first().fareClass)
+        r.fares(Operator.TRA, "1000", "4220")
+        assertEquals(1, api.fareCalls) // 7 天內讀 fare_cache
+    }
+
+    @Test
+    fun fares_staleCacheUsedWhenOffline() = runBlocking {
+        fareDao.rows += FareCache(Operator.TRA, "1000", "4220", "3", FareClass.ADULT, 891, false, now - 8 * day)
+        val api = FakeApi { ok(tainan) }
+        api.fareResponse = { throw IOException("offline") }
+        assertEquals(891, (repo(api, FakeDao()).fares(Operator.TRA, "1000", "4220") as Result.Success).data.single().price)
+    }
+
+    @Test
+    fun live_mapsDelayAndEta_dropsBlankIds() = runBlocking {
+        val api = FakeApi { ok(tainan) }
+        api.liveResponse = { ApiEnvelope(1L, "TDX", LiveData(listOf(LiveItemDto("143", 5, null), LiveItemDto("1610-14:30", null, 25), LiveItemDto("", 3, null)))) }
+        assertEquals(
+            listOf(LiveInfo("143", 5, null), LiveInfo("1610-14:30", null, 25)),
+            (repo(api, FakeDao()).live(Operator.TRA, "1080", "4220") as Result.Success).data,
+        )
+    }
 
     @Test
     fun bus_downloadsStopsWithCity() = runBlocking {

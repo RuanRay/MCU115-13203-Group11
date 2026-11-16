@@ -1,6 +1,7 @@
 package com.group11.hometide.ui.result
 
 import com.group11.hometide.data.local.entity.Operator
+import com.group11.hometide.data.repository.LiveInfo
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.time.LocalDate
@@ -29,6 +30,16 @@ class TrainStatusTest {
         assertEquals(TrainStatus.None, of(Operator.THSR, "15:00")) // 高鐵不顯示準點
         assertEquals(TrainStatus.BySchedule, of(Operator.BUS, "15:00"))
         assertEquals(TrainStatus.Soon(25), of(Operator.BUS, "14:30"))
+    }
+
+    @Test
+    fun withLive_delayOverridesSoon_etaReplacesSoon_departedStays() {
+        assertEquals(TrainStatus.Delayed(5), TrainStatus.withLive(TrainStatus.Soon(7), LiveInfo("143", 5, null)))
+        assertEquals(TrainStatus.Soon(7), TrainStatus.withLive(TrainStatus.Soon(7), LiveInfo("143", 0, null)))
+        assertEquals(TrainStatus.Arriving(25), TrainStatus.withLive(TrainStatus.Soon(25), LiveInfo("1610-14:30", null, 25)))
+        assertEquals(TrainStatus.Arriving(3), TrainStatus.withLive(TrainStatus.BySchedule, LiveInfo("1610-14:30", null, 3)))
+        assertEquals(TrainStatus.Departed, TrainStatus.withLive(TrainStatus.Departed, LiveInfo("143", 5, null)))
+        assertEquals(TrainStatus.OnTime, TrainStatus.withLive(TrainStatus.OnTime, null))
     }
 
     @Test

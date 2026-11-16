@@ -2,6 +2,7 @@ package com.group11.hometide.data.repository
 
 import android.util.Log
 import com.google.gson.Gson
+import com.group11.hometide.data.local.dao.FareDao
 import com.group11.hometide.data.local.dao.RecentSearch
 import com.group11.hometide.data.local.dao.SearchHistoryDao
 import com.group11.hometide.data.local.dao.StationDao
@@ -9,6 +10,8 @@ import com.group11.hometide.data.local.dao.TimetableDao
 import com.group11.hometide.data.local.dao.TimetableQuery
 import com.group11.hometide.data.local.entity.TimetableCache
 import com.group11.hometide.data.remote.dto.TripDto
+import com.group11.hometide.data.local.entity.FareCache
+import com.group11.hometide.data.local.entity.FareClass
 import com.group11.hometide.data.local.entity.Operator
 import com.group11.hometide.data.local.entity.SearchHistory
 import com.group11.hometide.data.local.entity.SearchSource
@@ -28,6 +31,7 @@ class TransitRepository(
     private val stationDao: StationDao,
     private val historyDao: SearchHistoryDao,
     private val timetableDao: TimetableDao,
+    private val fareDao: FareDao,
     private val gson: Gson,
     private val now: () -> Long = System::currentTimeMillis,
 ) {
@@ -83,6 +87,39 @@ class TransitRepository(
         Log.w(TAG, "Invalid timetable payload: $operator")
         return Result.Failure(AppError.ParseError)
     }
+
+    /** FR-RES-02、FR-BUS-03：各車種（國道客運為路線）的全票；依起訖站快取 7 天（7.1.5）。票種與多人於 4-5 */
+    suspend fun fares(operator: Operator, originId: String, destId: String): Result<List<FareCache>> =
+        guarded("Fare failed: $operator") {
+            val cached = fareDao.get(operator, originId, destId)
+            if (cached.isNotEmpty() && now() - cached.first().fetchedAt < FARE_FRESH_MS) return@guarded Result.Success(cached)
+            when (val res = apiCall(gson) { api.fare(operator.name, originId, destId) }) {
+                is Result.Failure -> if (cached.isNotEmpty()) Result.Success(cached) else res // 過期快取仍比「—」好
+                is Result.Success -> {
+                    val time = now()
+                    val fares = res.data.data?.fares?.mapNotNull { f ->
+                        val code = f.typeCode?.takeIf { it.isNotBlank() } ?: return@mapNotNull null
+                        val price = f.adultPrice?.takeIf { it > 0 } ?: return@mapNotNull null
+                        FareCache(operator, originId, destId, code, FareClass.ADULT, price, f.approximate ?: false, time)
+                    } ?: return@guarded Result.Failure(AppError.ParseError)
+                    fareDao.replace(operator, originId, destId, fares)
+                    Result.Success(fares)
+                }
+            }
+        }
+
+    /** FR-RES-03、FR-BUS-02：今天的即時資料（Worker 快取 60 秒，App 不另存） */
+    suspend fun live(operator: Operator, originId: String, destId: String): Result<List<LiveInfo>> =
+        guarded("Live failed: $operator") {
+            when (val res = apiCall(gson) { api.live(operator.name, originId, destId) }) {
+                is Result.Failure -> res
+                is Result.Success -> Result.Success(
+                    res.data.data?.items.orEmpty().mapNotNull { i ->
+                        i.tripId?.takeIf { it.isNotBlank() }?.let { LiveInfo(it, i.delayMin, i.etaMin) }
+                    },
+                )
+            }
+        }
 
     /** FR-SRCH-07：最近 5 筆不重複查詢 */
     fun recentSearches(): Flow<List<RecentSearch>> = historyDao.recent(RECENT_LIMIT)
@@ -143,6 +180,7 @@ class TransitRepository(
         const val STATIONS_STALE_MS = 7L * 24 * 60 * 60 * 1000
         const val RECENT_LIMIT = 5
         const val TIMETABLE_FRESH_MS = 2L * 60 * 60 * 1000
+        const val FARE_FRESH_MS = 7L * 24 * 60 * 60 * 1000
     }
 }
 
@@ -168,3 +206,6 @@ internal fun TripDto.toEntity(q: TimetableQuery, fetchedAt: Long): TimetableCach
         arriveEstimated = arriveEstimated ?: false, fetchedAt = fetchedAt,
     )
 }
+
+/** E-3 一筆：台鐵 delayMin、國道客運 etaMin */
+data class LiveInfo(val tripId: String, val delayMin: Int?, val etaMin: Int?)

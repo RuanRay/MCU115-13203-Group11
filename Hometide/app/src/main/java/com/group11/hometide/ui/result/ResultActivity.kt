@@ -3,6 +3,8 @@ package com.group11.hometide.ui.result
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
@@ -25,8 +27,8 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 /**
- * P4 查詢結果（規格 4.6；FR-RES-01、03、FR-BUS-04）。任務 4-2：票價先顯示「—」（4-3）、
- * 排序只有「依出發時間」（4-3）、收藏與提醒於第 5 週（訪客先顯示登入提示）、空狀態與離線於 4-4。
+ * P4 查詢結果（規格 4.6；FR-RES-01～04、FR-BUS-02～04）。收藏與提醒於第 5 週（訪客先顯示登入提示）、
+ * 空狀態與離線於 4-4、乘客晶片於 4-5。
  */
 class ResultActivity : BaseActivity() {
 
@@ -53,8 +55,14 @@ class ResultActivity : BaseActivity() {
 
         binding.tvBack.setOnClickListener { finish() }
         binding.btnFavorite.setOnClickListener { if (vm.state.value.isGuest) showLoginPrompt() } // 會員收藏於 5-1
-        binding.spSort.adapter = ArrayAdapter(this, R.layout.item_operator_spinner, listOf(getString(R.string.sort_by_depart)))
+        // FR-RES-04：選項依運具（國道客運沒有「僅對號列車」）
+        val sortOptions = SortOption.optionsFor(vm.state.value.operator)
+        binding.spSort.adapter = ArrayAdapter(this, R.layout.item_operator_spinner, sortOptions.map { getString(it.label) })
             .apply { setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+        binding.spSort.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) = vm.setSort(sortOptions[position])
+            override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+        }
 
         val adapter = TimelineAdapter(onRemind = { if (vm.state.value.isGuest) showLoginPrompt() }) // 會員提醒於 5-3
         val nowLine = NowLineDecoration(this)

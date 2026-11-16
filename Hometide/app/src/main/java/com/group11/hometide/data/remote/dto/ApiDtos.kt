@@ -39,6 +39,27 @@ data class TripDto(
     val bikeAllowed: Boolean?,
 )
 
+/** E-8 /api/fare（任務 4-5 前的格式） */
+data class FareData(
+    val operator: String?,
+    val fares: List<FareDto>?,
+)
+
+data class FareDto(
+    val typeCode: String?,
+    val adultPrice: Int?,
+    val approximate: Boolean?,
+)
+
+/** E-3 /api/live：台鐵 delayMin、國道客運 etaMin */
+data class LiveData(val items: List<LiveItemDto>?)
+
+data class LiveItemDto(
+    val tripId: String?,
+    val delayMin: Int?,
+    val etaMin: Int?,
+)
+
 data class StationDto(
     val id: String?,
     val nameZh: String?,

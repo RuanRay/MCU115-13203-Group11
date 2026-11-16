@@ -15,8 +15,10 @@ import com.group11.hometide.R
 import com.group11.hometide.data.local.entity.Operator
 import com.group11.hometide.data.local.entity.TimetableCache
 import com.group11.hometide.databinding.ItemTimelineTrainBinding
+import java.text.NumberFormat
+import java.util.Locale
 
-/** P4 時間軸（規格 4.6；FR-RES-01、03、FR-BUS-04）。票價於 4-3 接上，先顯示「—」。 */
+/** P4 時間軸（規格 4.6；FR-RES-01～03、FR-BUS-02～04）。 */
 class TimelineAdapter(
     private val onRemind: (TimetableCache) -> Unit,
 ) : ListAdapter<ResultViewModel.Item, TimelineAdapter.Holder>(Diff) {
@@ -35,13 +37,17 @@ class TimelineAdapter(
         b.tvHour.text = train.departTime
         b.tvTrainMeta.text = metaText(ctx, train)
         b.tvTime.text = ctx.getString(R.string.train_time, train.departTime, train.arriveTime)
-        b.tvFare.setText(R.string.fare_unknown)
+        // FR-RES-02：取不到顯示「—」；約略值為「約$410」（實作者確認）
+        b.tvFare.text = getItem(position).fare?.let { f ->
+            val amount = NumberFormat.getIntegerInstance(Locale.TAIWAN).format(f.price)
+            ctx.getString(if (f.isApprox) R.string.fare_price_approx else R.string.fare_price, amount)
+        } ?: ctx.getString(R.string.fare_unknown)
 
         val color = statusColor(status)
         b.vNode.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(ctx, color))
         b.chipStatus.isVisible = status.labelRes != null
         status.labelRes?.let { res ->
-            b.chipStatus.text = if (status is TrainStatus.Soon) ctx.getString(res, status.minutes) else ctx.getString(res)
+            b.chipStatus.text = status.minutes?.let { ctx.getString(res, it) } ?: ctx.getString(res)
             tint(b.chipStatus, color)
         }
 
@@ -101,11 +107,12 @@ class TimelineAdapter(
         (view.background.mutate() as GradientDrawable).setStroke(view.resources.getDimensionPixelSize(R.dimen.tag_stroke), c)
     }
 
-    /** 節點與狀態色：準點、即將發車綠；已開出灰；依班表藏青（bus_result.png）；誤點紅於 4-3 */
+    /** 節點與狀態色：準點、即將發車、預估到站綠；誤點紅；已開出灰；依班表藏青（bus_result.png） */
     @ColorRes
     private fun statusColor(s: TrainStatus): Int = when (s) {
         TrainStatus.Departed -> R.color.color_on_surface_muted
-        is TrainStatus.Soon, TrainStatus.OnTime -> R.color.color_success
+        is TrainStatus.Soon, TrainStatus.OnTime, is TrainStatus.Arriving -> R.color.color_success
+        is TrainStatus.Delayed -> R.color.color_stamp
         TrainStatus.BySchedule, TrainStatus.None -> R.color.color_primary
     }
 

@@ -88,6 +88,33 @@ class SearchDaoTest {
     }
 
     @Test
+    fun migration2to3_rebuildsFareCacheWithCr01Columns() {
+        val ctx = ApplicationProvider.getApplicationContext<android.content.Context>()
+        val helper = FrameworkSQLiteOpenHelperFactory().create(
+            SupportSQLiteOpenHelper.Configuration.builder(ctx).name(null).callback(object : SupportSQLiteOpenHelper.Callback(2) {
+                override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) = Unit
+                override fun onUpgrade(db: androidx.sqlite.db.SupportSQLiteDatabase, oldVersion: Int, newVersion: Int) = Unit
+            }).build(),
+        )
+        helper.writableDatabase.use { sql ->
+            sql.execSQL(
+                "CREATE TABLE fare_cache (operator TEXT NOT NULL, origin_id TEXT NOT NULL, dest_id TEXT NOT NULL, " +
+                    "train_type_code TEXT NOT NULL, adult_price INTEGER NOT NULL, fetched_at INTEGER NOT NULL, " +
+                    "PRIMARY KEY(operator, origin_id, dest_id, train_type_code))",
+            )
+            sql.execSQL("INSERT INTO fare_cache VALUES ('TRA', '1000', '4220', '3', 891, 1)")
+            AppDatabase.MIGRATION_2_3.migrate(sql)
+            sql.execSQL("INSERT INTO fare_cache (operator, origin_id, dest_id, train_type_code, fare_class, price, fetched_at) VALUES ('TRA', '1000', '4220', '3', 'ADULT', 891, 1)")
+            sql.query("SELECT price, is_approx FROM fare_cache").use { c ->
+                assertEquals(1, c.count)
+                c.moveToFirst()
+                assertEquals(891, c.getInt(0))
+                assertEquals(0, c.getInt(1)) // DEFAULT 0
+            }
+        }
+    }
+
+    @Test
     fun migration1to2_addsCityAndForcesRedownload() {
         val ctx = ApplicationProvider.getApplicationContext<android.content.Context>()
         val helper = FrameworkSQLiteOpenHelperFactory().create(

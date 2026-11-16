@@ -107,6 +107,10 @@
     <string name="result_count">共 %1$d 班</string>
     <string name="cd_favorite">收藏</string>
     <string name="sort_by_depart">依出發時間</string>
+    <string name="sort_by_duration">依行駛時間</string>
+    <string name="sort_by_fare">依票價</string>
+    <string name="filter_reserved_only">僅對號列車</string>
+    <string name="filter_upcoming_only">僅未開出班次</string>
     <string name="now_line">現在 %1$s</string>
     <string name="train_meta">%1$s %2$s 次</string>
     <string name="bus_meta">%1$s %2$s</string>
@@ -120,11 +124,15 @@
     <string name="status_soon">%1$d分後</string>
     <string name="status_on_time">準點</string>
     <string name="status_by_schedule">依班表</string>
+    <string name="status_delayed">誤點%1$d分</string>
+    <string name="status_arriving">%1$d分後到站</string>
     <string name="tag_reserved">對號</string>
     <string name="tag_unreserved">非對號</string>
     <string name="tag_bike">可帶自行車</string>
     <string name="tag_arrive_estimated">抵達為預估</string>
     <string name="fare_unknown">—</string>
+    <string name="fare_price">$%1$s</string>
+    <string name="fare_price_approx">約$%1$s</string>
     <string name="fare_adult">全票</string>
     <string name="btn_remind">🔔 提醒</string>
     <string name="stamp_departed">已開出</string>

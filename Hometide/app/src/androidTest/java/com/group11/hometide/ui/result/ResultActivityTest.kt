@@ -10,6 +10,8 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.group11.hometide.HometideApp
 import com.group11.hometide.R
 import com.group11.hometide.data.local.dao.TimetableQuery
+import com.group11.hometide.data.local.entity.FareCache
+import com.group11.hometide.data.local.entity.FareClass
 import com.group11.hometide.data.local.entity.Operator
 import com.group11.hometide.data.local.entity.TimetableCache
 import kotlinx.coroutines.runBlocking
@@ -27,9 +29,9 @@ class ResultActivityTest {
 
     private val fmt = DateTimeFormatter.ofPattern("HH:mm")
 
-    private fun row(q: TimetableQuery, no: String, dep: LocalTime, arr: LocalTime) = TimetableCache(
+    private fun row(q: TimetableQuery, no: String, dep: LocalTime, arr: LocalTime, type: String = "3") = TimetableCache(
         operator = q.operator, originId = q.originId, destId = q.destId, travelDate = q.travelDate,
-        trainNo = no, trainTypeCode = "3", trainTypeName = "自強", tripLine = 1,
+        trainNo = no, trainTypeCode = type, trainTypeName = "自強", tripLine = 1,
         departTime = dep.format(fmt), arriveTime = arr.format(fmt), durationMin = 60,
         reservedSeat = true, bikeAllowed = false, fetchedAt = System.currentTimeMillis(),
     )
@@ -60,6 +62,41 @@ class ResultActivityTest {
                 assertEquals(0.45f, departed.findViewById<View>(R.id.tkTrain).alpha, 0.001f)
                 assertEquals(activity.getString(R.string.status_on_time), upcoming.findViewById<TextView>(R.id.chipStatus).text)
                 assertEquals(View.VISIBLE, upcoming.findViewById<View>(R.id.btnRemind).visibility)
+            }
+        }
+    }
+
+    /** TC-13：每列顯示全票票價；約略值為「約$1,350」；取不到時「—」 */
+    @Test
+    fun tc13_eachRowShowsAdultFare() {
+        val tomorrow = LocalDate.now().plusDays(1)
+        val q = TimetableQuery(Operator.TRA, "1080", "4220", tomorrow.toString())
+        val db = ApplicationProvider.getApplicationContext<HometideApp>().container.database
+        val now = System.currentTimeMillis()
+        runBlocking {
+            db.timetableDao().replace(
+                q,
+                listOf(
+                    row(q, "139", LocalTime.of(8, 0), LocalTime.of(11, 0), "3"),
+                    row(q, "611", LocalTime.of(9, 0), LocalTime.of(12, 0), "4"),
+                    row(q, "2211", LocalTime.of(10, 0), LocalTime.of(13, 0), "99"),
+                ),
+            )
+            db.fareDao().replace(
+                q.operator, q.originId, q.destId,
+                listOf(
+                    FareCache(q.operator, q.originId, q.destId, "3", FareClass.ADULT, 739, false, now),
+                    FareCache(q.operator, q.originId, q.destId, "4", FareClass.ADULT, 1350, true, now),
+                ),
+            )
+        }
+        val ctx = ApplicationProvider.getApplicationContext<HometideApp>()
+        ActivityScenario.launch<ResultActivity>(ResultActivity.intent(ctx, q.operator, q.originId, q.destId, tomorrow)).use { scenario ->
+            InstrumentationRegistry.getInstrumentation().waitForIdleSync()
+            scenario.onActivity { activity ->
+                val rv = activity.findViewById<RecyclerView>(R.id.rvTimeline)
+                val fares = (0 until 3).map { rv.findViewHolderForAdapterPosition(it)!!.itemView.findViewById<TextView>(R.id.tvFare).text.toString() }
+                assertEquals(listOf("$739", "約$1,350", "—"), fares)
             }
         }
     }

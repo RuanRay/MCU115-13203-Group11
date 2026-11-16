@@ -3,6 +3,8 @@ package com.group11.hometide.data.remote
 import com.google.gson.Gson
 import com.group11.hometide.BuildConfig
 import com.group11.hometide.data.remote.dto.ApiEnvelope
+import com.group11.hometide.data.remote.dto.FareData
+import com.group11.hometide.data.remote.dto.LiveData
 import com.group11.hometide.data.remote.dto.StationsData
 import com.group11.hometide.data.remote.dto.TimetableData
 import okhttp3.OkHttpClient
@@ -28,6 +30,22 @@ interface HometideApi {
         @Query("to") to: String,
         @Query("date") date: String,
     ): ApiEnvelope<TimetableData>
+
+    /** E-8；國道客運省略 route，回傳所有路線 */
+    @GET("api/fare")
+    suspend fun fare(
+        @Query("operator") operator: String,
+        @Query("from") from: String,
+        @Query("to") to: String,
+    ): ApiEnvelope<FareData>
+
+    /** E-3；只查今天 */
+    @GET("api/live")
+    suspend fun live(
+        @Query("operator") operator: String,
+        @Query("from") from: String,
+        @Query("to") to: String,
+    ): ApiEnvelope<LiveData>
 
     companion object {
         private const val TIMEOUT_S = 15L
