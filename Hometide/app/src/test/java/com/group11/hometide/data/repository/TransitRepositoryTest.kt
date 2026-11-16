@@ -3,6 +3,23 @@ package com.group11.hometide.data.repository
 import android.database.Cursor
 import com.google.gson.Gson
 import com.group11.hometide.data.local.dao.StationDao
+import com.group11.hometide.data.local.dao.FareDao
+import com.group11.hometide.data.local.entity.FareCache
+import com.group11.hometide.data.local.entity.FareClass
+import com.group11.hometide.data.remote.dto.FareData
+import com.group11.hometide.data.remote.dto.FareDto
+import com.group11.hometide.data.remote.dto.LiveData
+import com.group11.hometide.data.remote.dto.LiveItemDto
+import com.group11.hometide.data.local.dao.TimetableDao
+import com.group11.hometide.data.local.dao.TimetableQuery
+import com.group11.hometide.data.local.entity.TimetableCache
+import com.group11.hometide.data.remote.dto.TimetableData
+import com.group11.hometide.data.remote.dto.TripDto
+import com.group11.hometide.data.local.dao.RecentSearch
+import com.group11.hometide.data.local.dao.SearchHistoryDao
+import com.group11.hometide.data.local.entity.SearchHistory
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import com.group11.hometide.data.local.entity.Operator
 import com.group11.hometide.data.local.entity.Station
 import com.group11.hometide.data.remote.HometideApi
@@ -33,20 +50,74 @@ class TransitRepositoryTest {
             saved += stations
         }
         override suspend fun lastUpdated(operator: Operator): Long? = last
+        override suspend fun nameOf(operator: Operator, stationId: String): String? =
+            saved.firstOrNull { it.operator == operator && it.stationId == stationId }?.nameZh
+        override suspend fun findByName(operator: Operator, name: String): Station? =
+            saved.firstOrNull { it.operator == operator && it.nameZh == name }
     }
 
-    private class FakeApi(val respond: () -> ApiEnvelope<StationsData>) : HometideApi {
+    private object NoHistory : SearchHistoryDao {
+        override suspend fun insert(history: SearchHistory) = Unit
+        override fun recent(limit: Int): Flow<List<RecentSearch>> = emptyFlow()
+        override suspend fun deleteRoute(operator: Operator, originId: String, destId: String) = Unit
+    }
+
+    private class FakeApi(
+        val trips: () -> ApiEnvelope<TimetableData> = { ApiEnvelope(1L, "TDX", TimetableData("TRA", emptyList())) },
+        val respond: () -> ApiEnvelope<StationsData>,
+    ) : HometideApi {
         var calls = 0
+        var timetableCalls = 0
         override suspend fun stations(operator: String): ApiEnvelope<StationsData> {
             calls++
             return respond()
+        }
+        override suspend fun timetable(operator: String, from: String, to: String, date: String): ApiEnvelope<TimetableData> {
+            timetableCalls++
+            return trips()
+        }
+        var fareCalls = 0
+        var fareResponse: () -> ApiEnvelope<FareData> = { ApiEnvelope(1L, "TDX", FareData("TRA", emptyList())) }
+        override suspend fun fare(operator: String, from: String, to: String): ApiEnvelope<FareData> {
+            fareCalls++
+            return fareResponse()
+        }
+        var liveResponse: () -> ApiEnvelope<LiveData> = { ApiEnvelope(1L, "TDX", LiveData(emptyList())) }
+        override suspend fun live(operator: String, from: String, to: String): ApiEnvelope<LiveData> = liveResponse()
+    }
+
+    private class FakeFareDao : FareDao {
+        val rows = mutableListOf<FareCache>()
+        override suspend fun get(operator: Operator, originId: String, destId: String) =
+            rows.filter { it.operator == operator && it.originId == originId && it.destId == destId }
+        override suspend fun delete(operator: Operator, originId: String, destId: String) {
+            rows.removeAll { it.operator == operator && it.originId == originId && it.destId == destId }
+        }
+        override suspend fun insertAll(fares: List<FareCache>) {
+            rows += fares
+        }
+    }
+
+    private class FakeTimetableDao : TimetableDao {
+        val rows = mutableListOf<TimetableCache>()
+        override suspend fun get(operator: Operator, originId: String, destId: String, travelDate: String) =
+            rows.filter { it.operator == operator && it.originId == originId && it.destId == destId && it.travelDate == travelDate }
+        override suspend fun deleteOlderThan(time: Long) = 0
+        override suspend fun delete(operator: Operator, originId: String, destId: String, travelDate: String) {
+            rows.removeAll { it.operator == operator && it.originId == originId && it.destId == destId && it.travelDate == travelDate }
+        }
+        override suspend fun insertAll(trains: List<TimetableCache>) {
+            rows += trains
         }
     }
 
     private fun ok(vararg s: StationDto) = ApiEnvelope(1L, "TDX", StationsData("TRA", s.toList()))
     private val tainan = StationDto("4220", "台南", "Tainan", "臺南市", 0)
 
-    private fun repo(api: HometideApi, dao: StationDao) = TransitRepository(api, dao, Gson()) { now }
+    private val timetableDao = FakeTimetableDao()
+    private val fareDao = FakeFareDao()
+
+    private fun repo(api: HometideApi, dao: StationDao) = TransitRepository(api, dao, NoHistory, timetableDao, fareDao, Gson()) { now }
 
     @Test
     fun downloadsWhenEmpty_andNormalizes() = runBlocking {
@@ -111,10 +182,80 @@ class TransitRepositoryTest {
         )
     }
 
+    private val query = TimetableQuery(Operator.TRA, "1080", "4220", "2026-11-16")
+    private val trip = TripDto("139", "3", "自強", 1, "14:12", "17:20", 188, false, true, false)
+    private fun trips(vararg t: TripDto) = ApiEnvelope(1L, "TDX", TimetableData("TRA", t.toList()))
+
     @Test
-    fun bus_notSupportedYet() = runBlocking {
+    fun timetable_fetchesAndCaches_thenReusesWithin2Hours() = runBlocking {
+        val api = FakeApi({ trips(trip) }) { ok(tainan) }
+        val r = repo(api, FakeDao())
+        val first = (r.timetable(query) as Result.Success).data
+        assertEquals(listOf("139"), first.map { it.trainNo })
+        assertEquals(1, first.single().tripLine)
+        assertEquals(1, (r.timetable(query) as Result.Success).data.size)
+        assertEquals(1, api.timetableCalls) // 2 小時內不重複呼叫（8.5）
+    }
+
+    @Test
+    fun timetable_staleCacheRefetches_andInvalidPayloadIsParseError() = runBlocking {
+        timetableDao.rows += first(trip).copy(fetchedAt = now - 3 * 60 * 60 * 1000)
+        val api = FakeApi({ trips(trip.copy(departTime = "25:00")) }) { ok(tainan) }
+        assertEquals(Result.Failure(AppError.ParseError), repo(api, FakeDao()).timetable(query))
+        assertEquals(1, api.timetableCalls)
+    }
+
+    private fun first(t: TripDto) = t.toEntity(query, now)!!
+
+    @Test
+    fun fares_cachedFor7Days_skipsInvalid_keepsApprox() = runBlocking {
         val api = FakeApi { ok(tainan) }
-        assertEquals(Result.Failure(AppError.NotFound), repo(api, FakeDao()).refreshStations(Operator.BUS))
-        assertEquals(0, api.calls)
+        api.fareResponse = {
+            ApiEnvelope(1L, "TDX", FareData("TRA", listOf(FareDto("3", 891, false), FareDto("4", 687, true), FareDto(null, 1, false), FareDto("6", 0, false))))
+        }
+        val r = repo(api, FakeDao())
+        val fares = (r.fares(Operator.TRA, "1000", "4220") as Result.Success).data
+        assertEquals(listOf("3" to 891, "4" to 687), fares.map { it.trainTypeCode to it.price })
+        assertEquals(listOf(false, true), fares.map { it.isApprox })
+        assertEquals(FareClass.ADULT, fares.first().fareClass)
+        r.fares(Operator.TRA, "1000", "4220")
+        assertEquals(1, api.fareCalls) // 7 天內讀 fare_cache
+    }
+
+    @Test
+    fun fares_staleCacheUsedWhenOffline() = runBlocking {
+        fareDao.rows += FareCache(Operator.TRA, "1000", "4220", "3", FareClass.ADULT, 891, false, now - 8 * day)
+        val api = FakeApi { ok(tainan) }
+        api.fareResponse = { throw IOException("offline") }
+        assertEquals(891, (repo(api, FakeDao()).fares(Operator.TRA, "1000", "4220") as Result.Success).data.single().price)
+    }
+
+    @Test
+    fun live_mapsDelayAndEta_dropsBlankIds() = runBlocking {
+        val api = FakeApi { ok(tainan) }
+        api.liveResponse = { ApiEnvelope(1L, "TDX", LiveData(listOf(LiveItemDto("143", 5, null), LiveItemDto("1610-14:30", null, 25), LiveItemDto("", 3, null)))) }
+        assertEquals(
+            listOf(LiveInfo("143", 5, null), LiveInfo("1610-14:30", null, 25)),
+            (repo(api, FakeDao()).live(Operator.TRA, "1080", "4220") as Result.Success).data,
+        )
+    }
+
+    @Test
+    fun bus_downloadsStopsWithCity() = runBlocking {
+        val dao = FakeDao()
+        val stop = StationDto("臺北轉運站", "台北轉運站", "Taipei Bus Station", "台北市", 0)
+        assertEquals(Result.Success(1), repo(FakeApi { ok(stop) }, dao).refreshStations(Operator.BUS))
+        assertEquals("臺北市", dao.saved.single().city)
+    }
+
+    @Test
+    fun findStation_triesFullNameThenWithoutTrailingStation() = runBlocking {
+        val dao = FakeDao()
+        val r = repo(FakeApi { ok(tainan) }, dao)
+        dao.saved += Station(Operator.BUS, "臺北轉運站", "臺北轉運站", null, 0, 0)
+        assertEquals("臺北轉運站", (r.findStation(Operator.BUS, "台北轉運站") as Result.Success).data?.stationId)
+        r.refreshStations(Operator.TRA)
+        assertEquals("4220", (r.findStation(Operator.TRA, "臺南站") as Result.Success).data?.stationId)
+        assertEquals(null, (r.findStation(Operator.TRA, "火星") as Result.Success).data)
     }
 }

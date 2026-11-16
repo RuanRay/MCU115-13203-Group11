@@ -47,6 +47,14 @@
     <dimen name="hero_back_ticket_width">230dp</dimen>
     <dimen name="hero_front_ticket_width">270dp</dimen>
     <dimen name="ticket_stub_min">56dp</dimen>
+    <dimen name="ticket_stub_max">92dp</dimen>
+
+    <!-- P4「現在」線（result.png） -->
+    <dimen name="now_line_gap">36dp</dimen>
+    <dimen name="now_line_width">2dp</dimen>
+    <dimen name="now_line_text">15sp</dimen>
+    <dimen name="now_line_text_gap">12dp</dimen>
+    <dimen name="tag_stroke">1.5dp</dimen>
     <dimen name="dialog_stamp_margin">24dp</dimen>
     <dimen name="member_card_ring_size">180dp</dimen>
     <dimen name="member_card_ring_stroke">16dp</dimen>

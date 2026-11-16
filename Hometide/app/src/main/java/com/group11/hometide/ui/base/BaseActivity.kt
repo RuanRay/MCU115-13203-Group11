@@ -22,7 +22,9 @@ import com.group11.hometide.R
 abstract class BaseActivity : AppCompatActivity() {
 
     /** Snackbar：3 秒、藏青底（規格 4.1） */
-    fun showSnackbar(@StringRes message: Int, anchor: View? = null) {
+    fun showSnackbar(@StringRes message: Int, anchor: View? = null) = showSnackbar(getText(message), anchor)
+
+    fun showSnackbar(message: CharSequence, anchor: View? = null) {
         Snackbar.make(findViewById(android.R.id.content), message, SNACKBAR_MS)
             .setBackgroundTint(ContextCompat.getColor(this, R.color.color_primary))
             .setTextColor(ContextCompat.getColor(this, R.color.color_on_primary))

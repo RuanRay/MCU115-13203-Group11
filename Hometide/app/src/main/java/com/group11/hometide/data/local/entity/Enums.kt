@@ -15,3 +15,6 @@ enum class AiStatus { PENDING, DONE, FAILED }
 enum class Sentiment { POSITIVE, NEUTRAL, NEGATIVE }
 
 enum class AiQueryResult { SUCCESS, STATION_NOT_FOUND, INVALID_DATE, PARSE_ERROR, TIMEOUT, NETWORK_ERROR, RATE_LIMITED }
+
+/** CR-01 票種代碼（7.1.5 fare_class） */
+enum class FareClass { ADULT, STUDENT, CHILD, SENIOR, DISABLED }

@@ -1,5 +1,121 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 第 1 週空版面：頁面內容依規格第 4 章於後續任務實作 -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- P4 查詢結果（規格 4.6、result.png、bus_result.png）。離線橫幅、下拉重新整理、空狀態於 4-4；排序選項於 4-3 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:layout_height="match_parent"
+    android:background="@color/color_background"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/page_horizontal_margin">
+
+    <!-- 1–2. 返回＋運具＋路線標題、收藏 ♥ -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="0dp"
+        app:contentInsetStart="0dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingTop="8dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvBack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:minHeight="@dimen/min_touch_target"
+                    android:textAppearance="@style/TextAppearance.Hometide.Body"
+                    android:textColor="@color/color_on_surface_muted" />
+
+                <TextView
+                    android:id="@+id/tvRoute"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.Hometide.Display"
+                    android:textColor="@color/color_on_background" />
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/btnFavorite"
+                android:layout_width="@dimen/min_touch_target"
+                android:layout_height="@dimen/min_touch_target"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/cd_favorite"
+                android:src="@drawable/ic_heart" />
+        </LinearLayout>
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <!-- 3. 離線橫幅（FR-OFF-01，任務 4-4） -->
+    <TextView
+        android:id="@+id/tvOfflineBanner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+    <!-- 4–5. 日期章、班次數、時段晶片、排序 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <com.group11.hometide.ui.widget.DateStampView
+            android:id="@+id/vDateStamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/tvCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:textAppearance="@style/TextAppearance.Hometide.Body"
+            android:textColor="@color/color_on_surface_muted" />
+
+        <!-- AI 時段篩選（第 6 週） -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipTimeRange"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:visibility="gone" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <Spinner
+            android:id="@+id/spSort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_select"
+            android:paddingHorizontal="8dp"
+            android:minHeight="@dimen/min_touch_target"
+            android:popupBackground="@color/color_surface" />
+    </LinearLayout>
+
+    <!-- 6–7. 時間軸列表、「現在」線（NowLineDecoration） -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvTimeline"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="12dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="24dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+</LinearLayout>

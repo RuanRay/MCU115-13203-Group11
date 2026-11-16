@@ -721,6 +721,24 @@ model: sonnet
                { "typeCode": "6", "adultPrice": 574, "approximate": false } ] } }
 ```
 
+**CR-01（票種與多人）新格式，任務 4-5 套用；在此之前 Worker 仍回傳上面的 `adultPrice`／`approximate`。** 一次回傳該起訖站所有車種（或路線）× 所有票種（`fareClass`＝ADULT／STUDENT／CHILD／SENIOR／DISABLED）的單價，App 自行計算總價；查無的票種**不出現在陣列中**，由 App 判斷為「查無」。不新增 ticket 參數，快取鍵不變。價格為示意。
+
+```json
+{
+  "updatedAt": 1762495500000,
+  "source": "TDX",
+  "data": {
+    "operator": "TRA",
+    "fares": [
+      { "typeCode": "3", "fareClass": "ADULT",    "price": 739, "approx": false },
+      { "typeCode": "3", "fareClass": "CHILD",    "price": 370, "approx": false },
+      { "typeCode": "3", "fareClass": "SENIOR",   "price": 370, "approx": false },
+      { "typeCode": "3", "fareClass": "DISABLED", "price": 370, "approx": false }
+    ]
+  }
+}
+```
+
 ### E-4 `GET /api/freeway/traffic?freeway=1&dir=S&from=<交流道>&to=<交流道>`
 
 ```json

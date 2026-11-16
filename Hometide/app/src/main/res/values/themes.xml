@@ -93,6 +93,43 @@
         <item name="strokeWidth">@dimen/button_stroke_width</item>
     </style>
 
+    <!-- P3 範例句晶片（home.png）：紙色底、藏青框與字 -->
+    <style name="Widget.Hometide.Chip.Example" parent="Widget.Material3.Chip.Assist">
+        <item name="chipBackgroundColor">@color/color_surface</item>
+        <item name="chipStrokeColor">@color/color_primary</item>
+        <item name="chipStrokeWidth">@dimen/button_stroke_width</item>
+        <item name="chipCornerRadius">@dimen/corner_floating_input</item>
+        <item name="android:textColor">@color/color_primary</item>
+        <item name="android:textAppearance">@style/TextAppearance.Hometide.Label</item>
+    </style>
+
+    <!-- P4 狀態／設施標籤（result.png）：外框與字同色，顏色由程式依狀態設定 -->
+    <style name="Widget.Hometide.Tag" parent="">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginEnd">6dp</item>
+        <item name="android:background">@drawable/bg_tag</item>
+        <item name="android:paddingHorizontal">8dp</item>
+        <item name="android:paddingVertical">2dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.Hometide.Label</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
+    <!-- P3 起站／迄站：宋體大字、無底線（home.png） -->
+    <style name="Widget.Hometide.StationInput" parent="Widget.AppCompat.AutoCompleteTextView">
+        <item name="android:background">@null</item>
+        <item name="android:completionThreshold">1</item>
+        <item name="android:dropDownWidth">200dp</item>
+        <item name="android:imeOptions">actionNext</item>
+        <item name="android:inputType">text</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:minHeight">@dimen/min_touch_target</item>
+        <item name="android:popupBackground">@color/color_surface</item>
+        <item name="android:textAppearance">@style/TextAppearance.Hometide.TicketRoute.Large</item>
+        <item name="android:textColor">@color/color_on_background</item>
+        <item name="android:textColorHint">@color/color_outline</item>
+    </style>
+
     <!-- 文字樣式（規格 5.2）。parent 用 AppCompat，不繼承 M3 的固定 lineHeight（避免 40sp 倒數被裁切） -->
     <style name="TextAppearance.Hometide.Display" parent="TextAppearance.AppCompat">
         <item name="fontFamily">@font/noto_serif_tc_black</item>
@@ -141,5 +178,10 @@
         <item name="android:fontFamily">@font/noto_serif_tc_bold</item>
         <item name="android:textSize">14sp</item>
         <item name="android:letterSpacing">0.2</item>
+    </style>
+
+    <!-- 宋體粗體標籤、不加字距：範例句晶片、區段標題（home.png） -->
+    <style name="TextAppearance.Hometide.Label" parent="TextAppearance.Hometide.Button">
+        <item name="android:letterSpacing">0</item>
     </style>
 </resources>

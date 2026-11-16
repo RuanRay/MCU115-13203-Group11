@@ -13,6 +13,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.setFragmentResultListener
 import com.group11.hometide.databinding.DialogLoginPromptBinding
@@ -70,4 +71,19 @@ fun Fragment.registerLoginPrompt(onLoggedIn: () -> Unit = {}): () -> Unit {
         }
     })
     return { LoginPromptDialog().show(parentFragmentManager, LoginPromptDialog.TAG) }
+}
+
+/** Activity 版（P4 的 ♥、提醒；4.10「訪客按 ♥／提醒 → 去登入」）。必須在 Activity 建立時（屬性初始化）呼叫。 */
+fun FragmentActivity.registerLoginPrompt(onLoggedIn: () -> Unit = {}): () -> Unit {
+    val launcher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        if (it.resultCode == Activity.RESULT_OK) onLoggedIn()
+    }
+    lifecycle.addObserver(object : DefaultLifecycleObserver {
+        override fun onCreate(owner: LifecycleOwner) {
+            supportFragmentManager.setFragmentResultListener(LoginPromptDialog.REQUEST_KEY, this@registerLoginPrompt) { _, _ ->
+                launcher.launch(LoginActivity.intentForResult(this@registerLoginPrompt))
+            }
+        }
+    })
+    return { LoginPromptDialog().show(supportFragmentManager, LoginPromptDialog.TAG) }
 }
