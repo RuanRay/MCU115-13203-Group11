@@ -16,7 +16,9 @@ suspend fun <T> apiCall(gson: Gson, block: suspend () -> T): Result<T> = try {
 } catch (e: CancellationException) {
     throw e
 } catch (e: HttpException) {
-    Result.Failure(workerErrorOf(gson, e))
+    val error = workerErrorOf(gson, e)
+    if (error == AppError.AuthError) Log.w(TAG, "Worker AUTH error") // 11.2：AuthError 記錄 log（只記事件）
+    Result.Failure(error)
 } catch (e: JsonParseException) {
     Log.w(TAG, "Worker response parse failed: ${e.javaClass.simpleName}") // 11.2：ParseError 記錄 log
     Result.Failure(AppError.ParseError)

@@ -57,11 +57,17 @@
         </LinearLayout>
     </com.google.android.material.appbar.MaterialToolbar>
 
-    <!-- 3. 離線橫幅（FR-OFF-01，任務 4-4） -->
+    <!-- 3. 離線橫幅（FR-OFF-01）：芥末黃橫幅；滑下動畫 AN-16 於 7-3 -->
     <TextView
         android:id="@+id/tvOfflineBanner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:background="@drawable/bg_offline_banner"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="8dp"
+        android:textAppearance="@style/TextAppearance.Hometide.Body"
+        android:textColor="@color/offline_banner_text"
         android:visibility="gone" />
 
     <!-- 4–5. 日期章、班次數、時段晶片、排序 -->
@@ -108,14 +114,45 @@
             android:popupBackground="@color/color_surface" />
     </LinearLayout>
 
-    <!-- 6–7. 時間軸列表、「現在」線（NowLineDecoration） -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvTimeline"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="12dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:paddingBottom="24dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        android:layout_weight="1">
+
+        <!-- 8. 下拉重新整理（小火車指示器 AN-12 於 7-3）；6–7. 時間軸列表、「現在」線（NowLineDecoration） -->
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefresh"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvTimeline"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingBottom="24dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <!-- 載入中：3 張骨架車票（FR-RES-06） -->
+        <LinearLayout
+            android:id="@+id/layoutSkeleton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="8dp">
+
+            <include layout="@layout/item_ticket_skeleton" />
+
+            <include layout="@layout/item_ticket_skeleton" />
+
+            <include layout="@layout/item_ticket_skeleton" />
+        </LinearLayout>
+
+        <!-- 9. 空狀態／錯誤狀態 -->
+        <include
+            android:id="@+id/layoutEmpty"
+            layout="@layout/layout_result_empty" />
+    </FrameLayout>
 </LinearLayout>

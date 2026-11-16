@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 離線橫幅：芥末黃（規格 5、AN-16） -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/color_accent" />
+    <corners android:radius="@dimen/corner_control_small" />
+</shape>

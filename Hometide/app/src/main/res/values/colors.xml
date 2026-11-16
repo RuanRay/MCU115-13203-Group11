@@ -14,4 +14,7 @@
     <color name="color_stamp">#B23A2E</color>
     <color name="color_success">#3E7A4A</color>
     <color name="color_facility">#2F6E6A</color>
+
+    <!-- 離線橫幅（芥末黃底）上的文字：沿用既有色票，深色模式改用 on_primary 以維持對比（任務 4-4） -->
+    <color name="offline_banner_text">@color/color_on_background</color>
 </resources>

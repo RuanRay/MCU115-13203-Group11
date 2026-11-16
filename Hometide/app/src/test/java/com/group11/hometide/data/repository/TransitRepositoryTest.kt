@@ -102,7 +102,11 @@ class TransitRepositoryTest {
         val rows = mutableListOf<TimetableCache>()
         override suspend fun get(operator: Operator, originId: String, destId: String, travelDate: String) =
             rows.filter { it.operator == operator && it.originId == originId && it.destId == destId && it.travelDate == travelDate }
-        override suspend fun deleteOlderThan(time: Long) = 0
+        var purgedBefore: Long? = null
+        override suspend fun deleteOlderThan(time: Long): Int {
+            purgedBefore = time
+            return 0
+        }
         override suspend fun delete(operator: Operator, originId: String, destId: String, travelDate: String) {
             rows.removeAll { it.operator == operator && it.originId == originId && it.destId == destId && it.travelDate == travelDate }
         }
@@ -191,18 +195,60 @@ class TransitRepositoryTest {
         val api = FakeApi({ trips(trip) }) { ok(tainan) }
         val r = repo(api, FakeDao())
         val first = (r.timetable(query) as Result.Success).data
-        assertEquals(listOf("139"), first.map { it.trainNo })
-        assertEquals(1, first.single().tripLine)
-        assertEquals(1, (r.timetable(query) as Result.Success).data.size)
+        assertEquals(listOf("139"), first.trains.map { it.trainNo })
+        assertEquals(1, first.trains.single().tripLine)
+        assertEquals(null, first.error)
+        assertEquals(1, (r.timetable(query) as Result.Success).data.trains.size)
         assertEquals(1, api.timetableCalls) // 2 小時內不重複呼叫（8.5）
+        r.timetable(query, force = true)
+        assertEquals(2, api.timetableCalls) // 下拉重新整理略過 2 小時快取（FR-RES-06）
     }
 
     @Test
-    fun timetable_staleCacheRefetches_andInvalidPayloadIsParseError() = runBlocking {
-        timetableDao.rows += first(trip).copy(fetchedAt = now - 3 * 60 * 60 * 1000)
+    fun timetable_invalidPayloadIsParseError_withoutCache() = runBlocking {
         val api = FakeApi({ trips(trip.copy(departTime = "25:00")) }) { ok(tainan) }
         assertEquals(Result.Failure(AppError.ParseError), repo(api, FakeDao()).timetable(query))
         assertEquals(1, api.timetableCalls)
+    }
+
+    /** FR-OFF-01：查詢失敗時讀快取（3 天內），附上最後更新時間與錯誤 */
+    @Test
+    fun timetable_offlineFallsBackToStaleCache() = runBlocking {
+        val fetched = now - 5 * 60 * 60 * 1000
+        timetableDao.rows += first(trip).copy(fetchedAt = fetched)
+        val api = FakeApi({ throw IOException("offline") }) { ok(tainan) }
+        val t = (repo(api, FakeDao()).timetable(query) as Result.Success).data
+        assertEquals(listOf("139"), t.trains.map { it.trainNo })
+        assertEquals(fetched, t.cachedAt)
+        assertEquals(AppError.NetworkError, t.error)
+    }
+
+    @Test
+    fun timetable_offlineWithoutUsableCache_fails_andNotFoundIgnoresCache() = runBlocking {
+        timetableDao.rows += first(trip).copy(fetchedAt = now - 4 * day) // 超過 3 天不用
+        assertEquals(Result.Failure(AppError.NetworkError), repo(FakeApi({ throw IOException("x") }) { ok(tainan) }, FakeDao()).timetable(query))
+        timetableDao.rows.clear()
+        timetableDao.rows += first(trip).copy(fetchedAt = now - 5 * 60 * 60 * 1000)
+        val notFound = HttpException(Response.error<Any>(404, "{}".toResponseBody()))
+        assertEquals(Result.Failure(AppError.NotFound), repo(FakeApi({ throw notFound }) { ok(tainan) }, FakeDao()).timetable(query))
+    }
+
+    /** 11.2 QuotaExceeded：60 秒內只讀快取，不再呼叫 Worker */
+    @Test
+    fun timetable_quotaCooldown60s() = runBlocking {
+        timetableDao.rows += first(trip).copy(fetchedAt = now - 5 * 60 * 60 * 1000)
+        val quota = HttpException(Response.error<Any>(429, "{}".toResponseBody()))
+        val api = FakeApi({ throw quota }) { ok(tainan) }
+        val r = repo(api, FakeDao())
+        assertEquals(AppError.QuotaExceeded, (r.timetable(query) as Result.Success).data.error)
+        assertEquals(AppError.QuotaExceeded, (r.timetable(query, force = true) as Result.Success).data.error)
+        assertEquals(1, api.timetableCalls)
+    }
+
+    @Test
+    fun purgeOldTimetables_deletesOlderThan3Days() = runBlocking {
+        assertEquals(Result.Success(0), repo(FakeApi { ok(tainan) }, FakeDao()).purgeOldTimetables())
+        assertEquals(now - 3 * day, timetableDao.purgedBefore)
     }
 
     private fun first(t: TripDto) = t.toEntity(query, now)!!
