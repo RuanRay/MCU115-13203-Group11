@@ -20,6 +20,25 @@ data class StationsData(
     val stations: List<StationDto>?,
 )
 
+/** E-1／E-2 /api/timetable */
+data class TimetableData(
+    val operator: String?,
+    val trips: List<TripDto>?,
+)
+
+data class TripDto(
+    val tripId: String?,
+    val typeCode: String?,
+    val typeName: String?,
+    val line: Int?,
+    val departTime: String?,
+    val arriveTime: String?,
+    val durationMin: Int?,
+    val arriveEstimated: Boolean?,
+    val reservedSeat: Boolean?,
+    val bikeAllowed: Boolean?,
+)
+
 data class StationDto(
     val id: String?,
     val nameZh: String?,

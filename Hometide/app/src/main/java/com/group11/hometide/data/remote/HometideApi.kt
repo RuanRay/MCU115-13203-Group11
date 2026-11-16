@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.group11.hometide.BuildConfig
 import com.group11.hometide.data.remote.dto.ApiEnvelope
 import com.group11.hometide.data.remote.dto.StationsData
+import com.group11.hometide.data.remote.dto.TimetableData
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -15,9 +16,18 @@ import java.util.concurrent.TimeUnit
 /** 只呼叫自建 Worker（規格 6.2、8.3）；App 不得直接呼叫 TDX。 */
 interface HometideApi {
 
-    /** E-7；operator = TRA／THSR */
+    /** E-7；operator = TRA／THSR／BUS */
     @GET("api/stations")
     suspend fun stations(@Query("operator") operator: String): ApiEnvelope<StationsData>
+
+    /** E-1／E-2；BUS 的 from／to 為站名，date＝yyyy-MM-dd */
+    @GET("api/timetable")
+    suspend fun timetable(
+        @Query("operator") operator: String,
+        @Query("from") from: String,
+        @Query("to") to: String,
+        @Query("date") date: String,
+    ): ApiEnvelope<TimetableData>
 
     companion object {
         private const val TIMEOUT_S = 15L

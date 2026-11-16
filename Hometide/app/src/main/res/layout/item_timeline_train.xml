@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- P4 時間軸項目（規格 4.6、result.png）：左側發車時刻＋節點，右側紙票（本體＋存根）；已開出另有印章 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/tvHour"
+        android:layout_width="56dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="end"
+        android:textAppearance="@style/TextAppearance.Hometide.TicketTime.Small"
+        android:textColor="@color/color_on_background" />
+
+    <!-- 時間軸直線＋節點圓點 -->
+    <FrameLayout
+        android:layout_width="24dp"
+        android:layout_height="match_parent">
+
+        <View
+            android:layout_width="3dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:background="@color/color_outline" />
+
+        <View
+            android:id="@+id/vNode"
+            android:layout_width="12dp"
+            android:layout_height="12dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="26dp"
+            android:background="@drawable/bg_timeline_node" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingVertical="@dimen/ticket_gap">
+
+        <com.group11.hometide.ui.widget.TicketView
+            android:id="@+id/tkTrain"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:ticketStyle="paper">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="8dp">
+
+                <TextView
+                    android:id="@+id/tvTrainMeta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.05"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:textAppearance="@style/TextAppearance.Hometide.Body"
+                    android:textColor="@color/color_on_surface_muted" />
+
+                <TextView
+                    android:id="@+id/tvTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textAppearance="@style/TextAppearance.Hometide.TicketRoute.Large"
+                    android:textColor="@color/color_on_background" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/chipStatus"
+                        style="@style/Widget.Hometide.Tag" />
+
+                    <!-- 設施標籤：對號／非對號、可帶自行車；國道客運為「抵達為預估」 -->
+                    <LinearLayout
+                        android:id="@+id/chipFacilities"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 存根：票價（任務 4-3）、全票、提醒（5-3） -->
+            <LinearLayout
+                android:layout_width="@dimen/ticket_stub_max"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingVertical="8dp">
+
+                <TextView
+                    android:id="@+id/tvFare"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.Hometide.TicketTime.Large"
+                    android:textColor="@color/color_primary" />
+
+                <TextView
+                    android:id="@+id/tvFareMix"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/fare_adult"
+                    android:textAppearance="@style/TextAppearance.Hometide.Caption.Large"
+                    android:textColor="@color/color_on_surface_muted" />
+
+                <TextView
+                    android:id="@+id/btnRemind"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center"
+                    android:minHeight="@dimen/min_touch_target"
+                    android:paddingHorizontal="4dp"
+                    android:text="@string/btn_remind"
+                    android:textAppearance="@style/TextAppearance.Hometide.Label"
+                    android:textColor="@color/color_primary" />
+            </LinearLayout>
+        </com.group11.hometide.ui.widget.TicketView>
+
+        <!-- 已開出印章（4.6；AN-14 蓋章動畫於第 7 週） -->
+        <com.group11.hometide.ui.widget.StampView
+            android:id="@+id/vDepartedStamp"
+            android:layout_width="@dimen/stamp_size"
+            android:layout_height="@dimen/stamp_size"
+            android:layout_gravity="center_vertical|end"
+            android:layout_marginEnd="@dimen/ticket_stub_max"
+            android:visibility="gone"
+            app:stampColor="red"
+            app:stampText="@string/stamp_departed" />
+    </FrameLayout>
+</LinearLayout>

@@ -3,6 +3,11 @@ package com.group11.hometide.data.repository
 import android.database.Cursor
 import com.google.gson.Gson
 import com.group11.hometide.data.local.dao.StationDao
+import com.group11.hometide.data.local.dao.TimetableDao
+import com.group11.hometide.data.local.dao.TimetableQuery
+import com.group11.hometide.data.local.entity.TimetableCache
+import com.group11.hometide.data.remote.dto.TimetableData
+import com.group11.hometide.data.remote.dto.TripDto
 import com.group11.hometide.data.local.dao.RecentSearch
 import com.group11.hometide.data.local.dao.SearchHistoryDao
 import com.group11.hometide.data.local.entity.SearchHistory
@@ -38,6 +43,8 @@ class TransitRepositoryTest {
             saved += stations
         }
         override suspend fun lastUpdated(operator: Operator): Long? = last
+        override suspend fun nameOf(operator: Operator, stationId: String): String? =
+            saved.firstOrNull { it.operator == operator && it.stationId == stationId }?.nameZh
         override suspend fun findByName(operator: Operator, name: String): Station? =
             saved.firstOrNull { it.operator == operator && it.nameZh == name }
     }
@@ -48,18 +55,41 @@ class TransitRepositoryTest {
         override suspend fun deleteRoute(operator: Operator, originId: String, destId: String) = Unit
     }
 
-    private class FakeApi(val respond: () -> ApiEnvelope<StationsData>) : HometideApi {
+    private class FakeApi(
+        val trips: () -> ApiEnvelope<TimetableData> = { ApiEnvelope(1L, "TDX", TimetableData("TRA", emptyList())) },
+        val respond: () -> ApiEnvelope<StationsData>,
+    ) : HometideApi {
         var calls = 0
+        var timetableCalls = 0
         override suspend fun stations(operator: String): ApiEnvelope<StationsData> {
             calls++
             return respond()
+        }
+        override suspend fun timetable(operator: String, from: String, to: String, date: String): ApiEnvelope<TimetableData> {
+            timetableCalls++
+            return trips()
+        }
+    }
+
+    private class FakeTimetableDao : TimetableDao {
+        val rows = mutableListOf<TimetableCache>()
+        override suspend fun get(operator: Operator, originId: String, destId: String, travelDate: String) =
+            rows.filter { it.operator == operator && it.originId == originId && it.destId == destId && it.travelDate == travelDate }
+        override suspend fun deleteOlderThan(time: Long) = 0
+        override suspend fun delete(operator: Operator, originId: String, destId: String, travelDate: String) {
+            rows.removeAll { it.operator == operator && it.originId == originId && it.destId == destId && it.travelDate == travelDate }
+        }
+        override suspend fun insertAll(trains: List<TimetableCache>) {
+            rows += trains
         }
     }
 
     private fun ok(vararg s: StationDto) = ApiEnvelope(1L, "TDX", StationsData("TRA", s.toList()))
     private val tainan = StationDto("4220", "台南", "Tainan", "臺南市", 0)
 
-    private fun repo(api: HometideApi, dao: StationDao) = TransitRepository(api, dao, NoHistory, Gson()) { now }
+    private val timetableDao = FakeTimetableDao()
+
+    private fun repo(api: HometideApi, dao: StationDao) = TransitRepository(api, dao, NoHistory, timetableDao, Gson()) { now }
 
     @Test
     fun downloadsWhenEmpty_andNormalizes() = runBlocking {
@@ -123,6 +153,31 @@ class TransitRepositoryTest {
             repo(FakeApi { ok(tainan) }, FakeDao(failUpsert = true)).refreshStations(Operator.TRA),
         )
     }
+
+    private val query = TimetableQuery(Operator.TRA, "1080", "4220", "2026-11-16")
+    private val trip = TripDto("139", "3", "自強", 1, "14:12", "17:20", 188, false, true, false)
+    private fun trips(vararg t: TripDto) = ApiEnvelope(1L, "TDX", TimetableData("TRA", t.toList()))
+
+    @Test
+    fun timetable_fetchesAndCaches_thenReusesWithin2Hours() = runBlocking {
+        val api = FakeApi({ trips(trip) }) { ok(tainan) }
+        val r = repo(api, FakeDao())
+        val first = (r.timetable(query) as Result.Success).data
+        assertEquals(listOf("139"), first.map { it.trainNo })
+        assertEquals(1, first.single().tripLine)
+        assertEquals(1, (r.timetable(query) as Result.Success).data.size)
+        assertEquals(1, api.timetableCalls) // 2 小時內不重複呼叫（8.5）
+    }
+
+    @Test
+    fun timetable_staleCacheRefetches_andInvalidPayloadIsParseError() = runBlocking {
+        timetableDao.rows += first(trip).copy(fetchedAt = now - 3 * 60 * 60 * 1000)
+        val api = FakeApi({ trips(trip.copy(departTime = "25:00")) }) { ok(tainan) }
+        assertEquals(Result.Failure(AppError.ParseError), repo(api, FakeDao()).timetable(query))
+        assertEquals(1, api.timetableCalls)
+    }
+
+    private fun first(t: TripDto) = t.toEntity(query, now)!!
 
     @Test
     fun bus_downloadsStopsWithCity() = runBlocking {

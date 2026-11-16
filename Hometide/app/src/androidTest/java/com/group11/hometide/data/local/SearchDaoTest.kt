@@ -79,6 +79,14 @@ class SearchDaoTest {
         assertEquals("臺南轉運站", dao.findByName(Operator.BUS, "臺南轉運站")?.stationId)
     }
 
+    /** FR-SRCH-02：英文站名不分大小寫 */
+    @Test
+    fun searchCursor_matchesEnglishName() = runBlocking {
+        db.stationDao().upsertAll(listOf(Station(Operator.TRA, "1210", "新竹", "Hsinchu", 0, 1)))
+        db.stationDao().searchCursor(Operator.TRA, "hsinchu").use { assertEquals(1, it.count) }
+        db.stationDao().searchCursor(Operator.TRA, "Hsin").use { assertEquals(1, it.count) }
+    }
+
     @Test
     fun migration1to2_addsCityAndForcesRedownload() {
         val ctx = ApplicationProvider.getApplicationContext<android.content.Context>()

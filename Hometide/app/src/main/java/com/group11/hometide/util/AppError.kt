@@ -14,3 +14,15 @@ sealed interface AppError {
     data object InvalidCredentials : AppError
     data object TooManyAttempts : AppError
 }
+
+/** 11.2 錯誤訊息（Worker 與資料相關） */
+@get:androidx.annotation.StringRes
+val AppError.messageRes: Int
+    get() = when (this) {
+        AppError.NetworkError -> com.group11.hometide.R.string.error_network
+        AppError.AuthError -> com.group11.hometide.R.string.error_service_unavailable
+        AppError.QuotaExceeded -> com.group11.hometide.R.string.error_quota
+        AppError.NotFound -> com.group11.hometide.R.string.error_no_trains
+        AppError.ParseError -> com.group11.hometide.R.string.error_parse
+        else -> com.group11.hometide.R.string.error_unknown
+    }

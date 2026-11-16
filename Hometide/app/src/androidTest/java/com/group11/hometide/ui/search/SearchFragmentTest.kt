@@ -65,6 +65,15 @@ class SearchFragmentTest {
         }
     }
 
+    /** FR-SRCH-02：英文站名也能比對，下拉顯示中文站名 */
+    @Test
+    fun autocomplete_englishName() {
+        ActivityScenario.launch(MainActivity::class.java).use {
+            onView(withId(R.id.actvOrigin)).perform(click(), replaceText("hsinchu"))
+            onView(first(withText("新竹"))).inRoot(isPlatformPopup()).check(matches(isDisplayed()))
+        }
+    }
+
     /** 裝置上可能已有真實車站資料（代碼不同、站名相同），只檢查第一個符合者 */
     private fun <T> first(matcher: Matcher<T>): Matcher<T> = object : BaseMatcher<T>() {
         private var found = false

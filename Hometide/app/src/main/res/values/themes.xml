@@ -103,6 +103,18 @@
         <item name="android:textAppearance">@style/TextAppearance.Hometide.Label</item>
     </style>
 
+    <!-- P4 狀態／設施標籤（result.png）：外框與字同色，顏色由程式依狀態設定 -->
+    <style name="Widget.Hometide.Tag" parent="">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginEnd">6dp</item>
+        <item name="android:background">@drawable/bg_tag</item>
+        <item name="android:paddingHorizontal">8dp</item>
+        <item name="android:paddingVertical">2dp</item>
+        <item name="android:textAppearance">@style/TextAppearance.Hometide.Label</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+
     <!-- P3 起站／迄站：宋體大字、無底線（home.png） -->
     <style name="Widget.Hometide.StationInput" parent="Widget.AppCompat.AutoCompleteTextView">
         <item name="android:background">@null</item>

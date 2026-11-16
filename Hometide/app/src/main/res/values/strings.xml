@@ -101,6 +101,40 @@
     <string name="error_same_station">起站與迄站不能相同</string>
     <string name="error_station_not_found">找不到車站：%1$s</string>
 
+    <!-- P4 查詢結果（規格 4.6、result.png、bus_result.png） -->
+    <string name="result_back">‹ 返回・%1$s</string>
+    <string name="result_route">%1$s → %2$s</string>
+    <string name="result_count">共 %1$d 班</string>
+    <string name="cd_favorite">收藏</string>
+    <string name="sort_by_depart">依出發時間</string>
+    <string name="now_line">現在 %1$s</string>
+    <string name="train_meta">%1$s %2$s 次</string>
+    <string name="bus_meta">%1$s %2$s</string>
+    <string name="meta_with_extra">%1$s・%2$s</string>
+    <string name="line_mountain">山線</string>
+    <string name="line_sea">海線</string>
+    <string name="duration">%1$d:%2$02d</string>
+    <string name="duration_about">約 %1$d:%2$02d</string>
+    <string name="train_time">%1$s → %2$s</string>
+    <string name="status_departed">已開出</string>
+    <string name="status_soon">%1$d分後</string>
+    <string name="status_on_time">準點</string>
+    <string name="status_by_schedule">依班表</string>
+    <string name="tag_reserved">對號</string>
+    <string name="tag_unreserved">非對號</string>
+    <string name="tag_bike">可帶自行車</string>
+    <string name="tag_arrive_estimated">抵達為預估</string>
+    <string name="fare_unknown">—</string>
+    <string name="fare_adult">全票</string>
+    <string name="btn_remind">🔔 提醒</string>
+    <string name="stamp_departed">已開出</string>
+
+    <!-- 11.2 錯誤訊息 -->
+    <string name="error_service_unavailable">資料服務暫時無法使用</string>
+    <string name="error_quota">查詢太頻繁，請稍後再試</string>
+    <string name="error_no_trains">這天沒有符合的班次</string>
+    <string name="error_parse">資料格式異常，請稍後再試</string>
+
     <!-- P6 個人（規格 4.8） -->
     <string name="title_profile">個人</string>
     <string name="member_card_title">HOMETIDE 乘車會員證</string>

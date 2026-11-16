@@ -33,6 +33,10 @@ interface StationDao {
     )
     fun searchCursorByPattern(operator: Operator, contains: String, prefix: String): Cursor
 
+    /** P4 標題用（FR-RES-01） */
+    @Query("SELECT name_zh FROM station WHERE operator = :operator AND station_id = :stationId")
+    suspend fun nameOf(operator: Operator, stationId: String): String?
+
     /** 手動查詢驗證（FR-SRCH-01）：name 須先正規化 */
     @Query("SELECT * FROM station WHERE operator = :operator AND name_zh = :name ORDER BY sort_key LIMIT 1")
     suspend fun findByName(operator: Operator, name: String): Station?
