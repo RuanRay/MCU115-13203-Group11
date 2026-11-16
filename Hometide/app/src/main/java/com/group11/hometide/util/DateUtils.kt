@@ -15,3 +15,7 @@ object DateUtils {
     fun weekdayNarrow(date: LocalDate): String =
         date.dayOfWeek.getDisplayName(TextStyle.NARROW, Locale.TRADITIONAL_CHINESE)
 }
+
+/** 「11/7（六）」：P3 乘車日期、最近查詢（home.png） */
+fun android.content.Context.monthDayWeekday(date: LocalDate): String =
+    getString(com.group11.hometide.R.string.month_day_weekday, date.monthValue, date.dayOfMonth, DateUtils.weekdayNarrow(date))

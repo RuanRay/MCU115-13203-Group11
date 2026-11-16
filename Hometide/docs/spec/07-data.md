@@ -24,6 +24,7 @@
 | name_en | TEXT | — | 英文站名 |
 | sort_key | INTEGER | — | 顯示排序 |
 | updated_at | INTEGER | NOT NULL | 最後下載時間 |
+| city | TEXT | NULL | 縣市（臺），Worker 回傳；FR-BUS-01 輸入縣市名時列出該縣市站牌（任務 4-1 新增，Room 版本 2，實作者確認） |
 
 #### 7.1.3 search_history
 

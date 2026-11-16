@@ -30,10 +30,10 @@ class HometideApp : Application() {
         // TODO(第 7 週，FR-USG)：以 ProcessLifecycleOwner 註冊 UsageTracker（規格 6.2）
     }
 
-    /** 啟動時在背景更新台鐵、高鐵車站（沒有資料或超過 7 天才下載）；失敗不提示，下次啟動再試 */
+    /** 啟動時在背景更新台鐵、高鐵車站與國道客運站牌（沒有資料或超過 7 天才下載）；失敗不提示，下次啟動再試 */
     private fun refreshStations() {
         appScope.launch {
-            for (op in listOf(Operator.TRA, Operator.THSR)) {
+            for (op in Operator.entries) {
                 val res = container.transitRepository.refreshStations(op)
                 if (res is Result.Failure) Log.w(TAG, "Station refresh failed: $op ${res.error}")
             }

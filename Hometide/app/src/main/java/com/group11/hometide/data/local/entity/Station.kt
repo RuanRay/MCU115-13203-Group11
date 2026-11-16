@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 
-/** 7.1.2；name_zh 為正規化後站名（臺） */
+/** 7.1.2；name_zh 為正規化後站名（臺）；city 由任務 4-1 新增（FR-BUS-01 縣市建議，實作者確認） */
 @Entity(
     tableName = "station",
     primaryKeys = ["operator", "station_id"],
@@ -17,4 +17,5 @@ data class Station(
     @ColumnInfo(name = "name_en") val nameEn: String?,
     @ColumnInfo(name = "sort_key") val sortKey: Int?,
     @ColumnInfo(name = "updated_at") val updatedAt: Long,
+    val city: String? = null,
 )

@@ -3,6 +3,11 @@ package com.group11.hometide.data.repository
 import android.database.Cursor
 import com.google.gson.Gson
 import com.group11.hometide.data.local.dao.StationDao
+import com.group11.hometide.data.local.dao.RecentSearch
+import com.group11.hometide.data.local.dao.SearchHistoryDao
+import com.group11.hometide.data.local.entity.SearchHistory
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import com.group11.hometide.data.local.entity.Operator
 import com.group11.hometide.data.local.entity.Station
 import com.group11.hometide.data.remote.HometideApi
@@ -33,6 +38,14 @@ class TransitRepositoryTest {
             saved += stations
         }
         override suspend fun lastUpdated(operator: Operator): Long? = last
+        override suspend fun findByName(operator: Operator, name: String): Station? =
+            saved.firstOrNull { it.operator == operator && it.nameZh == name }
+    }
+
+    private object NoHistory : SearchHistoryDao {
+        override suspend fun insert(history: SearchHistory) = Unit
+        override fun recent(limit: Int): Flow<List<RecentSearch>> = emptyFlow()
+        override suspend fun deleteRoute(operator: Operator, originId: String, destId: String) = Unit
     }
 
     private class FakeApi(val respond: () -> ApiEnvelope<StationsData>) : HometideApi {
@@ -46,7 +59,7 @@ class TransitRepositoryTest {
     private fun ok(vararg s: StationDto) = ApiEnvelope(1L, "TDX", StationsData("TRA", s.toList()))
     private val tainan = StationDto("4220", "台南", "Tainan", "臺南市", 0)
 
-    private fun repo(api: HometideApi, dao: StationDao) = TransitRepository(api, dao, Gson()) { now }
+    private fun repo(api: HometideApi, dao: StationDao) = TransitRepository(api, dao, NoHistory, Gson()) { now }
 
     @Test
     fun downloadsWhenEmpty_andNormalizes() = runBlocking {
@@ -112,9 +125,21 @@ class TransitRepositoryTest {
     }
 
     @Test
-    fun bus_notSupportedYet() = runBlocking {
-        val api = FakeApi { ok(tainan) }
-        assertEquals(Result.Failure(AppError.NotFound), repo(api, FakeDao()).refreshStations(Operator.BUS))
-        assertEquals(0, api.calls)
+    fun bus_downloadsStopsWithCity() = runBlocking {
+        val dao = FakeDao()
+        val stop = StationDto("臺北轉運站", "台北轉運站", "Taipei Bus Station", "台北市", 0)
+        assertEquals(Result.Success(1), repo(FakeApi { ok(stop) }, dao).refreshStations(Operator.BUS))
+        assertEquals("臺北市", dao.saved.single().city)
+    }
+
+    @Test
+    fun findStation_triesFullNameThenWithoutTrailingStation() = runBlocking {
+        val dao = FakeDao()
+        val r = repo(FakeApi { ok(tainan) }, dao)
+        dao.saved += Station(Operator.BUS, "臺北轉運站", "臺北轉運站", null, 0, 0)
+        assertEquals("臺北轉運站", (r.findStation(Operator.BUS, "台北轉運站") as Result.Success).data?.stationId)
+        r.refreshStations(Operator.TRA)
+        assertEquals("4220", (r.findStation(Operator.TRA, "臺南站") as Result.Success).data?.stationId)
+        assertEquals(null, (r.findStation(Operator.TRA, "火星") as Result.Success).data)
     }
 }

@@ -69,6 +69,38 @@
     <string name="btn_later">稍後再說</string>
     <string name="btn_go_login">去登入</string>
 
+    <!-- P3 查詢（規格 4.4） -->
+    <!-- FR-SRCH-05 問候語依畫面圖 home.png（實作者確認）：週X＋時段＋好 -->
+    <string name="search_greeting">週%1$s%2$s好</string>
+    <string name="period_morning">早上</string>
+    <string name="period_afternoon">下午</string>
+    <string name="period_evening">晚上</string>
+    <string name="search_title_friday">今天要回家嗎？</string>
+    <string name="search_title_default">要去哪裡？</string>
+    <string name="ai_card_label">✎ 乘車申請單・用一句話查詢</string>
+    <string name="ai_hint">明天下午從桃園回台南…</string>
+    <string name="btn_parse">解析</string>
+    <string name="ai_coming_soon">一句話查詢即將推出</string>
+    <string name="example_tonight_home">今晚回家</string>
+    <string name="example_sunday_school">週日回學校</string>
+    <string name="example_thsr_fastest">高鐵最快一班</string>
+    <string name="fav_title">我的車票夾</string>
+    <string name="fav_more">滑動看更多 ›</string>
+    <string name="fav_empty_hint">把常用路線收藏起來，下次一鍵查詢</string>
+    <string name="manual_label">空白車票・手動查詢</string>
+    <string name="hint_origin">起站</string>
+    <string name="hint_dest">迄站</string>
+    <string name="cd_swap">交換起訖站</string>
+    <string name="travel_date">乘車日期 %1$s ▾</string>
+    <string name="month_day_weekday">%1$d/%2$d（%3$s）</string>
+    <string name="btn_search_trains">查詢\n班次</string>
+    <string name="recent_title">最近查詢</string>
+    <string name="recent_route">%1$s → %2$s</string>
+    <string name="recent_route_operator">%1$s → %2$s（%3$s）</string>
+    <string name="error_station_required">請輸入起站與迄站</string>
+    <string name="error_same_station">起站與迄站不能相同</string>
+    <string name="error_station_not_found">找不到車站：%1$s</string>
+
     <!-- P6 個人（規格 4.8） -->
     <string name="title_profile">個人</string>
     <string name="member_card_title">HOMETIDE 乘車會員證</string>

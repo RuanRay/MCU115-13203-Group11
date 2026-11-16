@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- spOperator 的 ▾（home.png），Material Symbols arrow_drop_down -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="@color/color_on_surface_muted"
+        android:pathData="M7,10l5,5 5,-5z" />
+</vector>

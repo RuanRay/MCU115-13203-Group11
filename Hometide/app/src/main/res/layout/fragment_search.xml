@@ -1,5 +1,311 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 第 1 週空版面：頁面內容依規格第 4 章於後續任務實作 -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- P3 查詢（規格 4.4、home.png）。AI 解析第 6 週、車票夾第 5 週、乘客列任務 4-5 -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/page_horizontal_margin"
+        android:paddingTop="16dp"
+        android:paddingBottom="24dp">
+
+        <!-- 1–2. 問候語＋標題、民國年日期章 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvGreeting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.Hometide.Body"
+                    android:textColor="@color/color_on_surface_muted" />
+
+                <TextView
+                    android:id="@+id/tvTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textAppearance="@style/TextAppearance.Hometide.Display"
+                    android:textColor="@color/color_on_background" />
+            </LinearLayout>
+
+            <com.group11.hometide.ui.widget.DateStampView
+                android:id="@+id/vDateStamp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <!-- 3–4. 乘車申請單・用一句話查詢、範例句 -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="@color/color_surface"
+            app:cardCornerRadius="@dimen/corner_ticket"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/color_primary"
+            app:strokeWidth="@dimen/button_stroke_width">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ai_card_label"
+                    android:textAppearance="@style/TextAppearance.Hometide.Label"
+                    android:textColor="@color/color_primary" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/etAiQuery"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:backgroundTint="@color/color_outline"
+                        android:hint="@string/ai_hint"
+                        android:imeOptions="actionSend"
+                        android:importantForAutofill="no"
+                        android:inputType="text"
+                        android:maxLength="60"
+                        android:minHeight="@dimen/min_touch_target"
+                        android:textAppearance="@style/TextAppearance.Hometide.Body"
+                        android:textColor="@color/color_on_background"
+                        android:textColorHint="@color/color_on_surface_muted" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnParse"
+                        style="@style/Widget.Hometide.Button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:enabled="false"
+                        android:text="@string/btn_parse" />
+                </LinearLayout>
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/chipGroupExamples"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp">
+
+                    <com.google.android.material.chip.Chip
+                        style="@style/Widget.Hometide.Chip.Example"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/example_tonight_home" />
+
+                    <com.google.android.material.chip.Chip
+                        style="@style/Widget.Hometide.Chip.Example"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/example_sunday_school" />
+
+                    <com.google.android.material.chip.Chip
+                        style="@style/Widget.Hometide.Chip.Example"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/example_thsr_fastest" />
+                </com.google.android.material.chip.ChipGroup>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 5. 我的車票夾 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvFavTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/fav_title"
+                android:textAppearance="@style/TextAppearance.Hometide.Label"
+                android:textColor="@color/color_on_surface_muted" />
+
+            <TextView
+                android:id="@+id/tvFavMore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/fav_more"
+                android:textAppearance="@style/TextAppearance.Hometide.Body"
+                android:textColor="@color/color_primary"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <!-- 6. 車票夾（橫向）；5-1 接收藏，4-1 先顯示空白提示票 -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvFavorites"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        <com.group11.hometide.ui.widget.TicketView
+            android:id="@+id/tkFavEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            app:ticketStyle="blank">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="20dp"
+                android:text="@string/fav_empty_hint"
+                android:textAppearance="@style/TextAppearance.Hometide.Body"
+                android:textColor="@color/color_on_surface_muted" />
+        </com.group11.hometide.ui.widget.TicketView>
+
+        <!-- 7. 空白車票・手動查詢（內含 8–11；乘客列 12 於任務 4-5） -->
+        <com.group11.hometide.ui.widget.TicketView
+            android:id="@+id/tkManual"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:ticketStyle="blank">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:letterSpacing="0.15"
+                        android:text="@string/manual_label"
+                        android:textAppearance="@style/TextAppearance.Hometide.Caption.Large"
+                        android:textColor="@color/color_on_surface_muted" />
+
+                    <!-- 8. 運具 -->
+                    <Spinner
+                        android:id="@+id/spOperator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:minHeight="@dimen/min_touch_target"
+                        android:popupBackground="@color/color_surface" />
+                </LinearLayout>
+
+                <!-- 9–10. 起站／迄站、交換 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/actvOrigin"
+                        style="@style/Widget.Hometide.StationInput"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:hint="@string/hint_origin"
+                        android:imeOptions="actionNext" />
+
+                    <ImageButton
+                        android:id="@+id/btnSwap"
+                        android:layout_width="@dimen/min_touch_target"
+                        android:layout_height="@dimen/min_touch_target"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/cd_swap"
+                        android:src="@drawable/ic_swap" />
+
+                    <AutoCompleteTextView
+                        android:id="@+id/actvDest"
+                        style="@style/Widget.Hometide.StationInput"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end|center_vertical"
+                        android:hint="@string/hint_dest"
+                        android:imeOptions="actionDone" />
+                </LinearLayout>
+
+                <!-- 11. 乘車日期 -->
+                <TextView
+                    android:id="@+id/btnDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:minHeight="@dimen/min_touch_target"
+                    android:textAppearance="@style/TextAppearance.Hometide.Body"
+                    android:textColor="@color/color_on_surface_muted" />
+            </LinearLayout>
+
+            <!-- 存根「查詢班次」為送出按鈕 -->
+            <TextView
+                android:id="@+id/btnSearch"
+                android:layout_width="@dimen/ticket_stub_max"
+                android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:lineSpacingExtra="6dp"
+                android:text="@string/btn_search_trains"
+                android:textAppearance="@style/TextAppearance.Hometide.Button"
+                android:textColor="@color/color_on_primary" />
+        </com.group11.hometide.ui.widget.TicketView>
+
+        <!-- 13. 最近查詢 -->
+        <TextView
+            android:id="@+id/tvRecentTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/recent_title"
+            android:textAppearance="@style/TextAppearance.Hometide.Label"
+            android:textColor="@color/color_on_surface_muted" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvRecent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:nestedScrollingEnabled="false"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+    </LinearLayout>
+</ScrollView>
