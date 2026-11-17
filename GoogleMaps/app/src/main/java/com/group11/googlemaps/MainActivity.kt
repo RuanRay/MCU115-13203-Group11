@@ -17,12 +17,15 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
-import com.google.maps.DirectionsApi
-import com.google.maps.GeoApiContext
+import android.util.Log
+import com.google.maps.model.EncodedPolyline
 import com.google.maps.model.TravelMode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -31,18 +34,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var map: GoogleMap? = null
     private var route: Polyline? = null
-    private var geoApiContext: GeoApiContext? = null
+    private var apiKey: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         // 從 AndroidManifest 的 meta-data 取得金鑰（實際值來自 local.properties）
-        val apiKey = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
+        apiKey = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
             .metaData?.getString("com.google.android.geo.API_KEY")
-        if (!apiKey.isNullOrEmpty()) {
-            geoApiContext = GeoApiContext.Builder().apiKey(apiKey).build()
-        }
 
         findViewById<Button>(R.id.btnDriving).setOnClickListener { drawRoute(TravelMode.DRIVING) }
         findViewById<Button>(R.id.btnWalking).setOnClickListener { drawRoute(TravelMode.WALKING) }
@@ -98,26 +98,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun drawRoute(mode: TravelMode) {
         val map = map ?: return
-        val context = geoApiContext ?: return showNoRoute()
+        val key = apiKey
+        if (key.isNullOrEmpty()) {
+            Log.e(TAG, "MAPS_API_KEY 未設定（local.properties）")
+            return showNoRoute()
+        }
 
         lifecycleScope.launch {
             val path = try {
-                withContext(Dispatchers.IO) {
-                    DirectionsApi.newRequest(context)
-                        .origin(com.google.maps.model.LatLng(taipei101.latitude, taipei101.longitude))
-                        .destination(
-                            com.google.maps.model.LatLng(
-                                taipeiMainStation.latitude, taipeiMainStation.longitude
-                            )
-                        )
-                        .mode(mode)
-                        .await()
-                        .routes.firstOrNull()
-                        ?.overviewPolyline?.decodePath()
-                        ?.map { LatLng(it.lat, it.lng) }
-                }
+                withContext(Dispatchers.IO) { fetchRoute(key, mode) }
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e(TAG, "查詢路線失敗", e)
                 null
             }
 
@@ -133,12 +124,55 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    /**
+     * 老師範例用的 Directions API 已被 Google 列為 Legacy，新專案無法啟用（回傳 REQUEST_DENIED），
+     * 因此改呼叫 Routes API。回傳的 encoded polyline 格式相同，仍用 maps-services 的 EncodedPolyline 解碼。
+     */
+    private fun fetchRoute(key: String, mode: TravelMode): List<LatLng> {
+        val travelMode = when (mode) {
+            TravelMode.DRIVING -> "DRIVE"
+            TravelMode.BICYCLING -> "BICYCLE"
+            else -> "WALK"
+        }
+        val body = JSONObject()
+            .put("origin", waypoint(taipei101))
+            .put("destination", waypoint(taipeiMainStation))
+            .put("travelMode", travelMode)
+
+        val conn = URL("https://routes.googleapis.com/directions/v2:computeRoutes")
+            .openConnection() as HttpURLConnection
+        try {
+            conn.requestMethod = "POST"
+            conn.doOutput = true
+            conn.setRequestProperty("Content-Type", "application/json")
+            conn.setRequestProperty("X-Goog-Api-Key", key)
+            conn.setRequestProperty("X-Goog-FieldMask", "routes.polyline.encodedPolyline")
+            conn.outputStream.use { it.write(body.toString().toByteArray()) }
+
+            if (conn.responseCode != HttpURLConnection.HTTP_OK) {
+                error("HTTP ${conn.responseCode}: ${conn.errorStream?.bufferedReader()?.readText()}")
+            }
+            val routes = JSONObject(conn.inputStream.bufferedReader().readText())
+                .optJSONArray("routes") ?: return emptyList() // 該交通方式無路線
+            val encoded = routes.getJSONObject(0)
+                .getJSONObject("polyline").getString("encodedPolyline")
+            return EncodedPolyline(encoded).decodePath().map { LatLng(it.lat, it.lng) }
+        } finally {
+            conn.disconnect()
+        }
+    }
+
+    private fun waypoint(p: LatLng) = JSONObject().put(
+        "location", JSONObject().put(
+            "latLng", JSONObject().put("latitude", p.latitude).put("longitude", p.longitude)
+        )
+    )
+
     private fun showNoRoute() {
         Toast.makeText(this, R.string.no_route, Toast.LENGTH_SHORT).show()
     }
 
-    override fun onDestroy() {
-        geoApiContext?.shutdown()
-        super.onDestroy()
+    companion object {
+        private const val TAG = "MainActivity"
     }
 }
