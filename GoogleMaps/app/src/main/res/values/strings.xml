@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Google Maps</string>
+    <string name="driving">開車</string>
+    <string name="walking">走路</string>
+    <string name="bicycling">單車</string>
+    <string name="no_route">找不到路線</string>
+</resources>
