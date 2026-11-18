@@ -115,7 +115,7 @@ class ResultActivity : BaseActivity() {
                         nowLine.label = getString(R.string.now_line, s.now.format(HHMM))
                         adapter.submitList(s.items) {
                             binding.rvTimeline.invalidateItemDecorations()
-                            scrollToNowOnce(s.nowLineIndex)
+                            scrollOnce(s)
                         }
                     }
                 }
@@ -171,6 +171,13 @@ class ResultActivity : BaseActivity() {
     }
 
     /** 進入頁面時讓「現在」線位於畫面上方約 1/4 處 */
+    private fun scrollOnce(s: ResultViewModel.UiState) {
+        // FR-NEXT-04：從下一班點小車票時捲到該班，否則捲到「現在」線
+        val target = intent.getStringExtra(EXTRA_SCROLL_TRAIN)
+        val index = if (target != null && s.hasList) s.items.indexOfFirst { it.train.trainNo == target }.takeIf { it >= 0 } else null
+        scrollToNowOnce(index ?: s.nowLineIndex)
+    }
+
     private fun scrollToNowOnce(index: Int?) {
         if (scrolledToNow || index == null) return
         scrolledToNow = true
@@ -187,6 +194,7 @@ class ResultActivity : BaseActivity() {
         const val EXTRA_DEST_ID = "destId"
         const val EXTRA_DATE = "date" // yyyy-MM-dd
         const val EXTRA_PASSENGERS = "passengers" // JSON（CR-01），沒有時為全票 1
+        const val EXTRA_SCROLL_TRAIN = "scrollTrain" // FR-NEXT-04：開啟後捲到這個車次
         private const val REQUEST_PASSENGERS = "result_passengers"
 
         private const val TICK_MS = 60_000L
@@ -203,8 +211,10 @@ class ResultActivity : BaseActivity() {
             destId: String,
             date: LocalDate,
             passengers: Passengers = Passengers.DEFAULT,
+            scrollToTrain: String? = null,
         ): Intent =
             Intent(context, ResultActivity::class.java)
+                .putExtra(EXTRA_SCROLL_TRAIN, scrollToTrain)
                 .putExtra(EXTRA_PASSENGERS, passengers.toJson())
                 .putExtra(EXTRA_OPERATOR, operator.name)
                 .putExtra(EXTRA_ORIGIN_ID, originId)

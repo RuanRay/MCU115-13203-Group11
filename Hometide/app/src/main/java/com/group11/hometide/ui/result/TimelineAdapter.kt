@@ -48,7 +48,7 @@ class TimelineAdapter(
         b.tvTime.text = ctx.getString(R.string.train_time, train.departTime, train.arriveTime)
         bindFare(b, item)
 
-        val color = statusColor(status)
+        val color = status.colorRes
         b.vNode.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(ctx, color))
         b.chipStatus.isVisible = status.labelRes != null
         status.labelRes?.let { res ->
@@ -144,15 +144,6 @@ class TimelineAdapter(
         val c = ContextCompat.getColor(view.context, color)
         view.setTextColor(c)
         (view.background.mutate() as GradientDrawable).setStroke(view.resources.getDimensionPixelSize(R.dimen.tag_stroke), c)
-    }
-
-    /** 節點與狀態色：準點、即將發車、預估到站綠；誤點紅；已開出灰；依班表藏青（bus_result.png） */
-    @ColorRes
-    private fun statusColor(s: TrainStatus): Int = when (s) {
-        TrainStatus.Departed -> R.color.color_on_surface_muted
-        is TrainStatus.Soon, TrainStatus.OnTime, is TrainStatus.Arriving -> R.color.color_success
-        is TrainStatus.Delayed -> R.color.color_stamp
-        TrainStatus.BySchedule, TrainStatus.None -> R.color.color_primary
     }
 
     private object Diff : DiffUtil.ItemCallback<ResultViewModel.Item>() {

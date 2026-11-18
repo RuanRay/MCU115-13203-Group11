@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 下一班路線晶片（next.png）：選中藏青底、未選紙色底 -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/color_primary" android:state_checked="true" />
+    <item android:color="@color/color_surface" />
+</selector>

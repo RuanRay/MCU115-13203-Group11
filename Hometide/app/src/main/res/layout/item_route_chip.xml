@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 下一班路線晶片（規格 4.5 chipGroupRoutes、next.png）：「名稱・運具」，選中藏青底 -->
+<com.google.android.material.chip.Chip xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/Widget.Hometide.Chip.Route"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" />

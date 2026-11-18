@@ -17,4 +17,6 @@
 
     <!-- 離線橫幅（芥末黃底）上的文字：沿用既有色票，深色模式改用 on_primary 以維持對比（任務 4-4） -->
     <color name="offline_banner_text">@color/color_on_primary</color>
+    <!-- 深色模式主車票為芥末黃底：用深紅維持大字對比（約 3.7:1） -->
+    <color name="countdown_urgent">#9B1C12</color>
 </resources>

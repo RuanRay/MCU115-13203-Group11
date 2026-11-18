@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 下一班浮動一句話列（next.png）：紙色底、藏青框、大圓角 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/color_surface" />
+    <stroke android:width="@dimen/button_stroke_width" android:color="@color/color_primary" />
+    <corners android:radius="@dimen/corner_floating_input" />
+</shape>

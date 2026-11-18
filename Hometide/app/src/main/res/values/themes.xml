@@ -113,6 +113,14 @@
         <item name="android:textColor">@color/color_on_primary</item>
     </style>
 
+    <!-- 下一班路線晶片（next.png）：單選，選中藏青底 -->
+    <style name="Widget.Hometide.Chip.Route" parent="Widget.Hometide.Chip.Example">
+        <item name="android:checkable">true</item>
+        <item name="checkedIconVisible">false</item>
+        <item name="chipBackgroundColor">@color/chip_route_bg</item>
+        <item name="android:textColor">@color/chip_route_text</item>
+    </style>
+
     <!-- P4 狀態／設施標籤（result.png）：外框與字同色，顏色由程式依狀態設定 -->
     <style name="Widget.Hometide.Tag" parent="">
         <item name="android:layout_width">wrap_content</item>

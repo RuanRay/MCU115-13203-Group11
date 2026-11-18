@@ -1,5 +1,339 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 第 1 週空版面：頁面內容依規格第 4 章於後續任務實作 -->
+<!-- 下一班（規格 4.5、next.png、next_guest.png）。浮動一句話列固定在導覽列上方（AI 於 6-4） -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:layout_height="match_parent">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollNext"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/floating_ai_space">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/page_horizontal_margin"
+            android:paddingTop="16dp">
+
+            <!-- 1–2. 「下一班回家」＋標題、日期章 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/next_header"
+                        android:textAppearance="@style/TextAppearance.Hometide.Body"
+                        android:textColor="@color/color_on_surface_muted" />
+
+                    <TextView
+                        android:id="@+id/tvNextTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:textAppearance="@style/TextAppearance.Hometide.Display"
+                        android:textColor="@color/color_on_background" />
+                </LinearLayout>
+
+                <com.group11.hometide.ui.widget.DateStampView
+                    android:id="@+id/vDateStamp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <!-- 離線橫幅（FR-NEXT-06：離線時顯示快取） -->
+            <TextView
+                android:id="@+id/tvOfflineBanner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_offline_banner"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="8dp"
+                android:textAppearance="@style/TextAppearance.Hometide.Body"
+                android:textColor="@color/offline_banner_text"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/layoutNextContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- 3. 路線切換晶片 -->
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:scrollbars="none">
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chipGroupRoutes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:selectionRequired="true"
+                        app:singleLine="true"
+                        app:singleSelection="true" />
+                </HorizontalScrollView>
+
+                <!-- 4. 主車票 -->
+                <com.group11.hometide.ui.widget.TicketView
+                    android:id="@+id/tkNextMain"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:background="?attr/selectableItemBackground"
+                    app:ticketStyle="main">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            android:id="@+id/tvMainMeta"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.8"
+                            android:letterSpacing="0.05"
+                            android:textAppearance="@style/TextAppearance.Hometide.Body"
+                            android:textColor="@color/color_on_primary" />
+
+                        <TextView
+                            android:id="@+id/tvMainStations"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:maxLines="1"
+                            android:textAppearance="@style/TextAppearance.Hometide.Display"
+                            android:textColor="@color/color_on_primary" />
+
+                        <TextView
+                            android:id="@+id/tvMainTimes"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textAppearance="@style/TextAppearance.Hometide.TicketRoute.Large"
+                            android:textColor="@color/color_on_primary" />
+                    </LinearLayout>
+
+                    <!-- 存根：特大字倒數＋票價（AN-13 翻牌於 7-3） -->
+                    <LinearLayout
+                        android:layout_width="@dimen/ticket_stub_max"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingVertical="12dp">
+
+                        <TextView
+                            android:id="@+id/tvMainCountdown"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:includeFontPadding="false"
+                            android:textAppearance="@style/TextAppearance.Hometide.Countdown"
+                            android:textColor="@color/color_on_primary" />
+
+                        <TextView
+                            android:id="@+id/tvMainCountdownUnit"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/next_minutes_unit"
+                            android:textAppearance="@style/TextAppearance.Hometide.Label"
+                            android:textColor="@color/color_on_primary" />
+
+                        <TextView
+                            android:id="@+id/tvMainFare"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:alpha="0.8"
+                            android:textAppearance="@style/TextAppearance.Hometide.Body"
+                            android:textColor="@color/color_on_primary" />
+                    </LinearLayout>
+                </com.group11.hometide.ui.widget.TicketView>
+
+                <!-- 5. 接下來的班次 -->
+                <TextView
+                    android:id="@+id/tvUpcomingTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/next_upcoming_title"
+                    android:textAppearance="@style/TextAppearance.Hometide.Label"
+                    android:textColor="@color/color_on_surface_muted" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvUpcoming"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:nestedScrollingEnabled="false"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+                <!-- 6. 查看今天全部班次 › -->
+                <TextView
+                    android:id="@+id/tvSeeAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="4dp"
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center"
+                    android:minHeight="@dimen/min_touch_target"
+                    android:paddingHorizontal="12dp"
+                    android:text="@string/next_see_all"
+                    android:textAppearance="@style/TextAppearance.Hometide.Label"
+                    android:textColor="@color/color_primary" />
+            </LinearLayout>
+
+            <!-- 空狀態（FR-NEXT-06；next_guest.png）：問號車票「？ → 家」 -->
+            <LinearLayout
+                android:id="@+id/layoutNextEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingHorizontal="20dp"
+                android:paddingTop="96dp"
+                android:visibility="gone">
+
+                <com.group11.hometide.ui.widget.TicketView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:importantForAccessibility="noHideDescendants"
+                    android:rotation="-3"
+                    app:ticketStyle="paper">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/operator_tra"
+                            android:textAppearance="@style/TextAppearance.Hometide.Body"
+                            android:textColor="@color/color_on_surface_muted" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="56dp"
+                            android:text="@string/next_empty_route"
+                            android:textAppearance="@style/TextAppearance.Hometide.TicketRoute.Large"
+                            android:textColor="@color/color_on_background" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="@dimen/ticket_stub_max"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="@string/next_empty_minutes"
+                        android:textAppearance="@style/TextAppearance.Hometide.TicketTime.Large"
+                        android:textColor="@color/color_on_background" />
+                </com.group11.hometide.ui.widget.TicketView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:lineSpacingExtra="6dp"
+                    android:text="@string/next_empty_body"
+                    android:textAppearance="@style/TextAppearance.Hometide.TicketRoute.Large"
+                    android:textColor="@color/color_on_background" />
+
+                <TextView
+                    android:id="@+id/tvNextEmptyHint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/next_empty_guest_hint"
+                    android:textAppearance="@style/TextAppearance.Hometide.Body"
+                    android:textColor="@color/color_on_surface_muted" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnLogin"
+                    style="@style/Widget.Hometide.Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/btn_member_login" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnGoSearch"
+                    style="@style/Widget.Hometide.Button.Outlined"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/btn_go_search" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- 7. 浮動一句話查詢列（FR-NEXT-05；5-2 只有外觀，解析於 6-4） -->
+    <LinearLayout
+        android:id="@+id/layoutFloatingAi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginHorizontal="@dimen/page_horizontal_margin"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/bg_floating_ai"
+        android:elevation="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="6dp"
+        android:paddingVertical="6dp">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_sparkle" />
+
+        <EditText
+            android:id="@+id/etFloatingAi"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:background="@null"
+            android:hint="@string/floating_ai_hint"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:maxLines="1"
+            android:minHeight="@dimen/min_touch_target"
+            android:textAppearance="@style/TextAppearance.Hometide.Body"
+            android:textColor="@color/color_on_background"
+            android:textColorHint="@color/color_on_surface_muted" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFloatingParse"
+            style="@style/Widget.Hometide.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_parse"
+            app:cornerRadius="@dimen/corner_floating_input" />
+    </LinearLayout>
+</FrameLayout>

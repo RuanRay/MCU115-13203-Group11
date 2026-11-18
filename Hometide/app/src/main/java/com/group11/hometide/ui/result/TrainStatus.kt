@@ -1,5 +1,6 @@
 package com.group11.hometide.ui.result
 
+import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import com.group11.hometide.R
 import com.group11.hometide.data.local.entity.Operator
@@ -73,4 +74,14 @@ val TrainStatus.minutes: Int?
         is TrainStatus.Delayed -> minutes
         is TrainStatus.Arriving -> minutes
         else -> null
+    }
+
+/** 節點與狀態色：準點、即將發車、預估到站綠；誤點紅；已開出灰；依班表藏青（bus_result.png）。P4 與下一班共用 */
+@get:ColorRes
+val TrainStatus.colorRes: Int
+    get() = when (this) {
+        TrainStatus.Departed -> R.color.color_on_surface_muted
+        is TrainStatus.Soon, TrainStatus.OnTime, is TrainStatus.Arriving -> R.color.color_success
+        is TrainStatus.Delayed -> R.color.color_stamp
+        TrainStatus.BySchedule, TrainStatus.None -> R.color.color_primary
     }

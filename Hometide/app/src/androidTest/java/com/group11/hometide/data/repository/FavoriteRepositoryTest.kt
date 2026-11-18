@@ -5,6 +5,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.gson.Gson
 import com.group11.hometide.data.local.AppDatabase
+import com.group11.hometide.data.local.SettingsStore
 import com.group11.hometide.data.local.dao.TimetableQuery
 import com.group11.hometide.data.local.entity.FareCache
 import com.group11.hometide.data.local.entity.FareClass
@@ -45,7 +46,7 @@ class FavoriteRepositoryTest {
             HometideApi.create("http://127.0.0.1:9/", gson),
             db.stationDao(), db.searchHistoryDao(), db.timetableDao(), db.fareDao(), gson,
         )
-        repo = FavoriteRepository(db.favoriteDao(), transit, clock = { now })
+        repo = FavoriteRepository(db.favoriteDao(), transit, SettingsStore(ApplicationProvider.getApplicationContext()), clock = { now })
     }
 
     @After

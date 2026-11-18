@@ -61,4 +61,6 @@
 
     <!-- 可點擊元件最小尺寸 -->
     <dimen name="min_touch_target">48dp</dimen>
+    <!-- 下一班：內容底部留給浮動一句話列的空間 -->
+    <dimen name="floating_ai_space">88dp</dimen>
 </resources>

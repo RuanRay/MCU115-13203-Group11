@@ -17,4 +17,6 @@
 
     <!-- 離線橫幅（芥末黃底）上的文字：沿用既有色票，深色模式改用 on_primary 以維持對比（任務 4-4） -->
     <color name="offline_banner_text">@color/color_on_background</color>
+    <!-- 下一班主車票倒數剩 5 分鐘內（FR-NEXT-03；實作者確認 2026-11-18：淺色沿用印章紅） -->
+    <color name="countdown_urgent">@color/color_stamp</color>
 </resources>

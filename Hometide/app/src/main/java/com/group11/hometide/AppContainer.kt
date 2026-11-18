@@ -30,6 +30,6 @@ class AppContainer(private val context: Context) {
         AuthRepository(FirebaseAuth.getInstance(), FirebaseFirestore.getInstance(), database.userProfileDao(), settingsStore)
     }
     val transitRepository: TransitRepository by lazy { TransitRepository(api, database.stationDao(), database.searchHistoryDao(), database.timetableDao(), database.fareDao(), gson) }
-    val favoriteRepository: FavoriteRepository by lazy { FavoriteRepository(database.favoriteDao(), transitRepository) }
+    val favoriteRepository: FavoriteRepository by lazy { FavoriteRepository(database.favoriteDao(), transitRepository, settingsStore) }
     val favoriteCards: FavoriteCards by lazy { FavoriteCards(authRepository, favoriteRepository, transitRepository) }
 }
