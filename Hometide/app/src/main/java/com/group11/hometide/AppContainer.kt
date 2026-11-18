@@ -9,6 +9,8 @@ import com.group11.hometide.data.local.SettingsStore
 import com.group11.hometide.data.remote.HometideApi
 import com.group11.hometide.data.repository.AuthRepository
 import com.group11.hometide.data.repository.FavoriteRepository
+import com.group11.hometide.data.repository.ReminderRepository
+import com.group11.hometide.reminder.ReminderScheduler
 import com.group11.hometide.data.repository.TransitRepository
 import com.group11.hometide.ui.routes.FavoriteCards
 
@@ -31,5 +33,6 @@ class AppContainer(private val context: Context) {
     }
     val transitRepository: TransitRepository by lazy { TransitRepository(api, database.stationDao(), database.searchHistoryDao(), database.timetableDao(), database.fareDao(), gson) }
     val favoriteRepository: FavoriteRepository by lazy { FavoriteRepository(database.favoriteDao(), transitRepository, settingsStore) }
+    val reminderRepository: ReminderRepository by lazy { ReminderRepository(database.reminderDao(), ReminderScheduler(context)) }
     val favoriteCards: FavoriteCards by lazy { FavoriteCards(authRepository, favoriteRepository, transitRepository) }
 }

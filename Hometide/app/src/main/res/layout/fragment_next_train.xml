@@ -131,6 +131,17 @@
                             android:layout_marginTop="4dp"
                             android:textAppearance="@style/TextAppearance.Hometide.TicketRoute.Large"
                             android:textColor="@color/color_on_primary" />
+
+                        <!-- 提醒狀態（FR-NEXT-01） -->
+                        <TextView
+                            android:id="@+id/tvMainReminder"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:alpha="0.85"
+                            android:textAppearance="@style/TextAppearance.Hometide.Body"
+                            android:textColor="@color/color_on_primary"
+                            android:visibility="gone" />
                     </LinearLayout>
 
                     <!-- 存根：特大字倒數＋票價（AN-13 翻牌於 7-3） -->

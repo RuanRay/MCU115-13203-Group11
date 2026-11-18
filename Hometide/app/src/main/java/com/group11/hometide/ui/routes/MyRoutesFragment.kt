@@ -28,9 +28,18 @@ class MyRoutesFragment : Fragment(R.layout.fragment_my_routes) {
         viewModelFactory {
             initializer {
                 val c = (requireActivity().application as HometideApp).container
-                MyRoutesViewModel(c.favoriteCards, c.favoriteRepository)
+                MyRoutesViewModel(c.favoriteCards, c.favoriteRepository, c.authRepository, c.reminderRepository)
             }
         }
+    }
+
+    // 點提醒通知時，分頁可能還沒建立：先記下，畫面建立後再切換
+    private var pendingReminders = false
+    private var pager: androidx.viewpager2.widget.ViewPager2? = null
+
+    /** FR-RMD-03：切到「出發提醒」分頁 */
+    fun showReminders() {
+        pager?.setCurrentItem(1, false) ?: run { pendingReminders = true }
     }
 
     // 登入成功後 profile Flow 會自動更新
@@ -46,13 +55,30 @@ class MyRoutesFragment : Fragment(R.layout.fragment_my_routes) {
             override fun createFragment(position: Int): Fragment = if (position == 0) FavoritesFragment() else RemindersFragment()
         }
         var favoriteCount = 0
+        var reminderCount = 0
         val mediator = TabLayoutMediator(b.tabLayout, b.viewPager) { tab, pos ->
-            tab.text = if (pos == 0) getString(R.string.tab_favorites, favoriteCount) else getString(R.string.tab_reminders, 0) // 提醒數於 5-3
+            tab.text = if (pos == 0) getString(R.string.tab_favorites, favoriteCount) else getString(R.string.tab_reminders, reminderCount)
         }
         mediator.attach()
+        pager = b.viewPager
+        if (pendingReminders) {
+            pendingReminders = false
+            b.viewPager.setCurrentItem(1, false)
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    // 分頁數字：尚未發車的已預約提醒（reminders.png「出發提醒 1」）
+                    vm.reminders.collect { list ->
+                        val now = System.currentTimeMillis()
+                        val n = list.count { it.status == com.group11.hometide.data.local.entity.ReminderStatus.SCHEDULED && it.departAt > now }
+                        if (n != reminderCount) {
+                            reminderCount = n
+                            b.tabLayout.getTabAt(1)?.text = getString(R.string.tab_reminders, n)
+                        }
+                    }
+                }
                 vm.state.collect { s ->
                     b.layoutRoutesGuest.isVisible = s.isGuest && !s.loading
                     b.btnAdd.isVisible = !s.isGuest
@@ -63,6 +89,11 @@ class MyRoutesFragment : Fragment(R.layout.fragment_my_routes) {
                 }
             }
         }
+    }
+
+    override fun onDestroyView() {
+        pager = null
+        super.onDestroyView()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {

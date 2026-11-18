@@ -23,6 +23,7 @@ import com.group11.hometide.ui.auth.LoginActivity
 import com.group11.hometide.ui.base.BaseActivity
 import com.group11.hometide.ui.base.asButtonForAccessibility
 import com.group11.hometide.ui.main.MainActivity
+import com.group11.hometide.ui.result.ReminderDialog
 import com.group11.hometide.ui.result.ResultActivity
 import com.group11.hometide.util.labelRes
 import com.group11.hometide.util.passengerText
@@ -45,7 +46,7 @@ class NextTrainFragment : Fragment(R.layout.fragment_next_train) {
         viewModelFactory {
             initializer {
                 val c = (requireActivity().application as HometideApp).container
-                NextTrainViewModel(c.authRepository, c.favoriteRepository)
+                NextTrainViewModel(c.authRepository, c.favoriteRepository, c.reminderRepository)
             }
         }
     }
@@ -61,8 +62,22 @@ class NextTrainFragment : Fragment(R.layout.fragment_next_train) {
         val adapter = UpcomingAdapter(onClick = ::openResult)
         b.rvUpcoming.adapter = adapter
 
-        // FR-NEXT-01：點主車票開 P4 並捲到該班（提醒對話框於 5-3，實作者確認）
-        b.tkNextMain.setOnClickListener { vm.state.value.main?.let { openResult(it.train) } }
+        // FR-NEXT-01：未設定提醒 → 提醒對話框；已設定 → 開 P4 並捲到該班
+        b.tkNextMain.setOnClickListener {
+            val s = vm.state.value
+            val main = s.main ?: return@setOnClickListener
+            if (s.mainReminder != null) {
+                openResult(main.train)
+            } else {
+                ReminderDialog.show(
+                    requireContext(),
+                    main.train,
+                    existing = null, // 這裡只處理「未設定」：已設定時點主車票開 P4，取消在 P4 存根
+                    onSet = { min -> vm.setReminder(main.train, ReminderDialog.typeName(requireContext(), main.train), min) },
+                    onCancelReminder = {},
+                )
+            }
+        }
         b.tkNextMain.asButtonForAccessibility()
         b.tvSeeAll.setOnClickListener { openResult(null) }
         b.tvSeeAll.asButtonForAccessibility()
@@ -76,6 +91,11 @@ class NextTrainFragment : Fragment(R.layout.fragment_next_train) {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    vm.reminderSet.collect { min ->
+                        snackbar(if (min > 0) getString(R.string.reminder_set, min) else getString(R.string.error_unknown))
+                    }
+                }
                 vm.state.collect { s ->
                     render(b, s)
                     adapter.submitList(s.upcoming)
@@ -170,6 +190,9 @@ class NextTrainFragment : Fragment(R.layout.fragment_next_train) {
         // FR-NEXT-03：剩 5 分鐘以內數字變紅（脈動於 7-3）
         val urgent = main != null && NextTrainViewModel.isUrgent(main.minutes)
         b.tvMainCountdown.setTextColor(ContextCompat.getColor(ctx, if (urgent) R.color.countdown_urgent else R.color.color_on_primary))
+        // FR-NEXT-01：「🔔 已設定提前 N 分鐘提醒」
+        b.tvMainReminder.isVisible = main != null && s.mainReminder != null
+        s.mainReminder?.let { b.tvMainReminder.text = getString(R.string.next_reminder_status, it.remindBeforeMin) }
         b.tvMainFare.isVisible = main != null
         b.tvMainFare.text = ctx.priceText(main?.fare?.total, main?.fare?.approx ?: false)
         b.tkNextMain.isClickable = main != null

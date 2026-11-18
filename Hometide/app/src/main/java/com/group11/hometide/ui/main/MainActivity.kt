@@ -1,5 +1,7 @@
 package com.group11.hometide.ui.main
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment
@@ -29,11 +31,28 @@ class MainActivity : BaseActivity() {
 
         // 重建時 FragmentManager 與 BottomNavigationView 會自行還原狀態
         if (savedInstanceState == null) switchTo(R.id.navSearch, animate = false)
+        handleIntent(intent)
 
         binding.bottomNav.setOnItemSelectedListener { item ->
             switchTo(item.itemId, animate = true)
             true
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
+
+    /** FR-RMD-03：點提醒通知 → P5「出發提醒」分頁 */
+    private fun handleIntent(intent: Intent?) {
+        if (intent?.getBooleanExtra(EXTRA_OPEN_REMINDERS, false) != true) return
+        intent.removeExtra(EXTRA_OPEN_REMINDERS)
+        // 直接切分頁並勾選導覽列（onCreate 期間設 selectedItemId 不一定會觸發監聽器）
+        switchTo(R.id.navRoutes, animate = false)
+        binding.bottomNav.menu.findItem(R.id.navRoutes).isChecked = true
+        // 分頁畫面可能還沒建立：MyRoutesFragment 會先記下，畫面建立後再切到提醒分頁
+        (supportFragmentManager.findFragmentByTag(TAGS[3]) as? MyRoutesFragment)?.showReminders()
     }
 
     /** P5「＋ 新增」→ P3 並聚焦手動查詢（規格 4.7） */
@@ -75,11 +94,19 @@ class MainActivity : BaseActivity() {
         else -> error("Unknown tab $tab")
     }
 
-    private companion object {
+    companion object {
+        private const val EXTRA_OPEN_REMINDERS = "open_reminders"
+
+        /** 提醒通知的點擊目的地（FR-RMD-03） */
+        fun intentForReminders(context: Context): Intent =
+            Intent(context, MainActivity::class.java)
+                .putExtra(EXTRA_OPEN_REMINDERS, true)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+
         /** 導覽列由左到右的順序，用來判斷滑動方向。 */
-        val TABS = listOf(R.id.navSearch, R.id.navNext, R.id.navHighway, R.id.navRoutes, R.id.navProfile)
+        private val TABS = listOf(R.id.navSearch, R.id.navNext, R.id.navHighway, R.id.navRoutes, R.id.navProfile)
 
         /** Fragment tag 用固定字串，不用資源 ID（ID 每次建置可能不同，會影響狀態還原）。 */
-        val TAGS = listOf("tab_search", "tab_next", "tab_highway", "tab_routes", "tab_profile")
+        private val TAGS = listOf("tab_search", "tab_next", "tab_highway", "tab_routes", "tab_profile")
     }
 }

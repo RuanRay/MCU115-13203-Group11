@@ -6,7 +6,12 @@ import com.group11.hometide.data.local.entity.FavoriteRoute
 import com.group11.hometide.data.local.entity.Operator
 import com.group11.hometide.data.local.entity.TimetableCache
 import com.group11.hometide.data.repository.AuthRepository
+import com.group11.hometide.data.local.entity.TripReminder
 import com.group11.hometide.data.repository.FavoriteRepository
+import com.group11.hometide.data.repository.ReminderRepository
+import com.group11.hometide.util.ReminderRules
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import com.group11.hometide.ui.result.TrainStatus
 import com.group11.hometide.util.FareTotal
 import com.group11.hometide.util.Passengers
@@ -33,6 +38,7 @@ import java.time.LocalDateTime
 class NextTrainViewModel(
     private val auth: AuthRepository,
     private val favorites: FavoriteRepository,
+    private val reminders: ReminderRepository,
     private val clock: () -> LocalDateTime = LocalDateTime::now,
 ) : ViewModel() {
 
@@ -63,6 +69,8 @@ class NextTrainViewModel(
         val cachedAt: Long? = null,
         /** 預設乘客（主車票「票種」與票價，FR-SET-02） */
         val passengers: Passengers = Passengers.DEFAULT,
+        /** FR-NEXT-01：主車票已設定的提醒 */
+        val mainReminder: TripReminder? = null,
     ) {
         /** FR-NEXT-06：訪客或沒有常用路線 */
         val isEmpty: Boolean get() = !loading && (isGuest || routes.isEmpty())
@@ -97,7 +105,17 @@ class NextTrainViewModel(
             if (route != null) emit(Loaded(route, favorites.board(route), pax))
         }
 
-    val state: StateFlow<UiState> = combine(routes, loaded, now) { list, l, time ->
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val myReminders = auth.profile.map { it?.uid }.distinctUntilChanged().flatMapLatest { uid ->
+        if (uid == null) flowOf(emptyList()) else reminders.observe(uid)
+    }
+
+    private val reminderEvents = Channel<Int>(Channel.BUFFERED)
+
+    /** 設定提醒的結果（Snackbar 文字的分鐘數；失敗為 null） */
+    val reminderSet = reminderEvents.receiveAsFlow()
+
+    val state: StateFlow<UiState> = combine(routes, loaded, now, myReminders) { list, l, time, rs ->
         val board = l.board
         if (list == null) return@combine UiState(loading = false, isGuest = true)
         if (board == null) {
@@ -129,8 +147,22 @@ class NextTrainViewModel(
             offline = board.offline,
             cachedAt = board.cachedAt,
             passengers = l.pax,
+            mainReminder = remaining.firstOrNull()?.let { m ->
+                val depart = ReminderRules.departAt(m.train.travelDate, m.train.departTime)
+                rs.firstOrNull { it.operator == m.train.operator && it.trainNo == m.train.trainNo && it.departAt == depart }
+            },
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), UiState())
+
+    /** FR-NEXT-01：未設定提醒時由主車票開對話框設定 */
+    fun setReminder(train: TimetableCache, typeName: String, beforeMin: Int) {
+        val uid = auth.currentUid ?: return
+        val s = state.value
+        viewModelScope.launch {
+            val r = reminders.set(uid, train, typeName, s.originName, s.destName, beforeMin)
+            reminderEvents.send(if (r is com.group11.hometide.util.Result.Success) beforeMin else -1)
+        }
+    }
 
     fun select(route: FavoriteRoute) {
         reloadedForTomorrow = false

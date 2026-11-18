@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 出發提醒單選對話框（FR-RMD-01；實作者確認 2026-11-18：標準單選＋「提醒可能延遲數分鐘」） -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="20dp"
+    android:paddingTop="8dp">
+
+    <RadioGroup
+        android:id="@+id/rgReminderBefore"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/rbBefore15"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/min_touch_target"
+            android:textAppearance="@style/TextAppearance.Hometide.Body" />
+
+        <RadioButton
+            android:id="@+id/rbBefore30"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/min_touch_target"
+            android:textAppearance="@style/TextAppearance.Hometide.Body" />
+
+        <RadioButton
+            android:id="@+id/rbBefore60"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/min_touch_target"
+            android:textAppearance="@style/TextAppearance.Hometide.Body" />
+    </RadioGroup>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/reminder_delay_note"
+        android:textAppearance="@style/TextAppearance.Hometide.Caption.Large"
+        android:textColor="@color/color_on_surface_muted" />
+</LinearLayout>

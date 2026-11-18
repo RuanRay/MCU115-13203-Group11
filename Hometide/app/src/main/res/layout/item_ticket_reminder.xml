@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  出發提醒項目（規格 4.7 item_ticket_reminder、reminders.png）：車次・日期・提前 N 分、時間與起訖、提醒時間；
+  存根蓋「已預約」（紅）或「已使用」（灰）章。已預約可左滑取消，vCancelBg 只在左滑時顯示
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="@dimen/ticket_gap">
+
+    <FrameLayout
+        android:id="@+id/vCancelBg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_swipe_delete"
+        android:visibility="invisible">
+
+        <TextView
+            android:layout_width="@dimen/ticket_stub_max"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:gravity="center"
+            android:text="@string/btn_cancel_reminder"
+            android:textAppearance="@style/TextAppearance.Hometide.Label"
+            android:textColor="@color/color_on_primary" />
+    </FrameLayout>
+
+    <com.group11.hometide.ui.widget.TicketView
+        android:id="@+id/tkReminder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:ticketStyle="paper">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="8dp"
+            android:paddingVertical="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvReminderMeta"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:letterSpacing="0.05"
+                    android:textAppearance="@style/TextAppearance.Hometide.Body"
+                    android:textColor="@color/color_on_surface_muted" />
+
+                <TextView
+                    android:id="@+id/tvReminderBefore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:textAppearance="@style/TextAppearance.Hometide.Body"
+                    android:textColor="@color/color_on_surface_muted" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvReminderRoute"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:maxLines="1"
+                android:textAppearance="@style/TextAppearance.Hometide.TicketRoute.Large"
+                android:textColor="@color/color_on_background" />
+
+            <TextView
+                android:id="@+id/tvReminderNote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textAppearance="@style/TextAppearance.Hometide.Body"
+                android:textColor="@color/color_on_surface_muted" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="@dimen/ticket_stub_max"
+            android:layout_height="match_parent">
+
+            <com.group11.hometide.ui.widget.StampView
+                android:id="@+id/vReminderStamp"
+                android:layout_width="@dimen/stamp_size"
+                android:layout_height="@dimen/stamp_size"
+                android:layout_gravity="center" />
+        </FrameLayout>
+    </com.group11.hometide.ui.widget.TicketView>
+</FrameLayout>

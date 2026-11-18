@@ -3,7 +3,16 @@ package com.group11.hometide.ui.routes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.group11.hometide.data.local.entity.FavoriteRoute
+import com.group11.hometide.R
+import com.group11.hometide.data.local.entity.TripReminder
+import com.group11.hometide.data.repository.AuthRepository
 import com.group11.hometide.data.repository.FavoriteRepository
+import com.group11.hometide.data.repository.ReminderRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import com.group11.hometide.util.Passengers
 import com.group11.hometide.util.Result
 import com.group11.hometide.util.messageRes
@@ -20,7 +29,28 @@ import kotlinx.coroutines.launch
 class MyRoutesViewModel(
     private val cards: FavoriteCards,
     private val favorites: FavoriteRepository,
+    auth: AuthRepository,
+    private val reminderRepo: ReminderRepository,
 ) : ViewModel() {
+
+    private val reminderEvents = Channel<Int>(Channel.BUFFERED)
+
+    /** FR-FAV-05：已預約與已提醒的提醒（訪客為空） */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val reminders: StateFlow<List<TripReminder>> = auth.profile.map { it?.uid }.distinctUntilChanged()
+        .flatMapLatest { uid -> if (uid == null) flowOf(emptyList()) else reminderRepo.observe(uid) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), emptyList())
+
+    /** 取消提醒的結果訊息 */
+    val reminderMessages = reminderEvents.receiveAsFlow()
+
+    /** FR-FAV-05：左滑取消（同時取消 AlarmManager） */
+    fun cancelReminder(reminder: TripReminder) {
+        viewModelScope.launch {
+            val r = reminderRepo.cancel(reminder)
+            reminderEvents.send(if (r is Result.Success) R.string.reminder_cancelled else R.string.error_unknown)
+        }
+    }
 
     private val refresh = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     private val deletedEvents = Channel<FavoriteRoute>(Channel.BUFFERED)

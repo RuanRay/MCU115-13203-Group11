@@ -10,6 +10,9 @@ import com.group11.hometide.data.local.entity.TimetableCache
 import com.group11.hometide.data.local.entity.FavoriteRoute
 import com.group11.hometide.data.repository.AuthRepository
 import com.group11.hometide.data.repository.FavoriteRepository
+import com.group11.hometide.data.repository.ReminderRepository
+import com.group11.hometide.data.local.entity.TripReminder
+import com.group11.hometide.util.ReminderRules
 import com.group11.hometide.data.repository.LiveInfo
 import com.group11.hometide.data.repository.TransitRepository
 import com.group11.hometide.util.AppError
@@ -41,6 +44,7 @@ class ResultViewModel(
     private val transit: TransitRepository,
     private val auth: AuthRepository,
     private val favorites: FavoriteRepository,
+    private val reminders: ReminderRepository,
     private val query: TimetableQuery,
     initialPassengers: Passengers = Passengers.DEFAULT,
     private val clock: () -> LocalDateTime = LocalDateTime::now,
@@ -56,6 +60,8 @@ class ResultViewModel(
         val fare: FareTotal,
         val faresLoaded: Boolean = true,
         val expanded: Boolean = false,
+        /** FR-RMD-01：這班已設定的提醒（存根顯示「🔔 前 N 分」） */
+        val reminder: TripReminder? = null,
     )
 
     /** 規格 6.3 的 UiState 狀態 */
@@ -122,12 +128,35 @@ class ResultViewModel(
     /** FR-RES-05：新增收藏成功（畫面播放 AN-06 並顯示「已加入我的路線」＋「復原」） */
     val favoriteAdded = added.receiveAsFlow()
 
-    private data class Member(val isGuest: Boolean, val isFavorite: Boolean)
+    private val reminderEvents = Channel<ReminderEvent>(Channel.BUFFERED)
+
+    /** FR-RMD-01：設定或取消提醒的結果（Snackbar） */
+    val reminderMessages = reminderEvents.receiveAsFlow()
+
+    sealed interface ReminderEvent {
+        data class Set(val beforeMin: Int) : ReminderEvent
+        data object Cancelled : ReminderEvent
+        data object Failed : ReminderEvent
+    }
+
+    private data class Member(val isGuest: Boolean, val isFavorite: Boolean, val reminders: Map<String, TripReminder> = emptyMap())
+
+    // 這天、這個運具的提醒，以車次對應（同一車次同一天只有一筆，FR-RMD-01）
+    private val dayRange = ReminderRules.dayRange(ReminderRules.departAt(query.travelDate, "12:00"))
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val member = auth.profile.flatMapLatest { p ->
-        if (p == null) flowOf(Member(true, false))
-        else favorites.isFavorite(p.uid, query.operator, query.originId, query.destId).map { Member(false, it) }
+        if (p == null) {
+            flowOf(Member(true, false))
+        } else {
+            combine(
+                favorites.isFavorite(p.uid, query.operator, query.originId, query.destId),
+                reminders.observe(p.uid),
+            ) { fav, list ->
+                val today = list.filter { it.operator == query.operator && it.departAt >= dayRange.first && it.departAt < dayRange.second }
+                Member(false, fav, today.associateBy { it.trainNo })
+            }
+        }
     }
 
     /** 一次性訊息（Snackbar）：有快取但被限流時的 11.2 訊息 */
@@ -141,7 +170,7 @@ class ResultViewModel(
             val base = TrainStatus.of(query.operator, t.departTime, date, today, nowTime.toLocalTime())
             // 國道客運 typeCode 為路線號；台鐵、高鐵為車種代碼（E-8）。FR-RES-02：依本次乘客組合計算總價
             val fare = FareTotal.of(t.trainTypeCode?.let { d.fares?.get(it) }.orEmpty(), d.passengers)
-            Item(t, TrainStatus.withLive(base, d.live[t.trainNo]), fare, d.fares != null, t.trainNo in d.expanded)
+            Item(t, TrainStatus.withLive(base, d.live[t.trainNo]), fare, d.fares != null, t.trainNo in d.expanded, m.reminders[t.trainNo])
         }
         UiState(
             operator = query.operator,
@@ -235,6 +264,23 @@ class ResultViewModel(
                 is Result.Success -> (r.data as? FavoriteRepository.Toggle.Added)?.let { added.send(it.route) }
                 is Result.Failure -> events.send(r.error.messageRes)
             }
+        }
+    }
+
+    /** FR-RMD-01：設定（或更新）提醒；[typeName] 由畫面組好（鐵路車種、國道客運「業者 路線號」） */
+    fun setReminder(train: TimetableCache, typeName: String, beforeMin: Int) {
+        val uid = auth.currentUid ?: return
+        viewModelScope.launch {
+            val o = transit.stationName(query.operator, query.originId)
+            val d = transit.stationName(query.operator, query.destId)
+            val r = reminders.set(uid, train, typeName, o, d, beforeMin)
+            reminderEvents.send(if (r is Result.Success) ReminderEvent.Set(beforeMin) else ReminderEvent.Failed)
+        }
+    }
+
+    fun cancelReminder(reminder: TripReminder) {
+        viewModelScope.launch {
+            reminderEvents.send(if (reminders.cancel(reminder) is Result.Success) ReminderEvent.Cancelled else ReminderEvent.Failed)
         }
     }
 

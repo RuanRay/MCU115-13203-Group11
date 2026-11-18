@@ -45,7 +45,7 @@ class ResultActivity : BaseActivity() {
         viewModelFactory {
             initializer {
                 val c = (application as HometideApp).container
-                ResultViewModel(c.transitRepository, c.authRepository, c.favoriteRepository, queryOf(intent), Passengers.fromJson(intent.getStringExtra(EXTRA_PASSENGERS)))
+                ResultViewModel(c.transitRepository, c.authRepository, c.favoriteRepository, c.reminderRepository, queryOf(intent), Passengers.fromJson(intent.getStringExtra(EXTRA_PASSENGERS)))
             }
         }
     }
@@ -84,7 +84,8 @@ class ResultActivity : BaseActivity() {
         }
 
         val adapter = TimelineAdapter(
-            onRemind = { if (vm.state.value.isGuest) showLoginPrompt() }, // 會員提醒於 5-3
+            // FR-RMD-01：會員開提醒對話框；訪客顯示登入提示
+            onRemind = { item -> if (vm.state.value.isGuest) showLoginPrompt() else showReminderDialog(item) },
             onToggleDetail = vm::toggleDetail,
         )
         val nowLine = NowLineDecoration(this)
@@ -120,6 +121,15 @@ class ResultActivity : BaseActivity() {
                     }
                 }
                 launch { vm.messages.collect { showSnackbar(it) } }
+                launch {
+                    vm.reminderMessages.collect { e ->
+                        when (e) {
+                            is ResultViewModel.ReminderEvent.Set -> showSnackbar(getString(R.string.reminder_set, e.beforeMin))
+                            ResultViewModel.ReminderEvent.Cancelled -> showSnackbar(R.string.reminder_cancelled)
+                            ResultViewModel.ReminderEvent.Failed -> showSnackbar(R.string.error_unknown)
+                        }
+                    }
+                }
                 launch {
                     vm.favoriteAdded.collect { route ->
                         playHeartPop()
@@ -157,6 +167,17 @@ class ResultActivity : BaseActivity() {
         empty.tvEmptyMessage.isVisible = error && s.errorRes != null
         s.errorRes?.let { empty.tvEmptyMessage.setText(it) }
         empty.btnRetry.isVisible = error
+    }
+
+    private fun showReminderDialog(item: ResultViewModel.Item) {
+        val t = item.train
+        ReminderDialog.show(
+            this,
+            t,
+            item.reminder,
+            onSet = { min -> vm.setReminder(t, ReminderDialog.typeName(this, t), min) },
+            onCancelReminder = { item.reminder?.let(vm::cancelReminder) },
+        )
     }
 
     /** AN-06：愛心放大到 1.35 倍再回彈（250 ms，OvershootInterpolator） */

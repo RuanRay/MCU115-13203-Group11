@@ -27,7 +27,7 @@ import com.group11.hometide.util.priceText
 
 /** P4 時間軸（規格 4.6；FR-RES-01～03、07、FR-BUS-02～04）。 */
 class TimelineAdapter(
-    private val onRemind: (TimetableCache) -> Unit,
+    private val onRemind: (ResultViewModel.Item) -> Unit,
     private val onToggleDetail: (trainNo: String) -> Unit,
 ) : ListAdapter<ResultViewModel.Item, TimelineAdapter.Holder>(Diff) {
 
@@ -71,7 +71,9 @@ class TimelineAdapter(
         b.tvHour.alpha = alpha
         b.btnRemind.isVisible = !departed
         b.vDepartedStamp.isVisible = departed
-        b.btnRemind.setOnClickListener { onRemind(train) }
+        b.btnRemind.setOnClickListener { onRemind(item) }
+        // 已設定提醒：「🔔 前 15 分」（實作者確認）
+        b.btnRemind.text = item.reminder?.let { ctx.getString(R.string.btn_remind_set, it.remindBeforeMin) } ?: ctx.getString(R.string.btn_remind)
         // FR-RES-07：點車票本體展開／收合（「提醒」有自己的點擊，不會觸發）
         b.tkTrain.setOnClickListener { onToggleDetail(train.trainNo) }
         b.tkTrain.asButtonForAccessibility()
