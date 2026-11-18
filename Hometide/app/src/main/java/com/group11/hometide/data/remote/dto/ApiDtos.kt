@@ -39,7 +39,7 @@ data class TripDto(
     val bikeAllowed: Boolean?,
 )
 
-/** E-8 /api/fare（任務 4-5 前的格式） */
+/** E-8 /api/fare（CR-01：每個車種／路線 × 票種一筆；查無的票種不出現） */
 data class FareData(
     val operator: String?,
     val fares: List<FareDto>?,
@@ -47,8 +47,9 @@ data class FareData(
 
 data class FareDto(
     val typeCode: String?,
-    val adultPrice: Int?,
-    val approximate: Boolean?,
+    val fareClass: String?,
+    val price: Int?,
+    val approx: Boolean?,
 )
 
 /** E-3 /api/live：台鐵 delayMin、國道客運 etaMin */

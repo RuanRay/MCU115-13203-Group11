@@ -9,11 +9,14 @@ import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.group11.hometide.data.local.SettingsStore
 import com.group11.hometide.data.local.dao.UserProfileDao
 import com.group11.hometide.data.local.entity.Operator
 import com.group11.hometide.data.local.entity.UserProfile
+import com.group11.hometide.data.local.entity.FareClass
 import com.group11.hometide.util.AppError
+import com.group11.hometide.util.Passengers
 import com.group11.hometide.util.Result
 import com.group11.hometide.util.await
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -21,6 +24,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -56,7 +60,8 @@ class AuthRepository(
         runAuth(isRegister = true) {
             val uid = requireNotNull(auth.createUserWithEmailAndPassword(email, password).await().user).uid
             val profile = UserProfile(uid, email, nickname, operator, System.currentTimeMillis())
-            userDoc(uid).set(profile.toFirestore())
+            // 訪客時設定的預設乘客一併帶到雲端（FR-SET-02）
+            userDoc(uid).set(profile.toFirestore() + (PASSENGERS_FIELD to settings.defaultPassengers.first().toFirestore()))
                 .addOnFailureListener { Log.w(TAG, "Firestore write failed: ${it.javaClass.simpleName}") }
             saveLocally(profile)
             profile
@@ -65,9 +70,9 @@ class AuthRepository(
     /** FR-AUTH-02：Firestore 5 秒內取不到時用本機資料；本機也沒有時暫用 Email 前綴當暱稱 */
     suspend fun login(email: String, password: String): Result<UserProfile> = runAuth {
         val uid = requireNotNull(auth.signInWithEmailAndPassword(email, password).await().user).uid
-        val remote = withTimeoutOrNull(FIRESTORE_TIMEOUT_MS) {
+        val doc = withTimeoutOrNull(FIRESTORE_TIMEOUT_MS) {
             try {
-                userDoc(uid).get().await().toProfile(uid)
+                userDoc(uid).get().await()
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -75,9 +80,21 @@ class AuthRepository(
                 null
             }
         }
-        val profile = remote ?: profiles.get(uid) ?: fallbackProfile(uid)
+        val profile = doc?.toProfile(uid) ?: profiles.get(uid) ?: fallbackProfile(uid)
         saveLocally(profile)
+        // FR-SET-02：登入時以雲端預設乘客覆蓋本機；雲端沒有時保留本機
+        doc?.passengers()?.let { runCatching { settings.setDefaultPassengers(it) } }
         profile
+    }
+
+    /** FR-SET-02：存在本機；會員另同步到 Firestore（離線時 SDK 排隊重送，失敗只記 log） */
+    suspend fun setDefaultPassengers(passengers: Passengers) {
+        settings.setDefaultPassengers(passengers)
+        currentUid?.let { uid ->
+            // merge：文件不存在（例如註冊時寫入失敗）也能建立，不會像 update 一樣失敗
+            userDoc(uid).set(mapOf(PASSENGERS_FIELD to passengers.toFirestore()), SetOptions.merge())
+                .addOnFailureListener { Log.w(TAG, "Firestore write failed: ${it.javaClass.simpleName}") }
+        }
     }
 
     private fun fallbackProfile(uid: String): UserProfile {
@@ -140,16 +157,29 @@ class AuthRepository(
     private companion object {
         const val TAG = "AuthRepository"
         const val FIRESTORE_TIMEOUT_MS = 5_000L
+        const val PASSENGERS_FIELD = "defaultPassengers"
     }
 }
 
-// 7.4 users/{uid}：nickname、email、defaultOperator、createdAt
+// 7.4 users/{uid}：nickname、email、defaultOperator、defaultPassengers、createdAt
 private fun UserProfile.toFirestore() = mapOf(
     "nickname" to nickname,
     "email" to email,
     "defaultOperator" to defaultOperator.name,
     "createdAt" to createdAt,
 )
+
+private fun Passengers.toFirestore(): Map<String, Int> = counts.mapKeys { it.key.name }
+
+/** defaultPassengers（map，例 {ADULT: 1}）；沒有或不合法時回 null */
+private fun DocumentSnapshot.passengers(): Passengers? {
+    val raw = get("defaultPassengers") as? Map<*, *> ?: return null
+    val counts = raw.entries.mapNotNull { (k, v) ->
+        val cls = FareClass.entries.firstOrNull { it.name == k } ?: return@mapNotNull null
+        (v as? Number)?.let { cls to it.toInt() }
+    }.toMap()
+    return Passengers.ofOrNull(counts)
+}
 
 private fun DocumentSnapshot.toProfile(uid: String): UserProfile? {
     if (!exists()) return null

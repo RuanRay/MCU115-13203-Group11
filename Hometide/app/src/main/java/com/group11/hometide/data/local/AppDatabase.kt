@@ -38,7 +38,7 @@ import com.group11.hometide.data.local.entity.UserProfile
         FareCache::class, FavoriteRoute::class, TripReminder::class, AppSession::class,
         PageVisit::class, Feedback::class, AiQueryLog::class, DriveRoute::class, HighwayCache::class,
     ],
-    version = 3,
+    version = 4,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -79,7 +79,19 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * v4（任務 4-5）：search_history 加 passengers_json（NULL 視為全票 1）；
+         * 清空 fare_cache：v3 期間只寫入全票，7 天內不會重抓其他票種
+         */
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE search_history ADD COLUMN passengers_json TEXT")
+                db.execSQL("DELETE FROM fare_cache")
+            }
+        }
+
         fun create(context: Context): AppDatabase =
-            Room.databaseBuilder(context, AppDatabase::class.java, NAME).addMigrations(MIGRATION_1_2, MIGRATION_2_3).build()
+            Room.databaseBuilder(context, AppDatabase::class.java, NAME)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build()
     }
 }

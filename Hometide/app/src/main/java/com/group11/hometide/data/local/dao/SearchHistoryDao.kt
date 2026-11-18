@@ -16,6 +16,7 @@ data class RecentSearch(
     @ColumnInfo(name = "origin_name") val originName: String,
     @ColumnInfo(name = "dest_name") val destName: String,
     @ColumnInfo(name = "travel_date") val travelDate: String,
+    @ColumnInfo(name = "passengers_json") val passengersJson: String? = null, // 重新查詢時帶回當時的乘客（FR-SRCH-08）
 )
 
 @Dao
@@ -26,7 +27,7 @@ interface SearchHistoryDao {
 
     /** 依「運具＋起訖站」去重，每條取最近一次查詢，最新的在前 */
     @Query(
-        """SELECT h.operator, h.origin_id, h.dest_id, h.travel_date,
+        """SELECT h.operator, h.origin_id, h.dest_id, h.travel_date, h.passengers_json,
                   COALESCE(o.name_zh, h.origin_id) AS origin_name, COALESCE(d.name_zh, h.dest_id) AS dest_name
            FROM search_history h
            JOIN (SELECT operator, origin_id, dest_id, MAX(searched_at) AS last_at FROM search_history

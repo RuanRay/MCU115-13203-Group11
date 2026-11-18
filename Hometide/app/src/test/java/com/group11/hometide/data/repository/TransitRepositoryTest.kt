@@ -257,13 +257,16 @@ class TransitRepositoryTest {
     fun fares_cachedFor7Days_skipsInvalid_keepsApprox() = runBlocking {
         val api = FakeApi { ok(tainan) }
         api.fareResponse = {
-            ApiEnvelope(1L, "TDX", FareData("TRA", listOf(FareDto("3", 891, false), FareDto("4", 687, true), FareDto(null, 1, false), FareDto("6", 0, false))))
+            ApiEnvelope(1L, "TDX", FareData("TRA", listOf(
+                FareDto("3", "ADULT", 891, false), FareDto("4", "CHILD", 344, true),
+                FareDto(null, "ADULT", 1, false), FareDto("6", "ADULT", 0, false), FareDto("6", "GROUP", 500, false),
+            )))
         }
         val r = repo(api, FakeDao())
         val fares = (r.fares(Operator.TRA, "1000", "4220") as Result.Success).data
-        assertEquals(listOf("3" to 891, "4" to 687), fares.map { it.trainTypeCode to it.price })
+        assertEquals(listOf("3" to 891, "4" to 344), fares.map { it.trainTypeCode to it.price })
         assertEquals(listOf(false, true), fares.map { it.isApprox })
-        assertEquals(FareClass.ADULT, fares.first().fareClass)
+        assertEquals(listOf(FareClass.ADULT, FareClass.CHILD), fares.map { it.fareClass }) // 未知票種捨棄
         r.fares(Operator.TRA, "1000", "4220")
         assertEquals(1, api.fareCalls) // 7 天內讀 fare_cache
     }

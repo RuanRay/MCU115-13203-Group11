@@ -15,4 +15,5 @@ data class SearchHistory(
     @ColumnInfo(name = "travel_date") val travelDate: String, // yyyy-MM-dd
     val source: SearchSource,
     @ColumnInfo(name = "searched_at") val searchedAt: Long,
+    @ColumnInfo(name = "passengers_json") val passengersJson: String? = null, // CR-01，例 {"ADULT":2,"CHILD":1}；NULL 視為全票 1
 )

@@ -66,18 +66,27 @@ describe("高鐵時刻 → E-1", () => {
   });
 });
 
+// 高鐵 FareClass 9（半價優待）對應孩童、敬老、愛心；沒有學生（實作者確認）
+const THSR_FARES = [
+  { typeCode: "THSR", fareClass: "ADULT", price: 1350, approx: false },
+  { typeCode: "THSR", fareClass: "CHILD", price: 675, approx: false },
+  { typeCode: "THSR", fareClass: "SENIOR", price: 675, approx: false },
+  { typeCode: "THSR", fareClass: "DISABLED", price: 675, approx: false },
+];
+
 describe("票價挑選（8.7、FR-RES-02）", () => {
-  const fares = Object.fromEntries(toTraFares(traFare).map((f) => [f.typeCode, f]));
+  const all = toTraFares(traFare);
+  const fares = Object.fromEntries(all.filter((f) => f.fareClass === "ADULT").map((f) => [f.typeCode, f]));
 
   it("同車種取里程最短方向（西部直達 324.7 km，不取繞東部 551.2 km）", () => {
-    expect(fares["3"]).toEqual({ typeCode: "3", adultPrice: 891, approximate: false });
-    expect(fares["4"].adultPrice).toBe(687);
+    expect(fares["3"]).toEqual({ typeCode: "3", fareClass: "ADULT", price: 891, approx: false });
+    expect(fares["4"].price).toBe(687);
   });
 
   it("非對號車種一律取區間車價格", () => {
-    expect(fares["6"].adultPrice).toBe(574);
-    expect(fares["7"].adultPrice).toBe(574); // 普快自己是 344，但規格取區間
-    expect(fares["10"].adultPrice).toBe(574);
+    expect(fares["6"].price).toBe(574);
+    expect(fares["7"].price).toBe(574); // 普快自己是 344，但規格取區間
+    expect(fares["10"].price).toBe(574);
   });
 
   it("對號車種沒有票價時以自強代替並標示約", () => {
@@ -86,14 +95,20 @@ describe("票價挑選（8.7、FR-RES-02）", () => {
       { TrainType: 6, TravelDistance: 10, Fares: [{ TicketType: 1, FareClass: 1, CabinClass: 1, Price: 60 }] },
     ] };
     const f = Object.fromEntries(toTraFares(raw).map((x) => [x.typeCode, x]));
-    expect(f["1"]).toEqual({ typeCode: "1", adultPrice: 100, approximate: true });
-    expect(f["3"].approximate).toBe(false);
+    expect(f["1"]).toEqual({ typeCode: "1", fareClass: "ADULT", price: 100, approx: true });
+    expect(f["3"].approx).toBe(false);
+  });
+
+  it("CR-01：台鐵孩童、敬老、愛心各一筆；沒有學生票（FareClass 2）不輸出", () => {
+    const of = (cls: string) => all.find((f) => f.typeCode === "3" && f.fareClass === cls)?.price;
+    expect([of("CHILD"), of("SENIOR"), of("DISABLED")]).toEqual([446, 446, 446]);
+    expect(all.some((f) => f.fareClass === "STUDENT")).toBe(false);
   });
 
   it("全部取不到時為空", () => expect(toTraFares({ ODFares: [] })).toEqual([]));
 
   it("高鐵取標準車廂全票", () => {
-    expect(toThsrFares(thsrFare)).toEqual([{ typeCode: "THSR", adultPrice: 1350, approximate: false }]);
+    expect(toThsrFares(thsrFare)).toEqual(THSR_FARES);
     expect(toThsrFares([])).toEqual([]);
   });
 });
@@ -158,7 +173,7 @@ describe("端點", () => {
 
   it("fare：E-8 格式", async () => {
     const { body } = await get("/api/fare?operator=THSR&from=1000&to=1060");
-    expect(body.data).toEqual({ operator: "THSR", fares: [{ typeCode: "THSR", adultPrice: 1350, approximate: false }] });
+    expect(body.data).toEqual({ operator: "THSR", fares: THSR_FARES });
   });
 
   it("live 台鐵：以今天時刻的車次篩選 TrainLiveBoard", async () => {

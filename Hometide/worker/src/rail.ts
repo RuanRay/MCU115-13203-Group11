@@ -62,10 +62,10 @@ export async function handleTimetable(url: URL, env: Env, ctx: ExecutionContext)
   return cached(timetableKey(op, from, to, date), TIMETABLE_TTL_S, ctx, () => timetable(env, op, from, to, date));
 }
 
-/** GET /api/fare?operator=TRA|THSR&from&to（E-8） */
+/** GET /api/fare?operator=TRA|THSR&from&to（E-8）。快取鍵帶 v=2：CR-01 改格式，避免邊緣快取回傳舊格式 */
 export async function handleFare(url: URL, env: Env, ctx: ExecutionContext): Promise<Response> {
   const { op, from, to } = railQuery(url);
-  return cached(`/api/fare?operator=${op}&from=${from}&to=${to}`, FARE_TTL_S, ctx, async () => ({
+  return cached(`/api/fare?operator=${op}&from=${from}&to=${to}&v=2`, FARE_TTL_S, ctx, async () => ({
     operator: op,
     fares:
       op === "TRA"
@@ -181,11 +181,16 @@ export interface Trip {
   bikeAllowed: boolean;
 }
 
-/** E-8 的票價 */
+/** CR-01 票種代碼 */
+export type FareClass = "ADULT" | "STUDENT" | "CHILD" | "SENIOR" | "DISABLED";
+export const FARE_CLASSES: FareClass[] = ["ADULT", "STUDENT", "CHILD", "SENIOR", "DISABLED"];
+
+/** E-8 的票價：每個車種（國道為路線）× 票種一筆；查無的票種不輸出 */
 export interface Fare {
   typeCode: string;
-  adultPrice: number;
-  approximate: boolean;
+  fareClass: FareClass;
+  price: number;
+  approx: boolean;
 }
 
 export const THSR_TYPE = { code: "THSR", name: "高鐵" } as const;
@@ -291,40 +296,44 @@ export function toThsrTrips(raw: unknown): Trip[] {
 
 type TdxFare = { TicketType?: number; FareClass?: number; CabinClass?: number; Price?: number };
 
-/** 單程（TicketType 1）＋全票（FareClass 1）＋標準座／對號座（CabinClass 1），由 3-1 數值推定、實作者確認 */
-function adultPrice(fares: TdxFare[] | undefined): number | null {
-  const f = fares?.find((x) => x.TicketType === 1 && x.FareClass === 1 && x.CabinClass === 1);
+/**
+ * TDX FareClass → 票種（2026-11-18 以真實 TDX 查證）：台鐵 1/3/4/5 為全票、孩童、敬老、愛心，沒有學生（2）；
+ * 高鐵只有 1 與 9（半價優待），9 同時對應孩童、敬老、愛心（實作者確認，與 CR-01 第二節不同，已記入 devlog）
+ */
+const TRA_CLASS: Partial<Record<FareClass, number>> = { ADULT: 1, STUDENT: 2, CHILD: 3, SENIOR: 4, DISABLED: 5 };
+const THSR_CLASS: Partial<Record<FareClass, number>> = { ADULT: 1, CHILD: 9, SENIOR: 9, DISABLED: 9 };
+
+/** 單程（TicketType 1）＋標準座／對號座（CabinClass 1），由 3-1 數值推定、實作者確認 */
+function priceOf(fares: TdxFare[] | undefined, tdxClass: number | undefined): number | null {
+  const f = fares?.find((x) => x.TicketType === 1 && x.FareClass === tdxClass && x.CabinClass === 1);
   return typeof f?.Price === "number" ? f.Price : null;
 }
 
 /**
- * 台鐵：每個已知車種一筆。對號車種取自己的價格，沒有時以自強代替並標示約；
- * 非對號車種一律取區間車價格（FR-RES-02）。都取不到的車種不輸出（App 顯示「—」）。
+ * 台鐵：每個已知車種 × 票種一筆。對號車種取自己的價格，沒有時以自強代替並標示約；
+ * 非對號車種一律取區間車價格（FR-RES-02）。取不到的不輸出（App 顯示「—」或「查無」）。
  */
 export function toTraFares(raw: unknown): Fare[] {
   type Od = { TrainType?: number | string; TravelDistance?: number; Fares?: TdxFare[] };
   const list = (raw as { ODFares?: Od[] } | null)?.ODFares;
   if (!Array.isArray(list)) throw new ApiError("PARSE", "Unexpected TRA fare");
   // 同一車種有兩個方向（Direction 0／1）：一個走西部直達、一個繞東部環島，里程不同（3-1 查證）。取里程最短者
-  const best = new Map<string, { price: number; dist: number }>();
+  const shortest = new Map<string, Od>();
   for (const od of list) {
-    const p = adultPrice(od.Fares);
     const code = od.TrainType == null ? "" : String(od.TrainType);
-    const dist = typeof od.TravelDistance === "number" ? od.TravelDistance : Infinity;
-    if (p == null || !code) continue;
-    const cur = best.get(code);
-    if (!cur || dist < cur.dist) best.set(code, { price: p, dist });
+    if (!code || priceOf(od.Fares, 1) == null) continue;
+    const dist = (o: Od) => (typeof o.TravelDistance === "number" ? o.TravelDistance : Infinity);
+    const cur = shortest.get(code);
+    if (!cur || dist(od) < dist(cur)) shortest.set(code, od);
   }
-  const price = new Map([...best].map(([k, v]) => [k, v.price]));
   const out: Fare[] = [];
-  for (const [code, t] of Object.entries(TRA_TYPES)) {
-    if (!t.reserved) {
-      const p = price.get(TRA_LOCAL);
-      if (p != null) out.push({ typeCode: code, adultPrice: p, approximate: false });
-    } else if (price.has(code)) {
-      out.push({ typeCode: code, adultPrice: price.get(code)!, approximate: false });
-    } else if (price.has(TRA_EXPRESS)) {
-      out.push({ typeCode: code, adultPrice: price.get(TRA_EXPRESS)!, approximate: true });
+  for (const fareClass of FARE_CLASSES) {
+    const price = (code: string) => priceOf(shortest.get(code)?.Fares, TRA_CLASS[fareClass]);
+    for (const [code, t] of Object.entries(TRA_TYPES)) {
+      const own = price(t.reserved ? code : TRA_LOCAL);
+      const sub = t.reserved && own == null ? price(TRA_EXPRESS) : null;
+      if (own != null) out.push({ typeCode: code, fareClass, price: own, approx: false });
+      else if (sub != null) out.push({ typeCode: code, fareClass, price: sub, approx: true });
     }
   }
   return out;
@@ -332,8 +341,11 @@ export function toTraFares(raw: unknown): Fare[] {
 
 export function toThsrFares(raw: unknown): Fare[] {
   if (!Array.isArray(raw)) throw new ApiError("PARSE", "Unexpected THSR fare");
-  const p = adultPrice((raw[0] as { Fares?: TdxFare[] } | undefined)?.Fares);
-  return p == null ? [] : [{ typeCode: THSR_TYPE.code, adultPrice: p, approximate: false }];
+  const fares = (raw[0] as { Fares?: TdxFare[] } | undefined)?.Fares;
+  return FARE_CLASSES.flatMap((fareClass) => {
+    const price = priceOf(fares, THSR_CLASS[fareClass]);
+    return price == null ? [] : [{ typeCode: THSR_TYPE.code, fareClass, price, approx: false }];
+  });
 }
 
 /** E-3：台鐵以車次對應延誤分鐘；對應不到的車次視為準點，不輸出（8.7） */

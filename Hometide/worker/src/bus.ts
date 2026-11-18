@@ -2,7 +2,7 @@
 // 「哪些路線依序經過起訖站」只讀 scripts/build-index.ts 每日寫入 KV 的索引（8.6），請求中不掃描全部路線
 
 import { cached, cachedData } from "./cache";
-import { durationMin, normalizeName, taiwanToday, validDate, type Fare, type Trip } from "./rail";
+import { durationMin, FARE_CLASSES, normalizeName, taiwanToday, validDate, type Fare, type FareClass, type Trip } from "./rail";
 import { ApiError, json, tdxGet, type Env } from "./tdx";
 
 // 8.5 快取時間（秒）
@@ -193,14 +193,22 @@ type TdxRouteFare = {
   StageFares?: { OriginStage?: { StopName?: string }; DestinationStage?: { StopName?: string }; Fares?: TdxFareItem[] }[];
 };
 
+// CR-01 第二節：國道客運依 FareName 對應票種。2026-11-18 真實 TDX 查證只有「全票_」「半票_」與少數「學生票」，
+// 沒有孩童／敬老／愛心專屬名稱，所以這三種退回半票。電子票證、現金、刷卡、車上投現、來回票一律不收
+const PAYMENT = /^(電子|現金|刷卡|車上投現|來回)/;
+const OWN_NAME: Partial<Record<FareClass, string[]>> = { CHILD: ["孩童", "兒童"], SENIOR: ["敬老"], DISABLED: ["愛心", "身障"] };
+const PREFIX: Record<FareClass, string> = { ADULT: "全票_", STUDENT: "學生票", CHILD: "半票_", SENIOR: "半票_", DISABLED: "半票_" };
+
 /**
- * 依票種挑價（實作者確認：先篩票種 → 優惠價 → 最低原價）。目前規格只有全票（CR-01 於任務 4-5 擴充其他票種）。
- * 全票：只收名稱以「全票_」開頭者（排除電子票證、現金、刷卡、來回票、半票）；有「優惠」取最低優惠並標約，否則取原價／不分時段的最低價。
+ * 依票種挑價（實作者確認：先篩票種 → 優惠價 → 最低原價）。
+ * 有「優惠」取最低優惠並標約，否則取原價／不分時段的最低價。
  */
-export function pickAdultPrice(fares: TdxFareItem[] | undefined): { price: number; discounted: boolean } | null {
-  const adult = (fares ?? []).filter((f) => f.FareName?.startsWith("全票_") && typeof f.Price === "number" && f.Price > 0);
-  const promo = adult.filter((f) => f.FareName!.includes("_優惠_"));
-  const pool = promo.length ? promo : adult;
+export function pickPrice(fares: TdxFareItem[] | undefined, cls: FareClass): { price: number; discounted: boolean } | null {
+  const valid = (fares ?? []).filter((f) => f.FareName && !PAYMENT.test(f.FareName) && typeof f.Price === "number" && f.Price > 0);
+  const own = valid.filter((f) => OWN_NAME[cls]?.some((k) => f.FareName!.split("_")[0].includes(k)));
+  const pool0 = own.length ? own : valid.filter((f) => f.FareName!.startsWith(PREFIX[cls]));
+  const promo = pool0.filter((f) => f.FareName!.includes("_優惠_"));
+  const pool = promo.length ? promo : pool0;
   if (!pool.length) return null;
   return { price: Math.min(...pool.map((f) => f.Price!)), discounted: promo.length > 0 };
 }
@@ -255,13 +263,15 @@ export function toBusFares(index: BusIndex, subs: string[], raw: unknown, from: 
     const { route, stops } = index.routes[sub];
     const stages = stageMap.get(route);
     const hit = stages && stageFare(stops, stages, from, to);
-    const p = hit && pickAdultPrice(hit.fares);
-    if (!hit || !p) continue;
-    const fare = { typeCode: route, adultPrice: p.price, approximate: !hit.exact || p.discounted };
-    const prev = best.get(route);
-    // 同路線多條子路線：精確對中優先，其次取較低價
-    if (!prev || (prev.approximate && !fare.approximate) || (prev.approximate === fare.approximate && fare.adultPrice < prev.adultPrice)) {
-      best.set(route, fare);
+    if (!hit) continue;
+    for (const fareClass of FARE_CLASSES) {
+      const p = pickPrice(hit.fares, fareClass);
+      if (!p) continue;
+      const fare: Fare = { typeCode: route, fareClass, price: p.price, approx: !hit.exact || p.discounted };
+      const key = `${route}|${fareClass}`;
+      const prev = best.get(key);
+      // 同路線多條子路線：精確對中優先，其次取較低價
+      if (!prev || (prev.approx && !fare.approx) || (prev.approx === fare.approx && fare.price < prev.price)) best.set(key, fare);
     }
   }
   return [...best.values()].sort((a, b) => a.typeCode.localeCompare(b.typeCode));
@@ -271,7 +281,7 @@ export function toBusFares(index: BusIndex, subs: string[], raw: unknown, from: 
 export async function handleBusFare(url: URL, env: Env, ctx: ExecutionContext): Promise<Response> {
   const { from, to } = busParams(url);
   const route = url.searchParams.get("route");
-  const allKey = `/api/fare?operator=BUS&from=${q(from)}&to=${q(to)}`;
+  const allKey = `/api/fare?operator=BUS&from=${q(from)}&to=${q(to)}&v=2`; // v=2：CR-01 改格式
   const produceAll = async () => {
     const { index, subs, routes } = await busRoutes(env, from, to);
     const raw = routes.length ? await tdxByRoutes(env, "/v2/Bus/RouteFare/InterCity", "RouteName", routes, "RouteName,StageFares") : [];

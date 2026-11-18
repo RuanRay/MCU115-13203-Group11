@@ -20,6 +20,7 @@ import com.group11.hometide.data.remote.HometideApi
 import com.group11.hometide.data.remote.apiCall
 import com.group11.hometide.data.remote.dto.StationDto
 import com.group11.hometide.util.AppError
+import com.group11.hometide.util.Passengers
 import com.group11.hometide.util.Result
 import com.group11.hometide.util.StationNameNormalizer
 import kotlinx.coroutines.flow.Flow
@@ -105,7 +106,7 @@ class TransitRepository(
         return Result.Failure(AppError.ParseError)
     }
 
-    /** FR-RES-02、FR-BUS-03：各車種（國道客運為路線）的全票；依起訖站快取 7 天（7.1.5）。票種與多人於 4-5 */
+    /** FR-RES-02、FR-BUS-03：各車種（國道客運為路線）× 票種的單價；依起訖站快取 7 天（7.1.5）。總價由 [FareTotal] 計算 */
     suspend fun fares(operator: Operator, originId: String, destId: String): Result<List<FareCache>> =
         guarded("Fare failed: $operator") {
             val cached = fareDao.get(operator, originId, destId)
@@ -116,8 +117,9 @@ class TransitRepository(
                     val time = now()
                     val fares = res.data.data?.fares?.mapNotNull { f ->
                         val code = f.typeCode?.takeIf { it.isNotBlank() } ?: return@mapNotNull null
-                        val price = f.adultPrice?.takeIf { it > 0 } ?: return@mapNotNull null
-                        FareCache(operator, originId, destId, code, FareClass.ADULT, price, f.approximate ?: false, time)
+                        val cls = FareClass.entries.firstOrNull { it.name == f.fareClass } ?: return@mapNotNull null
+                        val price = f.price?.takeIf { it > 0 } ?: return@mapNotNull null
+                        FareCache(operator, originId, destId, code, cls, price, f.approx ?: false, time)
                     } ?: return@guarded Result.Failure(AppError.ParseError)
                     fareDao.replace(operator, originId, destId, fares)
                     Result.Success(fares)
@@ -149,8 +151,9 @@ class TransitRepository(
         destId: String,
         travelDate: String,
         source: SearchSource,
+        passengers: Passengers = Passengers.DEFAULT,
     ): Result<Unit> = guarded("Search history insert failed") {
-        historyDao.insert(SearchHistory(0, uid, operator, originId, destId, travelDate, source, now()))
+        historyDao.insert(SearchHistory(0, uid, operator, originId, destId, travelDate, source, now(), passengers.toJson()))
         Result.Success(Unit)
     }
 

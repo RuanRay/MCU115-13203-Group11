@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import worker from "../src/index";
 import { buildIndex, type TdxRoute, type TdxStopOfRoute } from "../scripts/build-index";
-import { candidateSubs, pickAdultPrice, stageFare, toBusFares, toBusLive, toBusTrips, toStageMap, type BusTrip } from "../src/bus";
+import { candidateSubs, pickPrice, stageFare, toBusFares, toBusLive, toBusTrips, toStageMap, type BusTrip } from "../src/bus";
 import { resetTokenForTest, type Env } from "../src/tdx";
 import routes from "./fixtures/bus-route.json";
 import stopOfRoutes from "./fixtures/bus-stopofroute.json";
@@ -97,11 +97,21 @@ describe("toBusTrips", () => {
   });
 });
 
+// 中港轉運站→建國客運站：全票取最低優惠 280（約）；孩童、敬老、愛心退回半票 146；沒有學生票
+const BUS_FARES = [
+  { typeCode: "1610", fareClass: "ADULT", price: 280, approx: true },
+  { typeCode: "1610", fareClass: "CHILD", price: 146, approx: false },
+  { typeCode: "1610", fareClass: "SENIOR", price: 146, approx: false },
+  { typeCode: "1610", fareClass: "DISABLED", price: 146, approx: false },
+];
+
 describe("票價", () => {
   const stages = toStageMap(routeFare).get("1610")!;
   const stops = index.routes["THB161001"].stops;
 
-  it("pickAdultPrice：只收「全票_」；有優惠取最低優惠並標示；沒有優惠取原價／不分時段最低", () => {
+  const pickAdultPrice = (f: Parameters<typeof pickPrice>[0]) => pickPrice(f, "ADULT");
+
+  it("pickPrice 全票：只收「全票_」；有優惠取最低優惠並標示；沒有優惠取原價／不分時段最低", () => {
     expect(pickAdultPrice([
       { FareName: "全票_優惠_四排座", Price: 280 }, { FareName: "全票_原價_四排座", Price: 290 },
       { FareName: "全票_優惠_三排座", Price: 300 }, { FareName: "全票_原價_三排座", Price: 364 },
@@ -114,6 +124,18 @@ describe("票價", () => {
     expect(pickAdultPrice([{ FareName: "半票_不分時段_四排座", Price: 146 }])).toBeNull();
   });
 
+  it("pickPrice 其他票種：孩童／敬老／愛心沒有專屬名稱時退回半票；學生只收「學生票」；查無回 null", () => {
+    const f = [
+      { FareName: "全票_不分時段_四排座", Price: 290 }, { FareName: "半票_不分時段_四排座", Price: 146 },
+      { FareName: "電子票證半票_不分時段_四排座", Price: 100 },
+    ];
+    expect(pickPrice(f, "CHILD")).toEqual({ price: 146, discounted: false });
+    expect(pickPrice(f, "SENIOR")).toEqual({ price: 146, discounted: false });
+    expect(pickPrice(f, "STUDENT")).toBeNull();
+    expect(pickPrice([...f, { FareName: "學生票_不分時段", Price: 200 }], "STUDENT")?.price).toBe(200);
+    expect(pickPrice([...f, { FareName: "敬老票_不分時段", Price: 120 }], "SENIOR")?.price).toBe(120);
+  });
+
   it("stageFare：精確對中、迄站往後吸附、起站前沒有分段起點時對不到", () => {
     expect(stageFare(stops, stages, "中港轉運站", "建國客運站")?.exact).toBe(true);
     const snapped = stageFare(stops, stages, "中港轉運站", "楠梓站");
@@ -123,12 +145,10 @@ describe("票價", () => {
   });
 
   it("toBusFares：取優惠或吸附時 approximate=true；對不到的路線不輸出", () => {
-    expect(toBusFares(index, ["THB161001"], routeFare, "中港轉運站", "建國客運站")).toEqual([
-      { typeCode: "1610", adultPrice: 280, approximate: true },
-    ]);
+    expect(toBusFares(index, ["THB161001"], routeFare, "中港轉運站", "建國客運站")).toEqual(BUS_FARES);
     const noPromo = [{ RouteName: "1610", StageFares: [{ OriginStage: { StopName: "中港轉運站" }, DestinationStage: { StopName: "建國客運站" }, Fares: [{ FareName: "全票_不分時段_四排座", Price: 290 }] }] }];
     expect(toBusFares(index, ["THB161001"], noPromo, "中港轉運站", "建國客運站")).toEqual([
-      { typeCode: "1610", adultPrice: 290, approximate: false },
+      { typeCode: "1610", fareClass: "ADULT", price: 290, approx: false },
     ]);
     expect(toBusFares(index, ["THB161001"], routeFare, "經國轉運站", "建國客運站")).toEqual([]);
   });
@@ -238,9 +258,9 @@ describe("端點（operator=BUS）", () => {
       const F = `from=${enc("中港轉運站")}&to=${enc("建國客運站")}`;
       expect((await get(`/api/fare?operator=BUS&${F}`)).body.data).toEqual({
         operator: "BUS",
-        fares: [{ typeCode: "1610", adultPrice: 280, approximate: true }],
+        fares: BUS_FARES,
       });
-      expect((await get(`/api/fare?operator=BUS&${F}&route=1610`)).body.data.fares).toHaveLength(1);
+      expect((await get(`/api/fare?operator=BUS&${F}&route=1610`)).body.data.fares).toHaveLength(BUS_FARES.length);
       expect((await get(`/api/fare?operator=BUS&${F}&route=9999`)).body.data.fares).toEqual([]);
       expect(tdxCalls()).toHaveLength(1);
       const none = await get(`/api/fare?operator=BUS&from=${enc("臺北轉運站")}&to=${enc("中壢服務區")}`);

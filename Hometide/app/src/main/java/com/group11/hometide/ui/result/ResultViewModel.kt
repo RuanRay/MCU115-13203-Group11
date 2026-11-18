@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.group11.hometide.data.local.dao.TimetableQuery
 import com.group11.hometide.data.local.entity.FareCache
+import com.group11.hometide.data.local.entity.FareClass
 import com.group11.hometide.data.local.entity.Operator
 import com.group11.hometide.data.local.entity.TimetableCache
 import com.group11.hometide.data.repository.AuthRepository
@@ -161,7 +162,8 @@ class ResultViewModel(
         viewModelScope.launch {
             // 票價取不到時存根顯示「—」，不影響列表（FR-RES-02）；Worker 失敗時 Repository 會用快取
             (transit.fares(query.operator, query.originId, query.destId) as? Result.Success)?.let { r ->
-                fares.value = r.data.associateBy { it.trainTypeCode }
+                // ponytail: 4-5a 先只用全票；4-5b 改依乘客組合計算總價
+                fares.value = r.data.filter { it.fareClass == FareClass.ADULT }.associateBy { it.trainTypeCode }
             }
         }
     }
