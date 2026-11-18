@@ -136,6 +136,9 @@
     <string name="fare_adult">全票</string>
     <string name="btn_remind">🔔 提醒</string>
     <string name="stamp_departed">已開出</string>
+    <string name="trains_unavailable">目前無法取得班次</string>
+    <string name="btn_retry">重試</string>
+    <string name="offline_banner">目前為離線資料（最後更新 %1$s）</string>
 
     <!-- 11.2 錯誤訊息 -->
     <string name="error_service_unavailable">資料服務暫時無法使用</string>

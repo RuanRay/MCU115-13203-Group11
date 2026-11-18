@@ -59,29 +59,46 @@ class TransitRepository(
     suspend fun stationName(operator: Operator, stationId: String): String =
         runCatching { stationDao.nameOf(operator, stationId) }.getOrNull() ?: stationId
 
+    /** 收到 QUOTA 後的冷卻期（11.2：60 秒內只讀快取） */
+    private var quotaUntil = 0L
+
     /**
-     * FR-RES-01：時刻表。同條件 2 小時內讀 timetable_cache 不重複呼叫（8.5），否則呼叫 Worker 並先刪後寫。
-     * 離線時改讀過期快取於任務 4-4（FR-OFF-01）。
+     * FR-RES-01、FR-OFF-01：時刻表。
+     * - 同條件 2 小時內讀 timetable_cache 不重複呼叫（8.5）；[force]（下拉重新整理）略過這個判斷
+     * - 呼叫 Worker 成功：先刪後寫
+     * - 呼叫失敗或 QUOTA 冷卻中：有 3 天內的快取就回傳快取並附上錯誤（畫面顯示離線橫幅或限流訊息），沒有才回 Failure
      */
-    suspend fun timetable(query: TimetableQuery, force: Boolean = false): Result<List<TimetableCache>> =
+    suspend fun timetable(query: TimetableQuery, force: Boolean = false): Result<Timetable> =
         guarded("Timetable failed: ${query.operator}") {
-            val cached = timetableDao.get(query)
-            if (!force && cached.isNotEmpty() && now() - cached.first().fetchedAt < TIMETABLE_FRESH_MS) {
-                return@guarded Result.Success(cached)
+            val cached = timetableDao.get(query).filter { now() - it.fetchedAt < CACHE_KEEP_MS }
+            val cachedAt = cached.firstOrNull()?.fetchedAt
+            if (!force && cachedAt != null && now() - cachedAt < TIMETABLE_FRESH_MS) {
+                return@guarded Result.Success(Timetable(cached))
             }
+            val fallback = { e: AppError -> if (cachedAt != null) Result.Success(Timetable(cached, cachedAt, e)) else Result.Failure(e) }
+            if (now() < quotaUntil) return@guarded fallback(AppError.QuotaExceeded)
             val q = query
             when (val res = apiCall(gson) { api.timetable(q.operator.name, q.originId, q.destId, q.travelDate) }) {
-                is Result.Failure -> res
+                is Result.Failure -> {
+                    if (res.error == AppError.QuotaExceeded) quotaUntil = now() + QUOTA_COOLDOWN_MS
+                    // NOT_FOUND＝查無班次（11.2），不改讀快取
+                    if (res.error == AppError.NotFound) res else fallback(res.error)
+                }
                 is Result.Success -> {
                     val time = now()
                     val trips = res.data.data?.trips
-                        ?.map { it.toEntity(q, time) ?: return@guarded timetableParseError(q.operator) }
-                        ?: return@guarded timetableParseError(q.operator)
+                        ?.map { it.toEntity(q, time) ?: return@guarded fallback(timetableParseError(q.operator).error) }
+                        ?: return@guarded fallback(timetableParseError(q.operator).error)
                     timetableDao.replace(q, trips)
-                    Result.Success(trips)
+                    Result.Success(Timetable(trips))
                 }
             }
         }
+
+    /** FR-OFF-01、7.1.4：啟動時清除超過 3 天的時刻快取，回傳刪除筆數 */
+    suspend fun purgeOldTimetables(): Result<Int> = guarded("Timetable purge failed") {
+        Result.Success(timetableDao.deleteOlderThan(now() - CACHE_KEEP_MS))
+    }
 
     private fun timetableParseError(operator: Operator): Result.Failure {
         Log.w(TAG, "Invalid timetable payload: $operator")
@@ -181,6 +198,8 @@ class TransitRepository(
         const val RECENT_LIMIT = 5
         const val TIMETABLE_FRESH_MS = 2L * 60 * 60 * 1000
         const val FARE_FRESH_MS = 7L * 24 * 60 * 60 * 1000
+        const val CACHE_KEEP_MS = 3L * 24 * 60 * 60 * 1000
+        const val QUOTA_COOLDOWN_MS = 60_000L
     }
 }
 
@@ -209,3 +228,6 @@ internal fun TripDto.toEntity(q: TimetableQuery, fetchedAt: Long): TimetableCach
 
 /** E-3 一筆：台鐵 delayMin、國道客運 etaMin */
 data class LiveInfo(val tripId: String, val delayMin: Int?, val etaMin: Int?)
+
+/** 時刻表結果：[cachedAt] 與 [error] 不為 null 表示查詢失敗、改用快取（FR-OFF-01） */
+data class Timetable(val trains: List<TimetableCache>, val cachedAt: Long? = null, val error: AppError? = null)
