@@ -27,7 +27,7 @@ object ResultSort {
     fun apply(items: List<ResultViewModel.Item>, option: SortOption): List<ResultViewModel.Item> = when (option) {
         SortOption.DEPART -> items
         SortOption.DURATION -> items.sortedBy { it.train.durationMin }
-        SortOption.FARE -> items.sortedWith(compareBy(nullsLast()) { it.fare?.price })
+        SortOption.FARE -> items.sortedWith(compareBy(nullsLast()) { it.fare.total })
         SortOption.RESERVED_ONLY -> items.filter { it.train.reservedSeat }
         SortOption.UPCOMING_ONLY -> items.filter { it.status != TrainStatus.Departed }
     }

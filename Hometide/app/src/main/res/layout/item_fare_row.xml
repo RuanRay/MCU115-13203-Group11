@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 票價明細一列（4.6 item_fare_row；result_fare_detail.png）：票種 × 人數、單價、小計 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingVertical="6dp">
+
+    <TextView
+        android:id="@+id/tvClass"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textAppearance="@style/TextAppearance.Hometide.Body"
+        android:textColor="@color/color_on_background" />
+
+    <TextView
+        android:id="@+id/tvUnit"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.Hometide.Body"
+        android:textColor="@color/color_on_surface_muted" />
+
+    <TextView
+        android:id="@+id/tvSubtotal"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="end"
+        android:textAppearance="@style/TextAppearance.Hometide.TicketTime.Small"
+        android:textColor="@color/color_on_background" />
+</LinearLayout>

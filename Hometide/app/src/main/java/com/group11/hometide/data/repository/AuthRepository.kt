@@ -87,6 +87,9 @@ class AuthRepository(
         profile
     }
 
+    /** FR-SET-02：預設乘客（訪客與會員皆有，沒有設定時為全票 1） */
+    val defaultPassengers: Flow<Passengers> = settings.defaultPassengers
+
     /** FR-SET-02：存在本機；會員另同步到 Firestore（離線時 SDK 排隊重送，失敗只記 log） */
     suspend fun setDefaultPassengers(passengers: Passengers) {
         settings.setDefaultPassengers(passengers)

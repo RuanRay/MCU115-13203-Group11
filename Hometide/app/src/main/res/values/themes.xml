@@ -103,6 +103,16 @@
         <item name="android:textAppearance">@style/TextAppearance.Hometide.Label</item>
     </style>
 
+    <!-- P6 會員證「預設乘客：全票 1 ›」（profile_passenger.png）：可點，會員與訪客共用 -->
+    <style name="Widget.Hometide.MemberPassengers" parent="">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:alpha">0.8</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:minHeight">@dimen/min_touch_target</item>
+        <item name="android:textColor">@color/color_on_primary</item>
+    </style>
+
     <!-- P4 狀態／設施標籤（result.png）：外框與字同色，顏色由程式依狀態設定 -->
     <style name="Widget.Hometide.Tag" parent="">
         <item name="android:layout_width">wrap_content</item>

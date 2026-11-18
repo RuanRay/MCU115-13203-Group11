@@ -5,13 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.group11.hometide.data.local.dao.TimetableQuery
 import com.group11.hometide.data.local.entity.FareCache
-import com.group11.hometide.data.local.entity.FareClass
 import com.group11.hometide.data.local.entity.Operator
 import com.group11.hometide.data.local.entity.TimetableCache
 import com.group11.hometide.data.repository.AuthRepository
 import com.group11.hometide.data.repository.LiveInfo
 import com.group11.hometide.data.repository.TransitRepository
 import com.group11.hometide.util.AppError
+import com.group11.hometide.util.FareTotal
+import com.group11.hometide.util.Passengers
 import com.group11.hometide.util.Result
 import com.group11.hometide.util.messageRes
 import kotlinx.coroutines.channels.Channel
@@ -33,12 +34,23 @@ import java.time.LocalDateTime
  */
 class ResultViewModel(
     private val transit: TransitRepository,
-    auth: AuthRepository,
+    private val auth: AuthRepository,
     private val query: TimetableQuery,
+    initialPassengers: Passengers = Passengers.DEFAULT,
     private val clock: () -> LocalDateTime = LocalDateTime::now,
 ) : ViewModel() {
 
-    data class Item(val train: TimetableCache, val status: TrainStatus, val fare: FareCache? = null)
+    /**
+     * [fare] 依本次乘客計算的總價與明細；[faresLoaded] 為 false 表示票價尚未取得或取不到（存根只顯示「—」，不標查無）。
+     * [expanded] 為票價明細是否展開（FR-RES-07）
+     */
+    data class Item(
+        val train: TimetableCache,
+        val status: TrainStatus,
+        val fare: FareTotal,
+        val faresLoaded: Boolean = true,
+        val expanded: Boolean = false,
+    )
 
     /** 規格 6.3 的 UiState 狀態 */
     enum class Phase { LOADING, SUCCESS, EMPTY, ERROR, OFFLINE }
@@ -59,6 +71,7 @@ class ResultViewModel(
         /** 錯誤畫面下方的 11.2 說明 */
         @param:StringRes val errorRes: Int? = null,
         val refreshing: Boolean = false,
+        val passengers: Passengers = Passengers.DEFAULT,
     ) {
         val hasList: Boolean get() = phase == Phase.SUCCESS || phase == Phase.OFFLINE
 
@@ -78,11 +91,19 @@ class ResultViewModel(
         val refreshing: Boolean = false,
     )
 
-    private data class Data(val load: Load, val fares: Map<String, FareCache>, val live: Map<String, LiveInfo>)
+    private data class Data(
+        val load: Load,
+        val fares: Map<String, List<FareCache>>?,
+        val live: Map<String, LiveInfo>,
+        val passengers: Passengers,
+        val expanded: Set<String>,
+    )
 
     private val date = LocalDate.parse(query.travelDate)
     private val load = MutableStateFlow(Load())
-    private val fares = MutableStateFlow<Map<String, FareCache>>(emptyMap())
+    private val fares = MutableStateFlow<Map<String, List<FareCache>>?>(null)
+    private val passengers = MutableStateFlow(initialPassengers)
+    private val expanded = MutableStateFlow<Set<String>>(emptySet())
     private val live = MutableStateFlow<Map<String, LiveInfo>>(emptyMap())
     private val sort = MutableStateFlow(SortOption.DEPART)
     private val names = MutableStateFlow("" to "")
@@ -92,14 +113,15 @@ class ResultViewModel(
     /** 一次性訊息（Snackbar）：有快取但被限流時的 11.2 訊息 */
     val messages = events.receiveAsFlow()
 
-    private val data = combine(load, fares, live, ::Data)
+    private val data = combine(load, fares, live, passengers, expanded, ::Data)
 
     val state: StateFlow<UiState> = combine(data, names, now, auth.profile.map { it == null }, sort) { d, n, nowTime, guest, option ->
         val today = nowTime.toLocalDate()
         val items = d.load.trains.map { t ->
             val base = TrainStatus.of(query.operator, t.departTime, date, today, nowTime.toLocalTime())
-            // 國道客運 typeCode 為路線號；台鐵、高鐵為車種代碼（E-8）
-            Item(t, TrainStatus.withLive(base, d.live[t.trainNo]), t.trainTypeCode?.let { d.fares[it] })
+            // 國道客運 typeCode 為路線號；台鐵、高鐵為車種代碼（E-8）。FR-RES-02：依本次乘客組合計算總價
+            val fare = FareTotal.of(t.trainTypeCode?.let { d.fares?.get(it) }.orEmpty(), d.passengers)
+            Item(t, TrainStatus.withLive(base, d.live[t.trainNo]), fare, d.fares != null, t.trainNo in d.expanded)
         }
         UiState(
             operator = query.operator,
@@ -115,6 +137,7 @@ class ResultViewModel(
             cachedAt = d.load.cachedAt,
             errorRes = d.load.errorRes,
             refreshing = d.load.refreshing,
+            passengers = d.passengers,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), UiState(query.operator, date, now = clock()))
 
@@ -160,10 +183,9 @@ class ResultViewModel(
             refreshLive()
         }
         viewModelScope.launch {
-            // 票價取不到時存根顯示「—」，不影響列表（FR-RES-02）；Worker 失敗時 Repository 會用快取
+            // 票價取不到時存根顯示「—」，不影響列表（FR-RES-02）；Worker 失敗時 Repository 會用快取（TC-51）
             (transit.fares(query.operator, query.originId, query.destId) as? Result.Success)?.let { r ->
-                // ponytail: 4-5a 先只用全票；4-5b 改依乘客組合計算總價
-                fares.value = r.data.filter { it.fareClass == FareClass.ADULT }.associateBy { it.trainTypeCode }
+                fares.value = r.data.groupBy { it.trainTypeCode }
             }
         }
     }
@@ -180,6 +202,20 @@ class ResultViewModel(
         viewModelScope.launch {
             names.value = transit.stationName(query.operator, query.originId) to transit.stationName(query.operator, query.destId)
         }
+    }
+
+    /** FR-RES-02：只重算票價，不重新查時刻表 */
+    fun setPassengers(p: Passengers) {
+        passengers.value = p
+    }
+
+    fun setDefaultPassengers(p: Passengers) {
+        viewModelScope.launch { runCatching { auth.setDefaultPassengers(p) } }
+    }
+
+    /** FR-RES-07：點車票本體展開／收合票價明細，可同時展開多張；重新整理與改乘客後保留 */
+    fun toggleDetail(trainNo: String) {
+        expanded.update { if (trainNo in it) it - trainNo else it + trainNo }
     }
 
     fun setSort(option: SortOption) {

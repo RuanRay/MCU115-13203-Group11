@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 細虛線分隔（選擇乘客各列，passenger_sheet.png） -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="line">
+    <stroke
+        android:width="@dimen/ticket_outline_width"
+        android:color="@color/color_outline"
+        android:dashWidth="@dimen/tear_dash_length"
+        android:dashGap="@dimen/tear_dash_gap" />
+</shape>

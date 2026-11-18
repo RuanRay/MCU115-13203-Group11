@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 選擇乘客「−／＋」：主色；停用時用 color_outline（CR-01 第五節） -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/color_outline" android:state_enabled="false" />
+    <item android:color="@color/color_primary" />
+</selector>

@@ -10,9 +10,6 @@ import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.SimpleCursorAdapter
 import android.widget.TextView
-import androidx.core.view.AccessibilityDelegateCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -30,9 +27,12 @@ import com.group11.hometide.databinding.FragmentSearchBinding
 import com.group11.hometide.provider.StationProvider
 import com.group11.hometide.ui.auth.registerLoginPrompt
 import com.group11.hometide.ui.base.BaseActivity
+import com.group11.hometide.ui.base.asButtonForAccessibility
 import com.group11.hometide.ui.result.ResultActivity
 import com.group11.hometide.util.DateUtils
+import com.group11.hometide.util.Passengers
 import com.group11.hometide.util.labelRes
+import com.group11.hometide.util.passengerText
 import com.group11.hometide.util.monthDayWeekday
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -40,8 +40,8 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 
 /**
- * P3 查詢（規格 4.4、home.png）。任務 4-1：AI 解析（第 6 週）先顯示「即將推出」、
- * 車票夾（5-1）先顯示空白提示票、乘客列（CR-01，任務 4-5）尚未加入。
+ * P3 查詢（規格 4.4、home.png、home_passenger.png）。任務 4-1：AI 解析（第 6 週）先顯示「即將推出」、
+ * 車票夾（5-1）先顯示空白提示票。
  */
 class SearchFragment : Fragment(R.layout.fragment_search) {
 
@@ -72,6 +72,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
                     vm.state.collect { s ->
                         if (b.spOperator.selectedItemPosition != s.operator.ordinal) b.spOperator.setSelection(s.operator.ordinal)
                         b.btnDate.text = getString(R.string.travel_date, requireContext().monthDayWeekday(s.travelDate))
+                        b.tvPassengers.text = getString(R.string.passengers_label, requireContext().passengerText(s.passengers))
                         b.tkFavEmpty.isClickable = s.isGuest // 會員點擊於 5-1 再處理，先不顯示按壓效果
                         recentAdapter.defaultOperator = s.defaultOperator
                         recentAdapter.submitList(s.recent)
@@ -141,8 +142,15 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         }
 
         // NFR-07：文字樣式的按鈕，讀屏時仍讀成「按鈕」
-        listOf(b.btnDate, b.btnSearch).forEach { ViewCompat.setAccessibilityDelegate(it, ButtonRole) }
+        listOf(b.btnDate, b.tvPassengers, b.btnSearch).forEach { it.asButtonForAccessibility() }
         b.btnDate.setOnClickListener { pickDate() }
+        // FR-SRCH-08：選擇乘客（只影響這次查詢；「設為我的預設」另寫入預設乘客）
+        b.tvPassengers.setOnClickListener { PassengerSheet.show(this, REQUEST_PASSENGERS, vm.state.value.passengers) }
+        childFragmentManager.setFragmentResultListener(REQUEST_PASSENGERS, viewLifecycleOwner) { _, r ->
+            val p = Passengers.fromJson(r.getString(PassengerSheet.KEY_PASSENGERS))
+            if (r.getBoolean(PassengerSheet.KEY_SET_DEFAULT)) vm.setDefaultPassengers(p)
+            vm.setPassengers(p)
+        }
         b.btnSearch.setOnClickListener { vm.submit(b.actvOrigin.text.toString(), b.actvDest.text.toString()) }
     }
 
@@ -180,7 +188,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         when (e) {
             is SearchViewModel.Event.Message -> snackbar(if (e.arg == null) getString(e.res) else getString(e.res, e.arg))
             is SearchViewModel.Event.OpenResult ->
-                startActivity(ResultActivity.intent(requireContext(), e.operator, e.originId, e.destId, e.date))
+                startActivity(ResultActivity.intent(requireContext(), e.operator, e.originId, e.destId, e.date, e.passengers))
             is SearchViewModel.Event.ClearStations -> {
                 if (e.origin) b.actvOrigin.setText("", false)
                 if (e.dest) b.actvDest.setText("", false)
@@ -193,15 +201,9 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         activity.showSnackbar(text, anchor = activity.findViewById(R.id.bottomNav))
     }
 
-    private object ButtonRole : AccessibilityDelegateCompat() {
-        override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfoCompat) {
-            super.onInitializeAccessibilityNodeInfo(host, info)
-            info.className = android.widget.Button::class.java.name
-        }
-    }
-
     private companion object {
         const val COL_NAME = "name_zh"
+        const val REQUEST_PASSENGERS = "search_passengers"
         const val SWAP_ROTATION = 180f
         const val SWAP_MS = 250L
     }

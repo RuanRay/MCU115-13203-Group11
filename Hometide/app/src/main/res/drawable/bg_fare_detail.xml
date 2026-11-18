@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 票價明細（4.6 layoutFareDetail、result_fare_detail.png）：虛線外框，上緣與車票相接 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/color_surface" />
+    <stroke
+        android:width="@dimen/ticket_outline_width"
+        android:color="@color/color_outline"
+        android:dashWidth="@dimen/tear_dash_length"
+        android:dashGap="@dimen/tear_dash_gap" />
+    <corners
+        android:bottomLeftRadius="@dimen/corner_ticket"
+        android:bottomRightRadius="@dimen/corner_ticket" />
+</shape>

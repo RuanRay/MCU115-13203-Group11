@@ -3,6 +3,8 @@ package com.group11.hometide.ui.result
 import com.group11.hometide.data.local.entity.FareCache
 import com.group11.hometide.data.local.entity.FareClass
 import com.group11.hometide.data.local.entity.Operator
+import com.group11.hometide.util.FareTotal
+import com.group11.hometide.util.Passengers
 import com.group11.hometide.data.local.entity.TimetableCache
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -19,7 +21,7 @@ class ResultSortTest {
                 durationMin = duration, reservedSeat = reserved, bikeAllowed = false, fetchedAt = 0,
             ),
             status,
-            price?.let { FareCache(Operator.TRA, "1080", "4220", "3", FareClass.ADULT, it, false, 0) },
+            FareTotal.of(listOfNotNull(price?.let { FareCache(Operator.TRA, "1080", "4220", "3", FareClass.ADULT, it, false, 0) }), Passengers.DEFAULT),
         )
 
     private val items = listOf(

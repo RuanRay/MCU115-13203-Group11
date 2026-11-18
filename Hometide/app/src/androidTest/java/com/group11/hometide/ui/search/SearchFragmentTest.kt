@@ -17,6 +17,7 @@ import com.group11.hometide.R
 import com.group11.hometide.data.local.entity.Operator
 import com.group11.hometide.data.local.entity.Station
 import com.group11.hometide.ui.main.MainActivity
+import com.group11.hometide.util.Passengers
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.BaseMatcher
 import org.hamcrest.Description
@@ -40,6 +41,20 @@ class SearchFragmentTest {
                 Station(Operator.TRA, "3360", "新烏日", "Xinwuri", 2, now),
             ),
         )
+    }
+
+    /** TC-49（部分）：預設乘客存在本機 DataStore，P3 乘客列以預設乘客為初始值；車票夾、下一班於各自任務驗證 */
+    @Test
+    fun tc49_defaultPassengersShownOnSearch() {
+        val auth = ApplicationProvider.getApplicationContext<HometideApp>().container.authRepository
+        runBlocking { auth.setDefaultPassengers(Passengers.fromJson("""{"ADULT":1,"SENIOR":1}""")) }
+        try {
+            ActivityScenario.launch(MainActivity::class.java).use {
+                onView(withId(R.id.tvPassengers)).check(matches(withText("👤 乘客：全票 1・敬老 1 ▾")))
+            }
+        } finally {
+            runBlocking { auth.setDefaultPassengers(Passengers.DEFAULT) }
+        }
     }
 
     /** TC-07：起訖站相同按查詢 → 「起站與迄站不能相同」 */

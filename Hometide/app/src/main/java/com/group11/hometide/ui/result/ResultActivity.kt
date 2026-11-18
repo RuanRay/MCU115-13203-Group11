@@ -21,6 +21,9 @@ import com.group11.hometide.data.local.entity.Operator
 import com.group11.hometide.databinding.ActivityResultBinding
 import com.group11.hometide.ui.auth.registerLoginPrompt
 import com.group11.hometide.ui.base.BaseActivity
+import com.group11.hometide.ui.base.asButtonForAccessibility
+import com.group11.hometide.ui.search.PassengerSheet
+import com.group11.hometide.util.Passengers
 import com.group11.hometide.util.labelRes
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -30,8 +33,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 /**
- * P4 查詢結果（規格 4.6；FR-RES-01～04、FR-BUS-02～04）。收藏與提醒於第 5 週（訪客先顯示登入提示）、
- * 乘客晶片於 4-5。
+ * P4 查詢結果（規格 4.6；FR-RES-01～04、07、FR-BUS-02～04）。收藏與提醒於第 5 週（訪客先顯示登入提示）。
  */
 class ResultActivity : BaseActivity() {
 
@@ -42,7 +44,7 @@ class ResultActivity : BaseActivity() {
         viewModelFactory {
             initializer {
                 val c = (application as HometideApp).container
-                ResultViewModel(c.transitRepository, c.authRepository, queryOf(intent))
+                ResultViewModel(c.transitRepository, c.authRepository, queryOf(intent), Passengers.fromJson(intent.getStringExtra(EXTRA_PASSENGERS)))
             }
         }
     }
@@ -67,7 +69,19 @@ class ResultActivity : BaseActivity() {
             override fun onNothingSelected(parent: AdapterView<*>?) = Unit
         }
 
-        val adapter = TimelineAdapter(onRemind = { if (vm.state.value.isGuest) showLoginPrompt() }) // 會員提醒於 5-3
+        // FR-RES-02：改乘客只重算票價，不重新查時刻表
+        binding.chipPassengers.asButtonForAccessibility()
+        binding.chipPassengers.setOnClickListener { PassengerSheet.show(this, REQUEST_PASSENGERS, vm.state.value.passengers) }
+        supportFragmentManager.setFragmentResultListener(REQUEST_PASSENGERS, this) { _, r ->
+            val p = Passengers.fromJson(r.getString(PassengerSheet.KEY_PASSENGERS))
+            if (r.getBoolean(PassengerSheet.KEY_SET_DEFAULT)) vm.setDefaultPassengers(p)
+            vm.setPassengers(p)
+        }
+
+        val adapter = TimelineAdapter(
+            onRemind = { if (vm.state.value.isGuest) showLoginPrompt() }, // 會員提醒於 5-3
+            onToggleDetail = vm::toggleDetail,
+        )
         val nowLine = NowLineDecoration(this)
         binding.rvTimeline.adapter = adapter
         binding.rvTimeline.addItemDecoration(nowLine)
@@ -83,6 +97,7 @@ class ResultActivity : BaseActivity() {
                         binding.tvBack.text = getString(R.string.result_back, getString(s.operator.labelRes))
                         binding.tvRoute.text = getString(R.string.result_route, s.originName, s.destName)
                         binding.vDateStamp.setDate(s.date, showWeekday = true)
+                        binding.chipPassengers.text = getString(R.string.passengers_chip, s.passengers.total)
                         binding.tvCount.text = if (s.hasList || s.phase == ResultViewModel.Phase.EMPTY) {
                             getString(R.string.result_count, s.items.size)
                         } else {
@@ -147,13 +162,23 @@ class ResultActivity : BaseActivity() {
         const val EXTRA_ORIGIN_ID = "originId"
         const val EXTRA_DEST_ID = "destId"
         const val EXTRA_DATE = "date" // yyyy-MM-dd
+        const val EXTRA_PASSENGERS = "passengers" // JSON（CR-01），沒有時為全票 1
+        private const val REQUEST_PASSENGERS = "result_passengers"
 
         private const val TICK_MS = 60_000L
         private val HHMM = DateTimeFormatter.ofPattern("HH:mm")
         private val BANNER_TIME = DateTimeFormatter.ofPattern("MM/dd HH:mm")
 
-        fun intent(context: Context, operator: Operator, originId: String, destId: String, date: LocalDate): Intent =
+        fun intent(
+            context: Context,
+            operator: Operator,
+            originId: String,
+            destId: String,
+            date: LocalDate,
+            passengers: Passengers = Passengers.DEFAULT,
+        ): Intent =
             Intent(context, ResultActivity::class.java)
+                .putExtra(EXTRA_PASSENGERS, passengers.toJson())
                 .putExtra(EXTRA_OPERATOR, operator.name)
                 .putExtra(EXTRA_ORIGIN_ID, originId)
                 .putExtra(EXTRA_DEST_ID, destId)

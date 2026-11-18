@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.group11.hometide.data.local.entity.UserProfile
 import com.group11.hometide.data.repository.AuthRepository
+import com.group11.hometide.util.Passengers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -16,6 +17,14 @@ class ProfileViewModel(private val repo: AuthRepository) : ViewModel() {
         data object Loading : UiState
         data object Guest : UiState
         data class Member(val profile: UserProfile) : UiState
+    }
+
+    /** FR-SET-02 */
+    val defaultPassengers: StateFlow<Passengers> =
+        repo.defaultPassengers.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), Passengers.DEFAULT)
+
+    fun setDefaultPassengers(p: Passengers) {
+        viewModelScope.launch { runCatching { repo.setDefaultPassengers(p) } }
     }
 
     val state: StateFlow<UiState> = repo.profile

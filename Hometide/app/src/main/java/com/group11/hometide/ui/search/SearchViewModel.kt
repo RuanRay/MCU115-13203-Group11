@@ -10,6 +10,7 @@ import com.group11.hometide.data.local.entity.SearchSource
 import com.group11.hometide.data.local.entity.Station
 import com.group11.hometide.data.repository.AuthRepository
 import com.group11.hometide.data.repository.TransitRepository
+import com.group11.hometide.util.Passengers
 import com.group11.hometide.util.Result
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,22 +38,35 @@ class SearchViewModel(
         val defaultOperator: Operator = Operator.TRA,
         val isGuest: Boolean = true,
         val recent: List<RecentSearch> = emptyList(),
+        val passengers: Passengers = Passengers.DEFAULT,
     )
 
     sealed interface Event {
         data class Message(@param:StringRes val res: Int, val arg: String? = null) : Event
-        data class OpenResult(val operator: Operator, val originId: String, val destId: String, val date: LocalDate) : Event
+        data class OpenResult(
+            val operator: Operator,
+            val originId: String,
+            val destId: String,
+            val date: LocalDate,
+            val passengers: Passengers,
+        ) : Event
         data class ClearStations(val origin: Boolean, val dest: Boolean) : Event
     }
 
-    private data class Form(val operator: Operator, val travelDate: LocalDate, val operatorChosen: Boolean = false)
+    /** passengers 為 null 表示沿用預設乘客（FR-SRCH-08） */
+    private data class Form(
+        val operator: Operator,
+        val travelDate: LocalDate,
+        val operatorChosen: Boolean = false,
+        val passengers: Passengers? = null,
+    )
 
     private val form = MutableStateFlow(Form(Operator.TRA, today()))
     private val events = Channel<Event>(Channel.BUFFERED)
     val eventFlow = events.receiveAsFlow()
 
-    val state: StateFlow<UiState> = combine(form, auth.profile, transit.recentSearches()) { f, profile, recent ->
-        UiState(f.operator, f.travelDate, profile?.defaultOperator ?: Operator.TRA, profile == null, recent)
+    val state: StateFlow<UiState> = combine(form, auth.profile, transit.recentSearches(), auth.defaultPassengers) { f, profile, recent, pax ->
+        UiState(f.operator, f.travelDate, profile?.defaultOperator ?: Operator.TRA, profile == null, recent, f.passengers ?: pax)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), UiState(travelDate = today()))
 
     init {
@@ -74,6 +88,16 @@ class SearchViewModel(
         }
     }
 
+    /** FR-SRCH-08：只影響這次查詢 */
+    fun setPassengers(p: Passengers) {
+        form.update { it.copy(passengers = p) }
+    }
+
+    /** FR-SRCH-08「設為我的預設」→ FR-SET-02 */
+    fun setDefaultPassengers(p: Passengers) {
+        viewModelScope.launch { runCatching { auth.setDefaultPassengers(p) } }
+    }
+
     fun setDate(date: LocalDate) {
         if (SearchRules.isSelectable(date, today())) form.update { it.copy(travelDate = date) }
     }
@@ -93,23 +117,23 @@ class SearchViewModel(
             val origin = find(f.operator, originText) ?: return@launch
             val dest = find(f.operator, destText) ?: return@launch
             if (origin.stationId == dest.stationId) return@launch events.send(Event.Message(R.string.error_same_station))
-            open(f.operator, origin.stationId, dest.stationId, f.travelDate)
+            open(f.operator, origin.stationId, dest.stationId, f.travelDate, state.value.passengers)
         }
     }
 
-    /** FR-SRCH-07：點一筆以「今天」查詢 */
+    /** FR-SRCH-07：點一筆以「今天」查詢；帶回當時的乘客（FR-SRCH-08） */
     fun searchRecent(item: RecentSearch) {
-        viewModelScope.launch { open(item.operator, item.originId, item.destId, today()) }
+        viewModelScope.launch { open(item.operator, item.originId, item.destId, today(), Passengers.fromJson(item.passengersJson)) }
     }
 
     fun deleteRecent(item: RecentSearch) {
         viewModelScope.launch { transit.deleteRecent(item) }
     }
 
-    private suspend fun open(op: Operator, originId: String, destId: String, date: LocalDate) {
+    private suspend fun open(op: Operator, originId: String, destId: String, date: LocalDate, pax: Passengers) {
         // 紀錄寫入失敗不影響查詢（Repository 已記 log）
-        transit.saveSearch(auth.currentUid, op, originId, destId, date.toString(), SearchSource.MANUAL)
-        events.send(Event.OpenResult(op, originId, destId, date))
+        transit.saveSearch(auth.currentUid, op, originId, destId, date.toString(), SearchSource.MANUAL, pax)
+        events.send(Event.OpenResult(op, originId, destId, date, pax))
     }
 
     /** 找不到或資料庫錯誤時送出訊息並回 null */

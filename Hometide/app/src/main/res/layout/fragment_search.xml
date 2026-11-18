@@ -275,6 +275,17 @@
                     android:minHeight="@dimen/min_touch_target"
                     android:textAppearance="@style/TextAppearance.Hometide.Body"
                     android:textColor="@color/color_on_surface_muted" />
+
+                <!-- CR-01 乘客（FR-SRCH-08；home_passenger.png）：主色粗體 -->
+                <TextView
+                    android:id="@+id/tvPassengers"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:gravity="center_vertical"
+                    android:minHeight="@dimen/min_touch_target"
+                    android:textAppearance="@style/TextAppearance.Hometide.Label"
+                    android:textColor="@color/color_primary" />
             </LinearLayout>
 
             <!-- 存根「查詢班次」為送出按鈕 -->

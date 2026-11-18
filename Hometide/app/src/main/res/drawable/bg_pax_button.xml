@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 選擇乘客「−／＋」主色外框圓鈕（CR-01 第五節、passenger_sheet.png） -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <stroke android:width="@dimen/button_stroke_width" android:color="@color/pax_button" />
+</shape>

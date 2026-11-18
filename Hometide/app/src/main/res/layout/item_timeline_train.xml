@@ -41,6 +41,15 @@
         android:layout_weight="1"
         android:paddingVertical="@dimen/ticket_gap">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
         <com.group11.hometide.ui.widget.TicketView
             android:id="@+id/tkTrain"
             android:layout_width="match_parent"
@@ -92,7 +101,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- 存根：票價（任務 4-3）、全票、提醒（5-3） -->
+            <!-- 存根：總價或單價、乘客組合或票種（CR-01，查無時第二行「<票種>查無」）、提醒（5-3） -->
             <LinearLayout
                 android:layout_width="@dimen/ticket_stub_max"
                 android:layout_height="match_parent"
@@ -111,7 +120,8 @@
                     android:id="@+id/tvFareMix"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/fare_adult"
+                    android:gravity="center"
+                    android:paddingHorizontal="2dp"
                     android:textAppearance="@style/TextAppearance.Hometide.Caption.Large"
                     android:textColor="@color/color_on_surface_muted" />
 
@@ -139,5 +149,74 @@
             android:visibility="gone"
             app:stampColor="red"
             app:stampText="@string/stamp_departed" />
+        </FrameLayout>
+
+        <!-- 票價明細（FR-RES-07；result_fare_detail.png）：點車票本體展開，可同時展開多張 -->
+        <LinearLayout
+            android:id="@+id/layoutFareDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_fare_detail"
+            android:layerType="software"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="12dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tvDetailTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/fare_detail_title"
+                android:textAppearance="@style/TextAppearance.Hometide.Label"
+                android:textColor="@color/color_on_surface_muted" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvFareRows"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/ticket_outline_width"
+                android:layout_marginVertical="8dp"
+                android:background="@color/color_outline" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/fare_detail_total"
+                    android:textAppearance="@style/TextAppearance.Hometide.Label"
+                    android:textColor="@color/color_on_background" />
+
+                <TextView
+                    android:id="@+id/tvDetailTotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.Hometide.TicketRoute.Large"
+                    android:textColor="@color/color_on_background" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvDetailNote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textAppearance="@style/TextAppearance.Hometide.Body"
+                android:textColor="@color/color_on_surface_muted"
+                android:visibility="gone" />
+        </LinearLayout>
+        </LinearLayout>
     </FrameLayout>
 </LinearLayout>

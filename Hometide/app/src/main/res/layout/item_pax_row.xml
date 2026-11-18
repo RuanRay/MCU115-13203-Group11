@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 選擇乘客一列（4.1 sheetPassengers；passenger_sheet.png）：票種＋說明、「− 數字 ＋」 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:minHeight="72dp"
+    android:orientation="horizontal">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvPaxName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:includeFontPadding="false"
+            android:textAppearance="@style/TextAppearance.Hometide.TicketRoute.Small"
+            android:textColor="@color/color_on_background" />
+
+        <TextView
+            android:id="@+id/tvPaxDesc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textAppearance="@style/TextAppearance.Hometide.Body"
+            android:textColor="@color/color_on_surface_muted"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/btnMinus"
+        android:layout_width="@dimen/min_touch_target"
+        android:layout_height="@dimen/min_touch_target"
+        android:background="@drawable/bg_pax_button"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:text="@string/pax_minus"
+        android:textAppearance="@style/TextAppearance.Hometide.Body"
+        android:textSize="24sp"
+        android:textColor="@color/pax_button" />
+
+    <TextView
+        android:id="@+id/tvCount"
+        android:layout_width="56dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.Hometide.TicketRoute.Large"
+        android:textColor="@color/color_on_background" />
+
+    <TextView
+        android:id="@+id/btnPlus"
+        android:layout_width="@dimen/min_touch_target"
+        android:layout_height="@dimen/min_touch_target"
+        android:background="@drawable/bg_pax_button"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:text="@string/pax_plus"
+        android:textAppearance="@style/TextAppearance.Hometide.Body"
+        android:textSize="24sp"
+        android:textColor="@color/pax_button" />
+</LinearLayout>

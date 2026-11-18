@@ -16,10 +16,14 @@ import com.group11.hometide.R
 import com.group11.hometide.databinding.FragmentProfileBinding
 import com.group11.hometide.ui.auth.LoginActivity
 import com.group11.hometide.ui.auth.registerLoginPrompt
+import com.group11.hometide.ui.base.asButtonForAccessibility
+import com.group11.hometide.ui.search.PassengerSheet
+import com.group11.hometide.util.Passengers
+import com.group11.hometide.util.passengerText
 import com.group11.hometide.util.labelRes
 import kotlinx.coroutines.launch
 
-/** P6 個人（規格 4.8）：目前只有會員證與登出 */
+/** P6 個人（規格 4.8）：目前只有會員證（含預設乘客 FR-SET-02）與登出 */
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
     private val vm: ProfileViewModel by viewModels {
@@ -33,14 +37,30 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         val binding = FragmentProfileBinding.bind(view)
         binding.btnMemberLogin.setOnClickListener { showLoginPrompt() }
         binding.btnLogout.setOnClickListener { confirmLogout() }
+        // FR-SET-02：會員在會員證上、訪客在登入按鈕下方；開啟同一個選擇乘客面板（設為預設）
+        listOf(binding.tvDefaultPassengers, binding.tvGuestPassengers).forEach { tv ->
+            tv.asButtonForAccessibility()
+            tv.setOnClickListener { PassengerSheet.show(this, REQUEST_PASSENGERS, vm.defaultPassengers.value, forDefault = true) }
+        }
+        childFragmentManager.setFragmentResultListener(REQUEST_PASSENGERS, viewLifecycleOwner) { _, r ->
+            vm.setDefaultPassengers(Passengers.fromJson(r.getString(PassengerSheet.KEY_PASSENGERS)))
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    vm.defaultPassengers.collect { p ->
+                        val text = getString(R.string.member_default_passengers, requireContext().passengerText(p))
+                        binding.tvDefaultPassengers.text = text
+                        binding.tvGuestPassengers.text = text
+                    }
+                }
                 vm.state.collect { state ->
                     val member = (state as? ProfileViewModel.UiState.Member)?.profile
                     binding.layoutMember.isVisible = member != null
                     binding.btnLogout.isVisible = member != null
                     binding.btnMemberLogin.isVisible = state == ProfileViewModel.UiState.Guest
+                    binding.tvGuestPassengers.isVisible = state == ProfileViewModel.UiState.Guest
                     if (member != null) {
                         binding.tvNickname.text = member.nickname
                         binding.tvEmail.text = member.email
@@ -50,6 +70,10 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                 }
             }
         }
+    }
+
+    private companion object {
+        const val REQUEST_PASSENGERS = "profile_passengers"
     }
 
     /** FR-AUTH-05：確認後登出並清除堆疊回 P1 */

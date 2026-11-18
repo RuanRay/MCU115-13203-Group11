@@ -83,6 +83,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
+        <!-- CR-01 乘客（FR-RES-02；result_multi.png）：點擊開啟選擇乘客，只重算票價 -->
+        <TextView
+            android:id="@+id/chipPassengers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:background="?attr/selectableItemBackground"
+            android:gravity="center_vertical"
+            android:minHeight="@dimen/min_touch_target"
+            android:paddingHorizontal="4dp"
+            android:textAppearance="@style/TextAppearance.Hometide.Label"
+            android:textColor="@color/color_primary" />
+
         <TextView
             android:id="@+id/tvCount"
             android:layout_width="wrap_content"
