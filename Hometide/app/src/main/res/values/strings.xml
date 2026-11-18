@@ -86,6 +86,7 @@
     <string name="example_thsr_fastest">高鐵最快一班</string>
     <string name="fav_title">我的車票夾</string>
     <string name="fav_more">滑動看更多 ›</string>
+    <string name="btn_fav_quick_query">一鍵\n查詢</string>
     <string name="fav_empty_hint">把常用路線收藏起來，下次一鍵查詢</string>
     <string name="manual_label">空白車票・手動查詢</string>
     <string name="hint_origin">起站</string>
@@ -178,6 +179,37 @@
     <string name="error_quota">查詢太頻繁，請稍後再試</string>
     <string name="error_no_trains">這天沒有符合的班次</string>
     <string name="error_parse">資料格式異常，請稍後再試</string>
+
+    <!-- 收藏與 P5 我的路線（FR-RES-05、FR-FAV-01～04、FR-SRCH-04；規格 4.7、routes.png） -->
+    <string name="cd_unfavorite">取消收藏</string>
+    <string name="favorite_added">已加入我的路線</string>
+    <string name="favorite_deleted">已刪除</string>
+    <string name="btn_undo">復原</string>
+    <string name="error_favorite_limit">最多收藏 10 條路線</string>
+    <string name="fav_member_hint">在查詢結果頁點 ♥ 就能收藏路線</string>
+    <string name="routes_title">我的路線</string>
+    <string name="btn_add_route">＋ 新增</string>
+    <string name="tab_favorites">車票夾 %1$d</string>
+    <string name="tab_reminders">出發提醒 %1$d</string>
+    <string name="route_meta">%1$s・%2$s</string>
+    <string name="btn_route_query">查詢</string>
+    <string name="next_train">下一班 %1$s %2$s・%3$d 分後發車</string>
+    <string name="next_train_name">%1$s %2$s</string>
+    <string name="next_train_short">下一班 %1$s・%2$d 分後</string>
+    <string name="next_train_with_fare">%1$s・%2$s</string>
+    <string name="next_train_loading">下一班：查詢中…</string>
+    <string name="next_train_tomorrow">今日已無班次，明天首班 %1$s</string>
+    <string name="next_train_none">今日已無班次</string>
+    <string name="next_train_offline">下一班：離線中無法取得</string>
+    <string name="routes_hint">← 向左滑動刪除　≡ 長按拖曳排序</string>
+    <string name="routes_guest">登入後即可使用我的路線</string>
+    <string name="routes_empty">還沒有收藏的路線</string>
+    <string name="reminders_empty">還沒有出發提醒</string>
+    <string name="btn_delete">刪除</string>
+    <string name="cd_drag_handle">拖曳排序</string>
+    <string name="cd_rename_route">修改路線名稱</string>
+    <string name="rename_route_title">路線名稱</string>
+    <string name="rename_route_hint">最多 10 個字</string>
 
     <!-- P6 個人（規格 4.8） -->
     <string name="title_profile">個人</string>

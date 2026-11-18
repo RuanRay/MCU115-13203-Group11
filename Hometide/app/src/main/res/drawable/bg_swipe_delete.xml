@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 左滑刪除露出的紅底（規格 4.7、routes.png；AN-08 於 7-3） -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/color_stamp" />
+    <corners android:radius="@dimen/corner_ticket" />
+</shape>

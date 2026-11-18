@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- P5「車票夾」分頁（FR-FAV-01～04、routes.png） -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/page_horizontal_margin"
+    android:paddingTop="8dp">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvFavoriteRoutes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:overScrollMode="never"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+    <TextView
+        android:id="@+id/tvRoutesHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="@string/routes_hint"
+        android:textAppearance="@style/TextAppearance.Hometide.Body"
+        android:textColor="@color/color_on_surface_muted" />
+
+    <!-- 空清單：空白票「還沒有收藏的路線」 -->
+    <com.group11.hometide.ui.widget.TicketView
+        android:id="@+id/tkRoutesEmpty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"
+        app:ticketStyle="blank">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="20dp"
+            android:text="@string/routes_empty"
+            android:textAppearance="@style/TextAppearance.Hometide.Body"
+            android:textColor="@color/color_on_surface_muted" />
+    </com.group11.hometide.ui.widget.TicketView>
+</LinearLayout>

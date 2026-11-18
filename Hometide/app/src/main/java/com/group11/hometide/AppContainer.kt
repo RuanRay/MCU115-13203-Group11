@@ -8,7 +8,9 @@ import com.group11.hometide.data.local.AppDatabase
 import com.group11.hometide.data.local.SettingsStore
 import com.group11.hometide.data.remote.HometideApi
 import com.group11.hometide.data.repository.AuthRepository
+import com.group11.hometide.data.repository.FavoriteRepository
 import com.group11.hometide.data.repository.TransitRepository
+import com.group11.hometide.ui.routes.FavoriteCards
 
 /**
  * 手動 DI（規格 6.1、6.2），由 HometideApp 持有，全 App 共用單例。
@@ -28,4 +30,6 @@ class AppContainer(private val context: Context) {
         AuthRepository(FirebaseAuth.getInstance(), FirebaseFirestore.getInstance(), database.userProfileDao(), settingsStore)
     }
     val transitRepository: TransitRepository by lazy { TransitRepository(api, database.stationDao(), database.searchHistoryDao(), database.timetableDao(), database.fareDao(), gson) }
+    val favoriteRepository: FavoriteRepository by lazy { FavoriteRepository(database.favoriteDao(), transitRepository) }
+    val favoriteCards: FavoriteCards by lazy { FavoriteCards(authRepository, favoriteRepository, transitRepository) }
 }

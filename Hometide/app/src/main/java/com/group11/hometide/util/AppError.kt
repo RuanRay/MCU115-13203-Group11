@@ -13,6 +13,9 @@ sealed interface AppError {
     data object EmailInUse : AppError
     data object InvalidCredentials : AppError
     data object TooManyAttempts : AppError
+
+    // FR-RES-05：收藏上限 10 筆
+    data object FavoriteLimit : AppError
 }
 
 /** 11.2 錯誤訊息（Worker 與資料相關） */
@@ -24,5 +27,6 @@ val AppError.messageRes: Int
         AppError.QuotaExceeded -> com.group11.hometide.R.string.error_quota
         AppError.NotFound -> com.group11.hometide.R.string.error_no_trains
         AppError.ParseError -> com.group11.hometide.R.string.error_parse
+        AppError.FavoriteLimit -> com.group11.hometide.R.string.error_favorite_limit
         else -> com.group11.hometide.R.string.error_unknown
     }

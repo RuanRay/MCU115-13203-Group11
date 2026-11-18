@@ -7,7 +7,9 @@ import com.group11.hometide.data.local.dao.TimetableQuery
 import com.group11.hometide.data.local.entity.FareCache
 import com.group11.hometide.data.local.entity.Operator
 import com.group11.hometide.data.local.entity.TimetableCache
+import com.group11.hometide.data.local.entity.FavoriteRoute
 import com.group11.hometide.data.repository.AuthRepository
+import com.group11.hometide.data.repository.FavoriteRepository
 import com.group11.hometide.data.repository.LiveInfo
 import com.group11.hometide.data.repository.TransitRepository
 import com.group11.hometide.util.AppError
@@ -15,11 +17,14 @@ import com.group11.hometide.util.FareTotal
 import com.group11.hometide.util.Passengers
 import com.group11.hometide.util.Result
 import com.group11.hometide.util.messageRes
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -35,6 +40,7 @@ import java.time.LocalDateTime
 class ResultViewModel(
     private val transit: TransitRepository,
     private val auth: AuthRepository,
+    private val favorites: FavoriteRepository,
     private val query: TimetableQuery,
     initialPassengers: Passengers = Passengers.DEFAULT,
     private val clock: () -> LocalDateTime = LocalDateTime::now,
@@ -65,6 +71,8 @@ class ResultViewModel(
         val isToday: Boolean = false,
         val now: LocalDateTime,
         val isGuest: Boolean = true,
+        /** FR-RES-05：這條路線（運具＋起訖站）是否已收藏 */
+        val isFavorite: Boolean = false,
         val sort: SortOption = SortOption.DEPART,
         /** 離線時快取的最後更新時間（FR-OFF-01） */
         val cachedAt: Long? = null,
@@ -109,13 +117,25 @@ class ResultViewModel(
     private val names = MutableStateFlow("" to "")
     private val now = MutableStateFlow(clock())
     private val events = Channel<Int>(Channel.BUFFERED)
+    private val added = Channel<FavoriteRoute>(Channel.BUFFERED)
+
+    /** FR-RES-05：新增收藏成功（畫面播放 AN-06 並顯示「已加入我的路線」＋「復原」） */
+    val favoriteAdded = added.receiveAsFlow()
+
+    private data class Member(val isGuest: Boolean, val isFavorite: Boolean)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val member = auth.profile.flatMapLatest { p ->
+        if (p == null) flowOf(Member(true, false))
+        else favorites.isFavorite(p.uid, query.operator, query.originId, query.destId).map { Member(false, it) }
+    }
 
     /** 一次性訊息（Snackbar）：有快取但被限流時的 11.2 訊息 */
     val messages = events.receiveAsFlow()
 
     private val data = combine(load, fares, live, passengers, expanded, ::Data)
 
-    val state: StateFlow<UiState> = combine(data, names, now, auth.profile.map { it == null }, sort) { d, n, nowTime, guest, option ->
+    val state: StateFlow<UiState> = combine(data, names, now, member, sort) { d, n, nowTime, m, option ->
         val today = nowTime.toLocalDate()
         val items = d.load.trains.map { t ->
             val base = TrainStatus.of(query.operator, t.departTime, date, today, nowTime.toLocalTime())
@@ -132,7 +152,8 @@ class ResultViewModel(
             items = ResultSort.apply(items, option),
             isToday = date == today,
             now = nowTime,
-            isGuest = guest,
+            isGuest = m.isGuest,
+            isFavorite = m.isFavorite,
             sort = option,
             cachedAt = d.load.cachedAt,
             errorRes = d.load.errorRes,
@@ -202,6 +223,24 @@ class ResultViewModel(
         viewModelScope.launch {
             names.value = transit.stationName(query.operator, query.originId) to transit.stationName(query.operator, query.destId)
         }
+    }
+
+    /** FR-RES-05：會員切換收藏；名稱預設「起站 → 迄站」（7.1.6）；超過 10 筆提示上限 */
+    fun toggleFavorite() {
+        val uid = auth.currentUid ?: return
+        viewModelScope.launch {
+            // 站名當下查詢，不依畫面標題（標題載入前可能是空字串）
+            val label = "${transit.stationName(query.operator, query.originId)} → ${transit.stationName(query.operator, query.destId)}"
+            when (val r = favorites.toggle(uid, query.operator, query.originId, query.destId, label)) {
+                is Result.Success -> (r.data as? FavoriteRepository.Toggle.Added)?.let { added.send(it.route) }
+                is Result.Failure -> events.send(r.error.messageRes)
+            }
+        }
+    }
+
+    /** 「復原」：取消剛加入的收藏 */
+    fun undoFavorite(route: FavoriteRoute) {
+        viewModelScope.launch { favorites.remove(route) }
     }
 
     /** FR-RES-02：只重算票價，不重新查時刻表 */

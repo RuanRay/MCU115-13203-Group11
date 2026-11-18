@@ -2,6 +2,7 @@ package com.group11.hometide.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.group11.hometide.data.local.entity.FavoriteRoute
@@ -34,6 +35,19 @@ interface FavoriteDao {
     suspend fun updateOrder(ids: List<Long>) {
         ids.forEachIndexed { index, id -> setSortOrder(id, index) }
     }
+
+    @Query("SELECT EXISTS(SELECT 1 FROM favorite_route WHERE uid = :uid AND operator = :operator AND origin_id = :originId AND dest_id = :destId)")
+    fun observeExists(uid: String, operator: Operator, originId: String, destId: String): Flow<Boolean>
+
+    @Query("SELECT COUNT(*) FROM favorite_route WHERE uid = :uid")
+    suspend fun count(uid: String): Int
+
+    /** 復原刪除：原樣插回（含原 id 與 sort_order） */
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun restore(route: FavoriteRoute)
+
+    @Query("UPDATE favorite_route SET label = :label WHERE id = :id")
+    suspend fun rename(id: Long, label: String)
 
     @Query("SELECT * FROM favorite_route WHERE uid = :uid AND operator = :operator AND origin_id = :originId AND dest_id = :destId")
     suspend fun find(uid: String, operator: Operator, originId: String, destId: String): FavoriteRoute?

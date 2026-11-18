@@ -36,6 +36,12 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    /** P5「＋ 新增」→ P3 並聚焦手動查詢（規格 4.7） */
+    fun openManualSearch() {
+        binding.bottomNav.selectedItemId = R.id.navSearch // 觸發監聽器切換分頁（commitNow 已完成）
+        (supportFragmentManager.findFragmentByTag(TAGS[0]) as? SearchFragment)?.focusManualSearch()
+    }
+
     private fun switchTo(@IdRes tab: Int, animate: Boolean) {
         val fm = supportFragmentManager
         // 目前分頁以「沒被隱藏的分頁 Fragment」為準，不依賴 bottomNav 狀態（重建時它可能尚未還原）

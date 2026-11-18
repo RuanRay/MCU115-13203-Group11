@@ -10,9 +10,13 @@ import com.group11.hometide.data.local.entity.SearchSource
 import com.group11.hometide.data.local.entity.Station
 import com.group11.hometide.data.repository.AuthRepository
 import com.group11.hometide.data.repository.TransitRepository
+import com.group11.hometide.ui.routes.FavoriteCard
+import com.group11.hometide.ui.routes.FavoriteCards
+import com.group11.hometide.ui.routes.FavoritesState
 import com.group11.hometide.util.Passengers
 import com.group11.hometide.util.Result
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -29,8 +33,28 @@ import java.time.LocalDate
 class SearchViewModel(
     private val transit: TransitRepository,
     private val auth: AuthRepository,
+    private val favoriteCards: FavoriteCards,
     private val today: () -> LocalDate = LocalDate::now,
 ) : ViewModel() {
+
+    private val favoritesRefresh = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+
+    /** FR-SRCH-04：首頁車票夾（會員的收藏，含下一班） */
+    val favorites: StateFlow<FavoritesState> = favoriteCards.state(favoritesRefresh)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), FavoritesState())
+
+    fun refreshFavorites() {
+        favoritesRefresh.tryEmit(Unit)
+    }
+
+    /** FR-SRCH-04：點存根以「今天」查詢（AN-05、AN-03 於 7-3）；乘客用預設乘客 */
+    fun searchFavorite(card: FavoriteCard) {
+        viewModelScope.launch {
+            val r = card.route
+            val date = today()
+            events.send(Event.OpenResult(r.operator, r.originId, r.destId, date, favoriteCards.prepareOpen(r, date.toString())))
+        }
+    }
 
     data class UiState(
         val operator: Operator = Operator.TRA,
@@ -130,9 +154,16 @@ class SearchViewModel(
         viewModelScope.launch { transit.deleteRecent(item) }
     }
 
-    private suspend fun open(op: Operator, originId: String, destId: String, date: LocalDate, pax: Passengers) {
+    private suspend fun open(
+        op: Operator,
+        originId: String,
+        destId: String,
+        date: LocalDate,
+        pax: Passengers,
+        source: SearchSource = SearchSource.MANUAL,
+    ) {
         // 紀錄寫入失敗不影響查詢（Repository 已記 log）
-        transit.saveSearch(auth.currentUid, op, originId, destId, date.toString(), SearchSource.MANUAL, pax)
+        transit.saveSearch(auth.currentUid, op, originId, destId, date.toString(), source, pax)
         events.send(Event.OpenResult(op, originId, destId, date, pax))
     }
 

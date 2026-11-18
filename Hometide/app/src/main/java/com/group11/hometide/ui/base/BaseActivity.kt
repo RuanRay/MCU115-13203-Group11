@@ -24,11 +24,19 @@ abstract class BaseActivity : AppCompatActivity() {
     /** Snackbar：3 秒、藏青底（規格 4.1） */
     fun showSnackbar(@StringRes message: Int, anchor: View? = null) = showSnackbar(getText(message), anchor)
 
-    fun showSnackbar(message: CharSequence, anchor: View? = null) {
+    /** 4.1 Snackbar：藏青底、3 秒；[action] 例如「復原」 */
+    fun showSnackbar(
+        message: CharSequence,
+        anchor: View? = null,
+        @StringRes actionText: Int? = null,
+        action: (() -> Unit)? = null,
+    ) {
         Snackbar.make(findViewById(android.R.id.content), message, SNACKBAR_MS)
             .setBackgroundTint(ContextCompat.getColor(this, R.color.color_primary))
             .setTextColor(ContextCompat.getColor(this, R.color.color_on_primary))
+            .setActionTextColor(ContextCompat.getColor(this, R.color.color_accent))
             .setAnchorView(anchor)
+            .apply { if (actionText != null && action != null) setAction(actionText) { action() } }
             .show()
     }
 

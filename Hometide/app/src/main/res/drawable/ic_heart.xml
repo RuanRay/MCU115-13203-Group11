@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- P4 收藏 ♥（result.png；收藏狀態於 5-1），Material Symbols favorite -->
+<!-- P4 已收藏 ♥（result.png、FR-RES-05），Material Symbols favorite；未收藏為 ic_heart_outline -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="32dp"
     android:height="32dp"

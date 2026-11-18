@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.animation.OvershootInterpolator
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.activity.viewModels
@@ -44,7 +45,7 @@ class ResultActivity : BaseActivity() {
         viewModelFactory {
             initializer {
                 val c = (application as HometideApp).container
-                ResultViewModel(c.transitRepository, c.authRepository, queryOf(intent), Passengers.fromJson(intent.getStringExtra(EXTRA_PASSENGERS)))
+                ResultViewModel(c.transitRepository, c.authRepository, c.favoriteRepository, queryOf(intent), Passengers.fromJson(intent.getStringExtra(EXTRA_PASSENGERS)))
             }
         }
     }
@@ -59,7 +60,11 @@ class ResultActivity : BaseActivity() {
         scrolledToNow = savedInstanceState != null
 
         binding.tvBack.setOnClickListener { finish() }
-        binding.btnFavorite.setOnClickListener { if (vm.state.value.isGuest) showLoginPrompt() } // 會員收藏於 5-1
+        // FR-RES-05：會員切換收藏；訪客顯示登入提示
+        binding.btnFavorite.setOnClickListener {
+            val s = vm.state.value
+            if (s.isGuest) showLoginPrompt() else vm.toggleFavorite()
+        }
         // FR-RES-04：選項依運具（國道客運沒有「僅對號列車」）
         val sortOptions = SortOption.optionsFor(vm.state.value.operator)
         binding.spSort.adapter = ArrayAdapter(this, R.layout.item_operator_spinner, sortOptions.map { getString(it.label) })
@@ -97,6 +102,8 @@ class ResultActivity : BaseActivity() {
                         binding.tvBack.text = getString(R.string.result_back, getString(s.operator.labelRes))
                         binding.tvRoute.text = getString(R.string.result_route, s.originName, s.destName)
                         binding.vDateStamp.setDate(s.date, showWeekday = true)
+                        binding.btnFavorite.setImageResource(if (s.isFavorite) R.drawable.ic_heart else R.drawable.ic_heart_outline)
+                        binding.btnFavorite.contentDescription = getString(if (s.isFavorite) R.string.cd_unfavorite else R.string.cd_favorite)
                         binding.chipPassengers.text = getString(R.string.passengers_chip, s.passengers.total)
                         binding.tvCount.text = if (s.hasList || s.phase == ResultViewModel.Phase.EMPTY) {
                             getString(R.string.result_count, s.items.size)
@@ -113,6 +120,12 @@ class ResultActivity : BaseActivity() {
                     }
                 }
                 launch { vm.messages.collect { showSnackbar(it) } }
+                launch {
+                    vm.favoriteAdded.collect { route ->
+                        playHeartPop()
+                        showSnackbar(getText(R.string.favorite_added), actionText = R.string.btn_undo) { vm.undoFavorite(route) }
+                    }
+                }
                 // FR-RES-03：前景時每 60 秒重算狀態並移動「現在」線
                 launch {
                     vm.tick() // 從背景回來時先更新一次
@@ -146,6 +159,17 @@ class ResultActivity : BaseActivity() {
         empty.btnRetry.isVisible = error
     }
 
+    /** AN-06：愛心放大到 1.35 倍再回彈（250 ms，OvershootInterpolator） */
+    private fun playHeartPop() {
+        if (!animationsEnabled) return
+        val heart = binding.btnFavorite
+        heart.animate().cancel()
+        heart.animate().scaleX(HEART_SCALE).scaleY(HEART_SCALE).setDuration(HEART_UP_MS).setInterpolator(null)
+            .withEndAction {
+                heart.animate().scaleX(1f).scaleY(1f).setDuration(HEART_MS - HEART_UP_MS).setInterpolator(OvershootInterpolator()).start()
+            }.start()
+    }
+
     /** 進入頁面時讓「現在」線位於畫面上方約 1/4 處 */
     private fun scrollToNowOnce(index: Int?) {
         if (scrolledToNow || index == null) return
@@ -166,6 +190,9 @@ class ResultActivity : BaseActivity() {
         private const val REQUEST_PASSENGERS = "result_passengers"
 
         private const val TICK_MS = 60_000L
+        private const val HEART_SCALE = 1.35f
+        private const val HEART_MS = 250L
+        private const val HEART_UP_MS = 100L
         private val HHMM = DateTimeFormatter.ofPattern("HH:mm")
         private val BANNER_TIME = DateTimeFormatter.ofPattern("MM/dd HH:mm")
 

@@ -29,6 +29,7 @@ import com.group11.hometide.ui.auth.registerLoginPrompt
 import com.group11.hometide.ui.base.BaseActivity
 import com.group11.hometide.ui.base.asButtonForAccessibility
 import com.group11.hometide.ui.result.ResultActivity
+import com.group11.hometide.ui.routes.FavoriteTicketAdapter
 import com.group11.hometide.util.DateUtils
 import com.group11.hometide.util.Passengers
 import com.group11.hometide.util.labelRes
@@ -49,7 +50,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         viewModelFactory {
             initializer {
                 val c = (requireActivity().application as HometideApp).container
-                SearchViewModel(c.transitRepository, c.authRepository)
+                SearchViewModel(c.transitRepository, c.authRepository, c.favoriteCards)
             }
         }
     }
@@ -60,7 +61,10 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val b = FragmentSearchBinding.bind(view).also { binding = it }
         bindAiCard(b)
-        b.tkFavEmpty.setOnClickListener { if (vm.state.value.isGuest) showLoginPrompt() } // 會員：5-1 再說明收藏方式
+        // FR-SRCH-04：訪客顯示登入提示；會員說明如何收藏
+        b.tkFavEmpty.setOnClickListener { if (vm.state.value.isGuest) showLoginPrompt() else snackbar(getString(R.string.fav_member_hint)) }
+        val favAdapter = FavoriteTicketAdapter(horizontal = true, onQuery = vm::searchFavorite)
+        b.rvFavorites.adapter = favAdapter
         bindManualTicket(b)
 
         val recentAdapter = RecentAdapter(onClick = vm::searchRecent, onLongClick = vm::deleteRecent)
@@ -73,13 +77,20 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
                         if (b.spOperator.selectedItemPosition != s.operator.ordinal) b.spOperator.setSelection(s.operator.ordinal)
                         b.btnDate.text = getString(R.string.travel_date, requireContext().monthDayWeekday(s.travelDate))
                         b.tvPassengers.text = getString(R.string.passengers_label, requireContext().passengerText(s.passengers))
-                        b.tkFavEmpty.isClickable = s.isGuest // 會員點擊於 5-1 再處理，先不顯示按壓效果
                         recentAdapter.defaultOperator = s.defaultOperator
                         recentAdapter.submitList(s.recent)
                         b.tvRecentTitle.isVisible = s.recent.isNotEmpty()
                     }
                 }
                 launch { vm.eventFlow.collect { onEvent(b, it) } }
+                launch {
+                    vm.favorites.collect { f ->
+                        favAdapter.submitList(f.cards)
+                        b.rvFavorites.isVisible = f.cards.isNotEmpty()
+                        b.tkFavEmpty.isVisible = f.cards.isEmpty() && !f.loading
+                        b.tvFavMore.isVisible = f.cards.size > 1
+                    }
+                }
             }
         }
     }
@@ -88,6 +99,19 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         super.onResume()
         binding?.let(::bindHeader) // 時段與日期可能在離開期間改變
         vm.ensureValidDate()
+        vm.refreshFavorites()
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) vm.refreshFavorites() // 分頁以 show／hide 切換
+    }
+
+    /** P5「＋ 新增」：捲到手動查詢並聚焦起站（規格 4.7） */
+    fun focusManualSearch() {
+        val b = binding ?: return
+        b.tkManual.requestRectangleOnScreen(android.graphics.Rect(0, 0, b.tkManual.width, b.tkManual.height))
+        b.actvOrigin.requestFocus()
     }
 
     override fun onDestroyView() {
