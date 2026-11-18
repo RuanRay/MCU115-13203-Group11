@@ -21,10 +21,17 @@ class NextTrainGuestTest {
     fun tc30_guestSeesEmptyState() {
         ActivityScenario.launch(MainActivity::class.java).use {
             onView(withId(R.id.navNext)).perform(click())
+            // 訪客狀態由 Firebase 登入監聽非同步送出，Espresso 不會等 Flow：最多等 5 秒
+            waitUntil { runCatching { onView(withId(R.id.layoutNextEmpty)).check(matches(isDisplayed())) }.isSuccess }
             onView(withId(R.id.layoutNextEmpty)).check(matches(isDisplayed()))
             onView(withId(R.id.tvNextTitle)).check(matches(withText(R.string.next_title_guest)))
             onView(withId(R.id.btnLogin)).check(matches(withText(R.string.btn_member_login)))
             onView(withId(R.id.btnGoSearch)).check(matches(withText(R.string.btn_go_search)))
         }
+    }
+
+    private fun waitUntil(timeoutMs: Long = 5_000, condition: () -> Boolean) {
+        val end = System.currentTimeMillis() + timeoutMs
+        while (!condition() && System.currentTimeMillis() < end) Thread.sleep(100)
     }
 }

@@ -89,7 +89,8 @@ class NextTrainViewModel(
     private val loaded = combine(selected, auth.defaultPassengers, reload.onStart { emit(Unit) }) { r, pax, _ -> r to pax }
         .transformLatest { (route, pax) ->
             // 只有切換路線時才回到「查詢中」；同一路線重查時保留上一份資料直到新資料回來
-            if (route?.id != shownRouteId) {
+            // 沒有路線（訪客／沒有收藏）時一定要送出，否則畫面停在載入中
+            if (route == null || route.id != shownRouteId) {
                 shownRouteId = route?.id
                 emit(Loaded(route, null, pax))
             }
