@@ -245,6 +245,35 @@ class TransitRepositoryTest {
         assertEquals(1, api.timetableCalls)
     }
 
+    /** 11.2：票價收到 QUOTA 後 60 秒內不再呼叫 Worker，有快取就用快取（TC-51 不受影響） */
+    @Test
+    fun fares_quotaCooldown60s_usesCache() = runBlocking {
+        val quota = HttpException(Response.error<Any>(429, "{}".toResponseBody()))
+        val api = FakeApi { ok(tainan) }
+        api.fareResponse = { throw quota }
+        val r = repo(api, FakeDao())
+        assertEquals(Result.Failure(AppError.QuotaExceeded), r.fares(Operator.TRA, "1000", "4220"))
+        assertEquals(Result.Failure(AppError.QuotaExceeded), r.fares(Operator.TRA, "1000", "4220"))
+        assertEquals(1, api.fareCalls)
+        fareDao.rows += FareCache(Operator.TRA, "1080", "4220", "3", FareClass.ADULT, 891, false, now - 8 * day)
+        assertEquals(891, (r.fares(Operator.TRA, "1080", "4220") as Result.Success).data.single().price)
+        assertEquals(1, api.fareCalls)
+    }
+
+    /** 冷卻共用：時刻表被限流後，票價、即時、站名 60 秒內也不呼叫 Worker */
+    @Test
+    fun quotaCooldown_sharedAcrossCalls() = runBlocking {
+        val quota = HttpException(Response.error<Any>(429, "{}".toResponseBody()))
+        var stationCalls = 0
+        val api = FakeApi({ throw quota }) { stationCalls++; ok(tainan) }
+        val r = repo(api, FakeDao())
+        r.timetable(query)
+        assertEquals(Result.Failure(AppError.QuotaExceeded), r.fares(Operator.TRA, "1080", "4220"))
+        assertEquals(Result.Failure(AppError.QuotaExceeded), r.live(Operator.TRA, "1080", "4220"))
+        assertEquals(Result.Failure(AppError.QuotaExceeded), r.refreshStations(Operator.TRA))
+        assertEquals(listOf(1, 0, 0), listOf(api.timetableCalls, api.fareCalls, stationCalls))
+    }
+
     @Test
     fun purgeOldTimetables_deletesOlderThan3Days() = runBlocking {
         assertEquals(Result.Success(0), repo(FakeApi { ok(tainan) }, FakeDao()).purgeOldTimetables())

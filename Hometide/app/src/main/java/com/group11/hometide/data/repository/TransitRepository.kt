@@ -60,8 +60,16 @@ class TransitRepository(
     suspend fun stationName(operator: Operator, stationId: String): String =
         runCatching { stationDao.nameOf(operator, stationId) }.getOrNull() ?: stationId
 
-    /** 收到 QUOTA 後的冷卻期（11.2：60 秒內只讀快取） */
-    private var quotaUntil = 0L
+    /** 收到 QUOTA 後的冷卻期（11.2：60 秒內只讀快取）；時刻表、票價、即時、站名共用 */
+    @Volatile private var quotaUntil = 0L
+
+    /** 所有 Worker 呼叫都經過這裡：冷卻中直接回 QuotaExceeded 不打網路，收到 QuotaExceeded 就開始冷卻 */
+    private suspend fun <T> workerCall(block: suspend () -> T): Result<T> {
+        if (now() < quotaUntil) return Result.Failure(AppError.QuotaExceeded)
+        return apiCall(gson, block).also {
+            if (it is Result.Failure && it.error == AppError.QuotaExceeded) quotaUntil = now() + QUOTA_COOLDOWN_MS
+        }
+    }
 
     /**
      * FR-RES-01、FR-OFF-01：時刻表。
@@ -77,11 +85,9 @@ class TransitRepository(
                 return@guarded Result.Success(Timetable(cached))
             }
             val fallback = { e: AppError -> if (cachedAt != null) Result.Success(Timetable(cached, cachedAt, e)) else Result.Failure(e) }
-            if (now() < quotaUntil) return@guarded fallback(AppError.QuotaExceeded)
             val q = query
-            when (val res = apiCall(gson) { api.timetable(q.operator.name, q.originId, q.destId, q.travelDate) }) {
+            when (val res = workerCall { api.timetable(q.operator.name, q.originId, q.destId, q.travelDate) }) {
                 is Result.Failure -> {
-                    if (res.error == AppError.QuotaExceeded) quotaUntil = now() + QUOTA_COOLDOWN_MS
                     // NOT_FOUND＝查無班次（11.2），不改讀快取
                     if (res.error == AppError.NotFound) res else fallback(res.error)
                 }
@@ -111,7 +117,7 @@ class TransitRepository(
         guarded("Fare failed: $operator") {
             val cached = fareDao.get(operator, originId, destId)
             if (cached.isNotEmpty() && now() - cached.first().fetchedAt < FARE_FRESH_MS) return@guarded Result.Success(cached)
-            when (val res = apiCall(gson) { api.fare(operator.name, originId, destId) }) {
+            when (val res = workerCall { api.fare(operator.name, originId, destId) }) {
                 is Result.Failure -> if (cached.isNotEmpty()) Result.Success(cached) else res // 過期快取仍比「—」好
                 is Result.Success -> {
                     val time = now()
@@ -130,7 +136,7 @@ class TransitRepository(
     /** FR-RES-03、FR-BUS-02：今天的即時資料（Worker 快取 60 秒，App 不另存） */
     suspend fun live(operator: Operator, originId: String, destId: String): Result<List<LiveInfo>> =
         guarded("Live failed: $operator") {
-            when (val res = apiCall(gson) { api.live(operator.name, originId, destId) }) {
+            when (val res = workerCall { api.live(operator.name, originId, destId) }) {
                 is Result.Failure -> res
                 is Result.Success -> Result.Success(
                     res.data.data?.items.orEmpty().mapNotNull { i ->
@@ -177,7 +183,7 @@ class TransitRepository(
         val last = stationDao.lastUpdated(operator)
         if (!force && last != null && now() - last < STATIONS_STALE_MS) return Result.Success(0)
 
-        return when (val res = apiCall(gson) { api.stations(operator.name) }) {
+        return when (val res = workerCall { api.stations(operator.name) }) {
             is Result.Failure -> res
             is Result.Success -> {
                 val time = now()
