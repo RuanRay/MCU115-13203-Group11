@@ -41,7 +41,11 @@ class SettingsStore(context: Context) {
         return id
     }
 
+    /** FR-RMD-05：是否已請求過通知權限（只在首次設定提醒時說明並請求） */
+    val notificationPermissionAsked: Flow<Boolean> = store.data.map { it[NOTIFICATION_PERMISSION_ASKED] ?: false }
+
     suspend fun setLoggedIn(value: Boolean) = set(IS_LOGGED_IN, value)
+    suspend fun setNotificationPermissionAsked(value: Boolean) = set(NOTIFICATION_PERMISSION_ASKED, value)
     suspend fun setGuestMode(value: Boolean) = set(GUEST_MODE, value)
     suspend fun setThemeMode(value: ThemeMode) = set(THEME_MODE, value.name)
     suspend fun setLastSyncAt(value: Long) = set(LAST_SYNC_AT, value)
@@ -66,5 +70,6 @@ class SettingsStore(context: Context) {
         val LAST_NEXT_ROUTE = longPreferencesKey("last_next_route")
         val LAST_DRIVE_ROUTE = longPreferencesKey("last_drive_route")
         val DEFAULT_PASSENGERS = stringPreferencesKey("default_passengers")
+        val NOTIFICATION_PERMISSION_ASKED = booleanPreferencesKey("notification_permission_asked")
     }
 }

@@ -19,4 +19,6 @@
     <color name="offline_banner_text">@color/color_on_background</color>
     <!-- 下一班主車票倒數剩 5 分鐘內（FR-NEXT-03；實作者確認 2026-11-18：淺色沿用印章紅） -->
     <color name="countdown_urgent">@color/color_stamp</color>
+    <!-- P5 通知權限橫幅底色（取自 reminders.png，外框為 color_accent） -->
+    <color name="permission_banner_bg">#FFF4D8</color>
 </resources>

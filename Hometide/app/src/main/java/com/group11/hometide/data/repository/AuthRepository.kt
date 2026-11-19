@@ -37,6 +37,7 @@ class AuthRepository(
     private val firestore: FirebaseFirestore,
     private val profiles: UserProfileDao,
     private val settings: SettingsStore,
+    private val reminders: ReminderRepository,
 ) {
 
     /** FR-AUTH-03：以 Firebase currentUser 判斷是否已登入 */
@@ -125,7 +126,8 @@ class AuthRepository(
 
     /** FR-AUTH-05：本地收藏與紀錄保留（以 uid 區分） */
     suspend fun logout() {
-        // TODO(第 5 週，FR-AUTH-05)：取消該使用者所有 SCHEDULED 提醒的 AlarmManager 排程（ReminderScheduler）
+        // 先取消提醒：失敗時（只會記 log）仍繼續登出，不讓使用者卡在登入狀態
+        currentUid?.let { reminders.cancelAll(it) }
         // 先清本地旗標再登出 Firebase：中途被取消時頂多是「旗標已清、仍登入」，重開 App 仍是一致狀態
         settings.setLoggedIn(false)
         settings.setGuestMode(false)

@@ -21,6 +21,7 @@ import com.group11.hometide.data.local.entity.TimetableCache
 import com.group11.hometide.databinding.FragmentNextTrainBinding
 import com.group11.hometide.ui.auth.LoginActivity
 import com.group11.hometide.ui.base.BaseActivity
+import com.group11.hometide.ui.base.NotificationPermission
 import com.group11.hometide.ui.base.asButtonForAccessibility
 import com.group11.hometide.ui.main.MainActivity
 import com.group11.hometide.ui.result.ReminderDialog
@@ -53,6 +54,7 @@ class NextTrainFragment : Fragment(R.layout.fragment_next_train) {
 
     // 登入成功後 profile Flow 會自動更新
     private val login = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {}
+    private val askNotificationPermission = NotificationPermission.register(this, this) { requireContext() }
     private var binding: FragmentNextTrainBinding? = null
     private var tickJob: Job? = null
     private var chipIds: List<Long> = emptyList()
@@ -94,6 +96,7 @@ class NextTrainFragment : Fragment(R.layout.fragment_next_train) {
                 launch {
                     vm.reminderSet.collect { min ->
                         snackbar(if (min > 0) getString(R.string.reminder_set, min) else getString(R.string.error_unknown))
+                        if (min > 0) askNotificationPermission() // FR-RMD-05：提醒建立後才說明並請求
                     }
                 }
                 vm.state.collect { s ->

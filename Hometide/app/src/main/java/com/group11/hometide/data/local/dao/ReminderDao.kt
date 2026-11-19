@@ -16,8 +16,13 @@ interface ReminderDao {
     @Insert
     suspend fun insert(reminder: TripReminder): Long
 
-    @Query("SELECT * FROM trip_reminder WHERE uid = :uid AND status = 'SCHEDULED' ORDER BY trigger_at")
-    fun scheduled(uid: String): Flow<List<TripReminder>>
+    /** FR-AUTH-05：登出時要取消排程的提醒 */
+    @Query("SELECT * FROM trip_reminder WHERE uid = :uid AND status = 'SCHEDULED'")
+    suspend fun scheduled(uid: String): List<TripReminder>
+
+    /** FR-AUTH-05：登出時把該使用者已預約的提醒改為已取消 */
+    @Query("UPDATE trip_reminder SET status = 'CANCELLED' WHERE uid = :uid AND status = 'SCHEDULED'")
+    suspend fun cancelScheduled(uid: String)
 
     /** FR-FAV-05：提醒分頁與 P4 存根（已預約、已提醒），依發車時間排序；已取消的不列 */
     @Query("SELECT * FROM trip_reminder WHERE uid = :uid AND status != 'CANCELLED' ORDER BY depart_at")

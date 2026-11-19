@@ -29,7 +29,7 @@ class AppContainer(private val context: Context) {
     val api: HometideApi by lazy { HometideApi.create(BuildConfig.WORKER_BASE_URL, gson) }
 
     val authRepository: AuthRepository by lazy {
-        AuthRepository(FirebaseAuth.getInstance(), FirebaseFirestore.getInstance(), database.userProfileDao(), settingsStore)
+        AuthRepository(FirebaseAuth.getInstance(), FirebaseFirestore.getInstance(), database.userProfileDao(), settingsStore, reminderRepository)
     }
     val transitRepository: TransitRepository by lazy { TransitRepository(api, database.stationDao(), database.searchHistoryDao(), database.timetableDao(), database.fareDao(), gson) }
     val favoriteRepository: FavoriteRepository by lazy { FavoriteRepository(database.favoriteDao(), transitRepository, settingsStore) }

@@ -45,6 +45,11 @@
         <!-- SyncService、ReminderReceiver、BootReceiver（規格 10.4）於第 5、7 週實作時再宣告 -->
         <!-- 出發提醒（FR-RMD-03、規格 10.2）；BootReceiver 於 5-4 -->
         <receiver android:name=".receiver.ReminderReceiver" android:exported="false" />
+        <receiver android:name=".receiver.BootReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

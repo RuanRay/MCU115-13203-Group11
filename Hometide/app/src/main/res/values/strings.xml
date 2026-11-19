@@ -67,6 +67,7 @@
     <string name="login_prompt_title">登入後就能收藏</string>
     <string name="login_prompt_body">收藏路線、設定出發提醒都需要帳號，登入後資料也不會因換手機而消失。</string>
     <string name="btn_later">稍後再說</string>
+    <string name="btn_continue">繼續</string>
     <string name="btn_go_login">去登入</string>
 
     <!-- P3 查詢（規格 4.4） -->
@@ -205,6 +206,11 @@
     <string name="routes_guest">登入後即可使用我的路線</string>
     <string name="routes_empty">還沒有收藏的路線</string>
     <string name="reminders_empty">還沒有出發提醒</string>
+    <!-- 通知權限（FR-RMD-05；橫幅文案依 reminders.png，說明對話框文案經實作者確認） -->
+    <string name="permission_banner">🔕 通知權限未開啟，提醒可能無法送達</string>
+    <string name="permission_banner_action">前往設定 ›</string>
+    <string name="notify_permission_title">開啟通知</string>
+    <string name="notify_permission_body">出發提醒要透過通知送達。接下來請允許 Hometide 傳送通知。</string>
     <string name="btn_delete">刪除</string>
     <string name="cd_drag_handle">拖曳排序</string>
     <string name="cd_rename_route">修改路線名稱</string>

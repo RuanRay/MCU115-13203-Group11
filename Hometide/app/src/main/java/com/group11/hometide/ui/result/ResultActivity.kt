@@ -23,6 +23,7 @@ import com.group11.hometide.databinding.ActivityResultBinding
 import com.group11.hometide.ui.auth.registerLoginPrompt
 import com.group11.hometide.ui.base.BaseActivity
 import com.group11.hometide.ui.base.asButtonForAccessibility
+import com.group11.hometide.ui.base.NotificationPermission
 import com.group11.hometide.ui.search.PassengerSheet
 import com.group11.hometide.util.Passengers
 import com.group11.hometide.util.labelRes
@@ -40,6 +41,7 @@ class ResultActivity : BaseActivity() {
 
     private lateinit var binding: ActivityResultBinding
     private val showLoginPrompt = registerLoginPrompt()
+    private val askNotificationPermission = NotificationPermission.register(this, this) { this }
 
     private val vm: ResultViewModel by viewModels {
         viewModelFactory {
@@ -124,7 +126,10 @@ class ResultActivity : BaseActivity() {
                 launch {
                     vm.reminderMessages.collect { e ->
                         when (e) {
-                            is ResultViewModel.ReminderEvent.Set -> showSnackbar(getString(R.string.reminder_set, e.beforeMin))
+                            is ResultViewModel.ReminderEvent.Set -> {
+                                showSnackbar(getString(R.string.reminder_set, e.beforeMin))
+                                askNotificationPermission() // FR-RMD-05：提醒建立後才說明並請求
+                            }
                             ResultViewModel.ReminderEvent.Cancelled -> showSnackbar(R.string.reminder_cancelled)
                             ResultViewModel.ReminderEvent.Failed -> showSnackbar(R.string.error_unknown)
                         }

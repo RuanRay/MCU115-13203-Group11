@@ -7,6 +7,8 @@ import com.group11.hometide.data.local.AppDatabase
 import com.group11.hometide.data.local.entity.Operator
 import com.group11.hometide.data.local.entity.ReminderStatus
 import com.group11.hometide.data.local.entity.TimetableCache
+import com.group11.hometide.data.local.entity.TripReminder
+import com.group11.hometide.receiver.ReminderReceiver
 import com.group11.hometide.reminder.ReminderScheduler
 import com.group11.hometide.util.ReminderRules
 import com.group11.hometide.util.Result
@@ -81,10 +83,10 @@ class ReminderRepositoryTest {
     fun fireAndCancel() = runBlocking {
         val a = (set("139", "14:12", 15) as Result.Success).data
         val b = (set("143", "14:30", 15) as Result.Success).data
-        assertEquals(ReminderStatus.FIRED, repo.fire(a.id)?.let { db.reminderDao().get(it.id)?.status })
-        assertNull(repo.fire(a.id)) // 已觸發過不再發通知
+        assertEquals(ReminderStatus.FIRED, repo.fire(a.id, "u1")?.let { db.reminderDao().get(it.id)?.status })
+        assertNull(repo.fire(a.id, "u1")) // 已觸發過不再發通知
         repo.cancel(b)
-        assertNull(repo.fire(b.id))
+        assertNull(repo.fire(b.id, "u1"))
         assertEquals(listOf(a.id), repo.observe("u1").first().map { it.id })
     }
 
@@ -101,5 +103,57 @@ class ReminderRepositoryTest {
         set("139", "14:12", 15)
         assertEquals(Result.Success(1), repo.purgeOld())
         assertEquals(1, repo.observe("u1").first().size)
+    }
+
+    private fun row(uid: String, no: String, departAt: Long, before: Int = 15, status: ReminderStatus = ReminderStatus.SCHEDULED) =
+        TripReminder(0, uid, Operator.TRA, no, "自強", "桃園", "臺南", departAt, before, departAt - before * 60_000L, status)
+
+    /** FR-AUTH-05／TC-05：登出只取消該使用者「已預約」的提醒；已提醒與其他帳號的不動 */
+    @Test
+    fun cancelAll_onlyScheduledOfUser(): Unit = runBlocking {
+        val a = (set("139", "14:12", 15) as Result.Success).data
+        val b = (set("143", "14:30", 15) as Result.Success).data
+        repo.fire(b.id, "u1")
+        val other = (repo.set("u2", train("151", "15:00"), "自強", "桃園", "臺南", 15) as Result.Success).data
+        assertEquals(Result.Success(Unit), repo.cancelAll("u1"))
+        assertEquals(listOf(b.id), repo.observe("u1").first().map { it.id })
+        assertEquals(ReminderStatus.CANCELLED, db.reminderDao().get(a.id)?.status)
+        assertNull(repo.fire(a.id, "u1")) // 原提醒不再觸發
+        assertEquals(ReminderStatus.SCHEDULED, db.reminderDao().get(other.id)?.status)
+        repo.cancel(other)
+    }
+
+    /** FR-RMD-04／TC-19：觸發未過 → 重排；觸發已過、發車未過 → 改 FIRED 並回傳立即通知；已發車 → 不處理 */
+    @Test
+    fun rescheduleAfterBoot(): Unit = runBlocking {
+        val dao = db.reminderDao()
+        val future = dao.insert(row("u1", "1", now + 60 * 60_000L))
+        val due = dao.insert(row("u1", "2", now + 5 * 60_000L))
+        val gone = dao.insert(row("u1", "3", now - 60_000L))
+        assertEquals(listOf(due), repo.rescheduleAfterBoot("u1").map { it.id })
+        assertEquals(ReminderStatus.SCHEDULED, dao.get(future)?.status)
+        assertEquals(ReminderStatus.FIRED, dao.get(due)?.status)
+        assertEquals(ReminderStatus.SCHEDULED, dao.get(gone)?.status)
+        // 其他帳號的提醒不重排也不補發
+        val otherDue = dao.insert(row("u2", "4", now + 5 * 60_000L))
+        assertEquals(emptyList<Long>(), repo.rescheduleAfterBoot("u1").map { it.id })
+        assertEquals(ReminderStatus.SCHEDULED, dao.get(otherDue)?.status)
+    }
+
+    /** FR-AUTH-05 第二道防線：不屬於目前登入者的提醒不發通知 */
+    @Test
+    fun fire_otherUserIgnored(): Unit = runBlocking {
+        val a = (set("139", "14:12", 15) as Result.Success).data
+        assertNull(repo.fire(a.id, "u2"))
+        assertNull(repo.fire(a.id, null))
+        assertEquals(ReminderStatus.SCHEDULED, db.reminderDao().get(a.id)?.status)
+    }
+
+    /** 開機補發的通知標題：剩 4.5 分 → 「5 分鐘後發車」；不超過設定值 */
+    @Test
+    fun minutesLeft() {
+        assertEquals(5, ReminderReceiver.minutesLeft(row("u1", "1", now + 270_000L), now))
+        assertEquals(15, ReminderReceiver.minutesLeft(row("u1", "1", now + 40 * 60_000L), now))
+        assertEquals(1, ReminderReceiver.minutesLeft(row("u1", "1", now + 1_000L), now))
     }
 }

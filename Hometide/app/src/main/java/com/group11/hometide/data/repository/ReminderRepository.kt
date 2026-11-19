@@ -53,14 +53,46 @@ class ReminderRepository(
         Result.Success(Unit)
     }
 
-    /** FR-RMD-03：ReminderReceiver 收到廣播時讀取提醒並改為 FIRED；已取消或不存在時回 null（不發通知） */
-    suspend fun fire(id: Long): TripReminder? = try {
-        dao.get(id)?.takeIf { it.status == ReminderStatus.SCHEDULED }?.also { dao.updateStatus(id, ReminderStatus.FIRED) }
+    /**
+     * FR-RMD-03：ReminderReceiver 收到廣播時讀取提醒並改為 FIRED；已取消、不存在、或不屬於目前登入者 [uid] 時回 null（不發通知）。
+     * uid 檢查是 FR-AUTH-05 的第二道防線：登出時取消排程失敗，也不會收到原帳號的提醒。
+     */
+    suspend fun fire(id: Long, uid: String?): TripReminder? = try {
+        dao.get(id)?.takeIf { it.status == ReminderStatus.SCHEDULED && it.uid == uid }?.also { dao.updateStatus(id, ReminderStatus.FIRED) }
     } catch (e: CancellationException) {
         throw e
     } catch (e: Exception) {
         Log.w(TAG, "Reminder fire failed: ${e.javaClass.simpleName}")
         null
+    }
+
+    /** FR-AUTH-05：登出時取消該使用者所有已預約的提醒（AlarmManager 排程與狀態） */
+    suspend fun cancelAll(uid: String): Result<Unit> = guarded("Reminder cancelAll failed") {
+        dao.scheduled(uid).forEach { scheduler.cancel(it.id) }
+        dao.cancelScheduled(uid)
+        Result.Success(Unit)
+    }
+
+    /**
+     * FR-RMD-04：開機後觸發時間未過的重新排程；觸發時間已過但發車時間未過的改為 FIRED 並回傳，由 BootReceiver 立即通知。
+     * 只處理目前登入者 [uid] 的提醒（未登入時不處理）。
+     */
+    suspend fun rescheduleAfterBoot(uid: String?): List<TripReminder> = try {
+        val t = now()
+        dao.pendingForBoot(t).filter { it.uid == uid }.mapNotNull { r ->
+            if (r.triggerAt > t) {
+                scheduler.schedule(r)
+                null
+            } else {
+                dao.updateStatus(r.id, ReminderStatus.FIRED)
+                r
+            }
+        }
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        Log.w(TAG, "Reminder reschedule failed: ${e.javaClass.simpleName}")
+        emptyList()
     }
 
     /** FR-FAV-05：發車超過 7 天的提醒自動移除 */
