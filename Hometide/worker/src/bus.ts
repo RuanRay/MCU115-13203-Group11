@@ -166,7 +166,7 @@ export function toBusTrips(raw: unknown, from: string, to: string, date: string,
 }
 
 /** 內部時刻（含 subs），時刻與預估到站共用同一份 2 小時快取 */
-async function busTimetable(env: Env, ctx: ExecutionContext, from: string, to: string, date: string) {
+export async function busTimetable(env: Env, ctx: ExecutionContext, from: string, to: string, date: string) {
   return cachedData(`/internal/bus-timetable?from=${q(from)}&to=${q(to)}&date=${date}`, TIMETABLE_TTL_S, ctx, async () => {
     const { routes, operator } = await busRoutes(env, from, to);
     if (routes.length === 0) return [] as BusTrip[];

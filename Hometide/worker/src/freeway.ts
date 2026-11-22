@@ -262,13 +262,24 @@ export function freewayParams(url: URL): { roadId: string; dir: Direction; from:
   return { roadId, dir, from, to };
 }
 
+type FreewayParams = ReturnType<typeof freewayParams>;
+
+const trafficKey = (p: FreewayParams) =>
+  `/api/freeway/traffic?freeway=${p.roadId}&dir=${p.dir}&from=${encodeURIComponent(p.from)}&to=${encodeURIComponent(p.to)}`;
+
+async function produceTraffic(env: Env, ctx: ExecutionContext, p: FreewayParams): Promise<Traffic> {
+  const all = await sections(env, ctx);
+  // 先驗證路線再打即時資料：不存在的路線不消耗 TDX 額度
+  const ids = routeSections(all, p.roadId, p.dir, p.from, p.to).map((s) => s.id);
+  return toTraffic(all, await liveFor(env, ids), p.roadId, p.dir, p.from, p.to);
+}
+
+/** 路況，與 /api/freeway/traffic 共用同一份 60 秒快取（compare 用） */
+export async function trafficData(env: Env, ctx: ExecutionContext, p: FreewayParams): Promise<Traffic> {
+  return (await cachedData(trafficKey(p), TRAFFIC_TTL_S, ctx, () => produceTraffic(env, ctx, p))).data;
+}
+
 export async function handleFreewayTraffic(url: URL, env: Env, ctx: ExecutionContext): Promise<Response> {
-  const { roadId, dir, from, to } = freewayParams(url);
-  const key = `/api/freeway/traffic?freeway=${roadId}&dir=${dir}&from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`;
-  return cached(key, TRAFFIC_TTL_S, ctx, async () => {
-    const all = await sections(env, ctx);
-    // 先驗證路線再打即時資料：不存在的路線不消耗 TDX 額度
-    const ids = routeSections(all, roadId, dir, from, to).map((s) => s.id);
-    return toTraffic(all, await liveFor(env, ids), roadId, dir, from, to);
-  });
+  const p = freewayParams(url);
+  return cached(trafficKey(p), TRAFFIC_TTL_S, ctx, () => produceTraffic(env, ctx, p));
 }

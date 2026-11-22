@@ -55,6 +55,11 @@ async function timetable(env: Env, op: RailOperator, from: string, to: string, d
 const timetableKey = (op: string, from: string, to: string, date: string) =>
   `/api/timetable?operator=${op}&from=${from}&to=${to}&date=${date}`;
 
+/** 今天的班次，與 /api/timetable 共用同一份 2 小時快取（compare 用） */
+export async function railTrips(env: Env, ctx: ExecutionContext, op: RailOperator, from: string, to: string, date: string): Promise<Trip[]> {
+  return (await cachedData(timetableKey(op, from, to, date), TIMETABLE_TTL_S, ctx, () => timetable(env, op, from, to, date))).data.trips;
+}
+
 /** GET /api/timetable?operator=TRA|THSR&from&to&date（E-1） */
 export async function handleTimetable(url: URL, env: Env, ctx: ExecutionContext): Promise<Response> {
   const { op, from, to } = railQuery(url);

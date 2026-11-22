@@ -792,7 +792,7 @@ model: sonnet
   "updatedAt": 1762495500000,
   "source": "TDX",
   "data": {
-    "fromCity": "桃園", "toCity": "臺南",
+    "fromCity": "桃園市", "toCity": "臺南市",
     "drive": { "totalMin": 185 },
     "options": [
       { "operator": "THSR", "label": "高鐵・桃園站", "departTime": "14:31", "arriveTime": "15:36",
@@ -808,6 +808,11 @@ model: sonnet
 ```
 
 某運具當天已無班次時，該項 `departTime` 為 `null`、`note` 為「今日已無班次」，不參與 `fastest` 判斷；`fastest` 可能為 `DRIVE`。
+
+- 起訖縣市由交流道對照表（`worker/src/static/interchange-city.json`）取得，為縣市全名；各縣市的代表車站與高鐵轉乘分鐘見 `city-transport.json`。
+- 每種運具挑「等車＋行駛」最短的一班（最早到達，不一定是最早發車）；`transferMin` 為起訖兩端高鐵轉乘分鐘之和，台鐵與客運為 0。
+- 縣市沒有該運具（或起訖同站）時，`label` 只有運具名稱、各時間欄位為 `null`、`note` 為「—」。
+- `drive.totalMin` 等於同條件 `/api/freeway/traffic` 的 `estimatedMin`。TDX 限流時整個回應為 `QUOTA`。
 
 ### E-6 錯誤回應
 
