@@ -69,7 +69,7 @@ describe("traffic → E-4", () => {
     const t = toTraffic(sections, live, "000010", "S", "基隆端", "五堵");
     // 即時 59＋61＋95＋77＝292 秒 ≈ 5 分；平常 6.8 公里／100 公里每時 ≈ 4 分
     expect(t).toMatchObject({ freewayName: "國道 1 號", directionName: "南下", from: "基隆端", to: "五堵", estimatedMin: 5, normalMin: 4, congestedCount: 0 });
-    expect(t.segments[0]).toEqual({ fromIc: "基隆端", toIc: "基隆", speedKmh: 66, level: "BUSY", travelMin: 1 });
+    expect(t.segments[0]).toEqual({ fromIc: "基隆端", toIc: "基隆", speedKmh: 66, level: "BUSY", travelMin: 1, closed: false });
     expect(t.segments.map((s) => s.toIc)).toEqual(["基隆", "八堵", "大華系統", "五堵"]);
   });
 
@@ -84,7 +84,7 @@ describe("traffic → E-4", () => {
       { SectionID: "0003", TravelTime: 0, TravelSpeed: 0, CongestionLevel: "-1" },
     ];
     const t = toTraffic(sections, patched, "000010", "S", "基隆端", "八堵");
-    expect(t.segments.map((s) => [s.level, s.speedKmh])).toEqual([["UNKNOWN", null], ["JAM", null]]);
+    expect(t.segments.map((s) => [s.level, s.speedKmh, s.closed])).toEqual([["UNKNOWN", null, false], ["JAM", null, true]]);
     expect(t.segments[1].travelMin).toBeNull();
     // 0001 有旅行時間 31 秒；0003 沒有 → 平常 1.5 公里 54 秒；共 85 秒 ≈ 1 分
     expect(t.estimatedMin).toBe(1);

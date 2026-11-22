@@ -65,6 +65,8 @@ export interface Segment {
   speedKmh: number | null;
   level: Level;
   travelMin: number | null;
+  /** 道路封閉（TDX 壅塞等級 -1）：level 仍為 JAM（紅色、計入壅塞段數），App 以「封閉」取代時速 */
+  closed: boolean;
 }
 
 export interface Traffic {
@@ -207,7 +209,8 @@ export function toTraffic(sections: Section[], live: TdxLive[], roadId: string, 
     const normal = (s.lengthKm / s.speedLimit) * 3600;
     normalSec += normal;
     estimatedSec += travelSec ?? normal;
-    return { fromIc: s.start, toIc: s.end, speedKmh: speed, level, travelMin: travelSec === null ? null : Math.round(travelSec / 60) };
+    const closed = l?.CongestionLevel === "-1";
+    return { fromIc: s.start, toIc: s.end, speedKmh: speed, level, travelMin: travelSec === null ? null : Math.round(travelSec / 60), closed };
   });
 
   return {

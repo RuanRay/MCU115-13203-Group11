@@ -775,15 +775,15 @@ model: sonnet
     "from": "桃園", "to": "永康",
     "estimatedMin": 185, "normalMin": 160, "congestedCount": 3,
     "segments": [
-      { "fromIc": "桃園", "toIc": "機場系統", "speedKmh": 98, "level": "SMOOTH", "travelMin": 4 },
-      { "fromIc": "機場系統", "toIc": "中壢", "speedKmh": 45, "level": "JAM", "travelMin": 9 },
-      { "fromIc": "中壢", "toIc": "內壢", "speedKmh": null, "level": "UNKNOWN", "travelMin": null }
+      { "fromIc": "桃園", "toIc": "機場系統", "speedKmh": 98, "level": "SMOOTH", "travelMin": 4, "closed": false },
+      { "fromIc": "機場系統", "toIc": "中壢", "speedKmh": 45, "level": "JAM", "travelMin": 9, "closed": false },
+      { "fromIc": "中壢", "toIc": "內壢", "speedKmh": null, "level": "UNKNOWN", "travelMin": null, "closed": false }
     ]
   }
 }
 ```
 
-`level` 只有四種值：`SMOOTH`（順暢）、`BUSY`（車多）、`JAM`（壅塞，含道路封閉）、`UNKNOWN`（無資料）。`estimatedMin` 為各路段即時旅行時間總和，沒有即時資料的路段以平常時間代替；`normalMin` 為各路段長度依速限換算之和；`congestedCount` 為 `JAM` 的段數。上路在下路之後（方向相反）或交流道不存在時回 `NOT_FOUND`。
+`level` 只有四種值：`SMOOTH`（順暢）、`BUSY`（車多）、`JAM`（壅塞，含道路封閉）、`UNKNOWN`（無資料）。`estimatedMin` 為各路段即時旅行時間總和，沒有即時資料的路段以平常時間代替；`normalMin` 為各路段長度依速限換算之和；`congestedCount` 為 `JAM` 的段數。`closed` 為 `true` 表示該路段道路封閉（TDX 壅塞等級 -1），`level` 仍為 `JAM`；App 路線圖在時速位置顯示「封閉」。上路在下路之後（方向相反）或交流道不存在時回 `NOT_FOUND`。
 
 ### E-5 `GET /api/compare?freeway=000010&dir=S&from=…&to=…`
 
