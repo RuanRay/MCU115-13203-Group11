@@ -1,6 +1,7 @@
 // 路由（規格 6.5：index.ts 只做路由；回應格式見規格 8.3、GUIDE 附錄 E）
 
 import { handleBusFare, handleBusLive, handleBusStations, handleBusTimetable } from "./bus";
+import { handleFreewayMeta, handleFreewayTraffic } from "./freeway";
 import { handleFare, handleLive, handleStations, handleTimetable } from "./rail";
 import { ApiError, errorResponse, json, type Env } from "./tdx";
 
@@ -24,6 +25,10 @@ async function route(request: Request, env: Env, ctx: ExecutionContext): Promise
       return bus ? handleBusFare(url, env, ctx) : handleFare(url, env, ctx);
     case "/api/live":
       return bus ? handleBusLive(url, env, ctx) : handleLive(url, env, ctx);
+    case "/api/freeway/meta":
+      return handleFreewayMeta(env, ctx);
+    case "/api/freeway/traffic":
+      return handleFreewayTraffic(url, env, ctx);
   }
   throw new ApiError("NOT_FOUND", "Not found");
 }

@@ -1,75 +1,98 @@
 {
-  "UpdateTime": "2026-11-11T23:19:06+08:00",
+  "UpdateTime": "2026-11-22T19:58:59+08:00",
   "UpdateInterval": 60,
-  "SrcUpdateTime": "2026-11-11T23:17:00+08:00",
+  "SrcUpdateTime": "2026-11-22T19:56:00+08:00",
   "SrcUpdateInterval": 60,
   "AuthorityCode": "NFB",
   "LinkVersion": "25.06.1",
   "LiveTraffics": [
     {
       "SectionID": "0001",
-      "LinkIDs": [
-        {
-          "LinkID": "0000100000000C"
-        },
-        {
-          "LinkID": "0000100000040C"
-        },
-        {
-          "LinkID": "0000100000080C"
-        },
-        {
-          "LinkID": "0000100000110C"
-        }
-      ],
-      "TravelTime": 52,
-      "TravelSpeed": 71,
+      "TravelTime": 59,
+      "TravelSpeed": 66,
       "CongestionLevelID": "A",
       "CongestionLevel": "2",
-      "DataSources": {
-        "HasHistorical": 0,
-        "HasVD": 1,
-        "HasAVI": 0,
-        "HasETAG": 0,
-        "HasGVP": 0,
-        "HasCVP": 0,
-        "HasOthers": 0
-      },
-      "DataCollectTime": "2026-11-11T23:18:00+08:00"
+      "DataCollectTime": "2026-11-22T19:58:00+08:00"
     },
     {
       "SectionID": "0003",
-      "LinkIDs": [
-        {
-          "LinkID": "0000100000080C"
-        },
-        {
-          "LinkID": "0000100000110C"
-        },
-        {
-          "LinkID": "0000100000130C"
-        },
-        {
-          "LinkID": "0000100000200C"
-        },
-        {
-          "LinkID": "0000100000260C"
-        }
-      ],
-      "TravelTime": 57,
-      "TravelSpeed": 90,
+      "TravelTime": 61,
+      "TravelSpeed": 86,
       "CongestionLevelID": "A",
       "CongestionLevel": "1",
-      "DataSources": {
-        "HasHistorical": 0,
-        "HasVD": 1,
-        "HasAVI": 0,
-        "HasETAG": 0,
-        "HasGVP": 0,
-        "HasCVP": 0,
-        "HasOthers": 0
-      },
-      "DataCollectTime": "2026-11-11T23:18:00+08:00"
+      "DataCollectTime": "2026-11-22T19:58:00+08:00"
+    },
+    {
+      "SectionID": "0005",
+      "TravelTime": 95,
+      "TravelSpeed": 88,
+      "CongestionLevelID": "A",
+      "CongestionLevel": "1",
+      "DataCollectTime": "2026-11-22T19:58:00+08:00"
+    },
+    {
+      "SectionID": "0419",
+      "TravelTime": 77,
+      "TravelSpeed": 84,
+      "CongestionLevelID": "A",
+      "CongestionLevel": "1",
+      "DataCollectTime": "2026-11-22T19:58:00+08:00"
+    },
+    {
+      "SectionID": "0002",
+      "TravelTime": 60,
+      "TravelSpeed": 62,
+      "CongestionLevelID": "A",
+      "CongestionLevel": "2",
+      "DataCollectTime": "2026-11-22T19:58:00+08:00"
+    },
+    {
+      "SectionID": "0004",
+      "TravelTime": 63,
+      "TravelSpeed": 86,
+      "CongestionLevelID": "A",
+      "CongestionLevel": "1",
+      "DataCollectTime": "2026-11-22T19:58:00+08:00"
+    },
+    {
+      "SectionID": "0006",
+      "TravelTime": 95,
+      "TravelSpeed": 89,
+      "CongestionLevelID": "A",
+      "CongestionLevel": "1",
+      "DataCollectTime": "2026-11-22T19:58:00+08:00"
+    },
+    {
+      "SectionID": "0420",
+      "TravelTime": 75,
+      "TravelSpeed": 85,
+      "CongestionLevelID": "A",
+      "CongestionLevel": "1",
+      "DataCollectTime": "2026-11-22T19:58:00+08:00"
+    },
+    {
+      "SectionID": "0475",
+      "TravelTime": 43,
+      "TravelSpeed": 81,
+      "CongestionLevelID": "A",
+      "CongestionLevel": "1",
+      "DataCollectTime": "2026-11-22T19:58:00+08:00"
+    },
+    {
+      "SectionID": "0491",
+      "TravelTime": 92,
+      "TravelSpeed": 77,
+      "CongestionLevelID": "A",
+      "CongestionLevel": "2",
+      "DataCollectTime": "2026-11-22T19:58:00+08:00"
+    },
+    {
+      "SectionID": "0492",
+      "TravelTime": 82,
+      "TravelSpeed": 84,
+      "CongestionLevelID": "A",
+      "CongestionLevel": "1",
+      "DataCollectTime": "2026-11-22T19:58:00+08:00"
     }
   ]
 }

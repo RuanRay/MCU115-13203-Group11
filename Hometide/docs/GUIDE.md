@@ -739,7 +739,32 @@ model: sonnet
 }
 ```
 
-### E-4 `GET /api/freeway/traffic?freeway=1&dir=S&from=<交流道>&to=<交流道>`
+### E-9 `GET /api/freeway/meta`
+
+快取 7 天。只列名稱以「國道」開頭的道路（TDX `/v2/Road/Traffic/Section/Freeway`），`id` 為 TDX RoadID；交流道依行車方向排序（南下、東向里程遞增；北上、西向遞減），名稱「台」轉「臺」。
+
+```json
+{
+  "updatedAt": 1763740800000,
+  "source": "TDX",
+  "data": {
+    "freeways": [
+      { "id": "000010", "name": "國道 1 號", "directions": [
+        { "dir": "S", "name": "南下", "interchanges": [ { "name": "基隆端", "km": 0 }, { "name": "基隆", "km": 1.1 }, { "name": "八堵", "km": 2.6 } ] },
+        { "dir": "N", "name": "北上", "interchanges": [ { "name": "高雄端", "km": 374.4 }, { "name": "漁港路", "km": 373 } ] }
+      ] },
+      { "id": "000021", "name": "國道 2 甲", "directions": [
+        { "dir": "E", "name": "東向", "interchanges": [ { "name": "圳頭", "km": 0 }, { "name": "大園", "km": 2 } ] },
+        { "dir": "W", "name": "西向", "interchanges": [ { "name": "大園", "km": 2 }, { "name": "圳頭", "km": 0 } ] }
+      ] }
+    ]
+  }
+}
+```
+
+`dir` 只有 `S`、`N`、`E`、`W` 四種。E-4、E-5 的 `freeway` 填 `id`，`from`、`to` 填交流道名稱（「台」「臺」皆可）。
+
+### E-4 `GET /api/freeway/traffic?freeway=000010&dir=S&from=<交流道>&to=<交流道>`
 
 ```json
 {
@@ -758,9 +783,9 @@ model: sonnet
 }
 ```
 
-`level` 只有四種值：`SMOOTH`（順暢）、`BUSY`（車多）、`JAM`（壅塞）、`UNKNOWN`（無資料）。
+`level` 只有四種值：`SMOOTH`（順暢）、`BUSY`（車多）、`JAM`（壅塞，含道路封閉）、`UNKNOWN`（無資料）。`estimatedMin` 為各路段即時旅行時間總和，沒有即時資料的路段以平常時間代替；`normalMin` 為各路段長度依速限換算之和；`congestedCount` 為 `JAM` 的段數。上路在下路之後（方向相反）或交流道不存在時回 `NOT_FOUND`。
 
-### E-5 `GET /api/compare?freeway=1&dir=S&from=…&to=…`
+### E-5 `GET /api/compare?freeway=000010&dir=S&from=…&to=…`
 
 ```json
 {

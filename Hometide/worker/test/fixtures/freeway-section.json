@@ -1,63 +1,184 @@
 {
-  "UpdateTime": "2026-11-11T02:11:00+08:00",
+  "UpdateTime": "2026-11-22T02:27:53+08:00",
   "UpdateInterval": 21600,
-  "SrcUpdateTime": "2026-11-11T01:59:38+08:00",
+  "SrcUpdateTime": "2026-11-22T01:59:12+08:00",
   "SrcUpdateInterval": 86400,
   "AuthorityCode": "NFB",
   "LinkVersion": "25.12.1",
   "Sections": [
     {
-      "SectionID": "0001",
-      "LinkIDs": [
-        {
-          "LinkID": "0000100000000C"
-        },
-        {
-          "LinkID": "0000100000040C"
-        },
-        {
-          "LinkID": "0000100000080C"
-        },
-        {
-          "LinkID": "0000100000110C"
-        }
-      ],
+      "SectionID": "0492",
       "SubAuthorityCode": "NFB-NR",
-      "SectionName": "國道1號(基隆端到基隆)",
+      "SectionName": "國道2甲(大園到圳頭)",
+      "RoadID": "000021",
+      "RoadName": "國道2甲",
+      "RoadClass": 0,
+      "RoadDirection": "W",
+      "RoadSection": {
+        "Start": "大園",
+        "End": "圳頭"
+      },
+      "SectionLength": 2,
+      "SectionMile": {
+        "StartKM": "2K+000",
+        "EndKM": "0K+000"
+      },
+      "SpeedLimit": 100
+    },
+    {
+      "SectionID": "0491",
+      "SubAuthorityCode": "NFB-NR",
+      "SectionName": "國道2甲(圳頭到大園)",
+      "RoadID": "000021",
+      "RoadName": "國道2甲",
+      "RoadClass": 0,
+      "RoadDirection": "E",
+      "RoadSection": {
+        "Start": "圳頭",
+        "End": "大園"
+      },
+      "SectionLength": 2,
+      "SectionMile": {
+        "StartKM": "0K+000",
+        "EndKM": "2K+000"
+      },
+      "SpeedLimit": 100
+    },
+    {
+      "SectionID": "0475",
+      "SubAuthorityCode": "NFB-NR",
+      "SectionName": "高港高架(58管制站到第二貨櫃中心)",
+      "RoadID": "",
+      "RoadName": "高港高架",
+      "RoadClass": 0,
+      "RoadDirection": "E",
+      "RoadSection": {
+        "Start": "58管制站",
+        "End": "第二貨櫃中心"
+      },
+      "SectionLength": 1,
+      "SectionMile": {
+        "StartKM": "0K+000",
+        "EndKM": "1K+000"
+      },
+      "SpeedLimit": 100
+    },
+    {
+      "SectionID": "0420",
+      "SubAuthorityCode": "NFB-NR",
+      "SectionName": "國道1號(五堵到大華系統)",
       "RoadID": "000010",
       "RoadName": "國道1號",
       "RoadClass": 0,
-      "RoadDirection": "S",
+      "RoadDirection": "N",
       "RoadSection": {
-        "Start": "基隆端",
+        "Start": "五堵",
+        "End": "大華系統"
+      },
+      "SectionLength": 1.8,
+      "SectionMile": {
+        "StartKM": "6K+800",
+        "EndKM": "5K+000"
+      },
+      "SpeedLimit": 100
+    },
+    {
+      "SectionID": "0006",
+      "SubAuthorityCode": "NFB-NR",
+      "SectionName": "國道1號(大華系統到八堵)",
+      "RoadID": "000010",
+      "RoadName": "國道1號",
+      "RoadClass": 0,
+      "RoadDirection": "N",
+      "RoadSection": {
+        "Start": "大華系統",
+        "End": "八堵"
+      },
+      "SectionLength": 2.4,
+      "SectionMile": {
+        "StartKM": "5K+000",
+        "EndKM": "2K+600"
+      },
+      "SpeedLimit": 100
+    },
+    {
+      "SectionID": "0004",
+      "SubAuthorityCode": "NFB-NR",
+      "SectionName": "國道1號(八堵到基隆)",
+      "RoadID": "000010",
+      "RoadName": "國道1號",
+      "RoadClass": 0,
+      "RoadDirection": "N",
+      "RoadSection": {
+        "Start": "八堵",
         "End": "基隆"
       },
-      "SectionLength": 1.1,
+      "SectionLength": 1.5,
       "SectionMile": {
-        "StartKM": "0K+000",
+        "StartKM": "2K+600",
         "EndKM": "1K+100"
       },
       "SpeedLimit": 100
     },
     {
+      "SectionID": "0002",
+      "SubAuthorityCode": "NFB-NR",
+      "SectionName": "國道1號(基隆到基隆端)",
+      "RoadID": "000010",
+      "RoadName": "國道1號",
+      "RoadClass": 0,
+      "RoadDirection": "N",
+      "RoadSection": {
+        "Start": "基隆",
+        "End": "基隆端"
+      },
+      "SectionLength": 1.1,
+      "SectionMile": {
+        "StartKM": "1K+100",
+        "EndKM": "0K+000"
+      },
+      "SpeedLimit": 100
+    },
+    {
+      "SectionID": "0419",
+      "SubAuthorityCode": "NFB-NR",
+      "SectionName": "國道1號(大華系統到五堵)",
+      "RoadID": "000010",
+      "RoadName": "國道1號",
+      "RoadClass": 0,
+      "RoadDirection": "S",
+      "RoadSection": {
+        "Start": "大華系統",
+        "End": "五堵"
+      },
+      "SectionLength": 1.8,
+      "SectionMile": {
+        "StartKM": "5K+000",
+        "EndKM": "6K+800"
+      },
+      "SpeedLimit": 100
+    },
+    {
+      "SectionID": "0005",
+      "SubAuthorityCode": "NFB-NR",
+      "SectionName": "國道1號(八堵到大華系統)",
+      "RoadID": "000010",
+      "RoadName": "國道1號",
+      "RoadClass": 0,
+      "RoadDirection": "S",
+      "RoadSection": {
+        "Start": "八堵",
+        "End": "大華系統"
+      },
+      "SectionLength": 2.4,
+      "SectionMile": {
+        "StartKM": "2K+600",
+        "EndKM": "5K+000"
+      },
+      "SpeedLimit": 100
+    },
+    {
       "SectionID": "0003",
-      "LinkIDs": [
-        {
-          "LinkID": "0000100000080C"
-        },
-        {
-          "LinkID": "0000100000110C"
-        },
-        {
-          "LinkID": "0000100000130C"
-        },
-        {
-          "LinkID": "0000100000200C"
-        },
-        {
-          "LinkID": "0000100000260C"
-        }
-      ],
       "SubAuthorityCode": "NFB-NR",
       "SectionName": "國道1號(基隆到八堵)",
       "RoadID": "000010",
@@ -72,6 +193,25 @@
       "SectionMile": {
         "StartKM": "1K+100",
         "EndKM": "2K+600"
+      },
+      "SpeedLimit": 100
+    },
+    {
+      "SectionID": "0001",
+      "SubAuthorityCode": "NFB-NR",
+      "SectionName": "國道1號(基隆端到基隆)",
+      "RoadID": "000010",
+      "RoadName": "國道1號",
+      "RoadClass": 0,
+      "RoadDirection": "S",
+      "RoadSection": {
+        "Start": "基隆端",
+        "End": "基隆"
+      },
+      "SectionLength": 1.1,
+      "SectionMile": {
+        "StartKM": "0K+000",
+        "EndKM": "1K+100"
       },
       "SpeedLimit": 100
     }
