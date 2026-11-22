@@ -2,6 +2,7 @@ package com.group11.hometide.ui.highway
 
 import android.content.Context
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -15,8 +16,13 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.group11.hometide.HometideApp
+import com.google.android.material.chip.Chip
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.group11.hometide.R
+import com.group11.hometide.data.local.entity.DriveRoute
+import com.group11.hometide.databinding.DialogRenameRouteBinding
 import com.group11.hometide.databinding.FragmentHighwayBinding
+import com.group11.hometide.ui.auth.registerLoginPrompt
 import com.group11.hometide.ui.base.BaseActivity
 import com.group11.hometide.ui.base.asButtonForAccessibility
 import com.group11.hometide.ui.highway.HighwayViewModel.Title
@@ -31,7 +37,7 @@ import java.time.format.DateTimeFormatter
 
 /**
  * 國道分頁（規格 4.11；highway.png、highway_dark.png、highway_guest.png；FR-HWY-02～06）。
- * 6-2a：空白車票表單＋查看路況；前景時每 60 秒更新（FR-HWY-05）。開車路線晶片與收藏於 6-2b。
+ * 表單＋查看路況（6-2a）、會員開車路線晶片與收藏（6-2b）；前景時每 60 秒更新（FR-HWY-05）。
  */
 class HighwayFragment : Fragment(R.layout.fragment_highway) {
 
@@ -39,12 +45,14 @@ class HighwayFragment : Fragment(R.layout.fragment_highway) {
         viewModelFactory {
             initializer {
                 val c = (requireActivity().application as HometideApp).container
-                HighwayViewModel(c.authRepository, c.highwayRepository)
+                HighwayViewModel(c.authRepository, c.highwayRepository, c.driveRouteRepository)
             }
         }
     }
 
+    private val showLoginPrompt = registerLoginPrompt()
     private var binding: FragmentHighwayBinding? = null
+    private var chipKey: List<String> = emptyList()
     private var tickJob: Job? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -60,6 +68,8 @@ class HighwayFragment : Fragment(R.layout.fragment_highway) {
         b.spExitIc.onSelect { i -> vm.state.value.exits.getOrNull(i)?.let(vm::selectExit) }
         b.btnShowTraffic.setOnClickListener { vm.showTraffic() }
         b.btnShowTraffic.asButtonForAccessibility()
+        // FR-HWY-06：訪客收藏 → 登入提示（FR-AUTH-06）；會員 → 命名後收藏
+        b.btnFavoriteDrive.setOnClickListener { if (vm.state.value.isGuest == true) showLoginPrompt() else showNameDialog(null) }
         b.btnHwyRetry.setOnClickListener {
             if (vm.state.value.metaErrorRes != null) vm.loadMeta() else vm.showTraffic()
         }
@@ -70,6 +80,15 @@ class HighwayFragment : Fragment(R.layout.fragment_highway) {
                     vm.messages.collect { res ->
                         val activity = requireActivity() as BaseActivity
                         activity.showSnackbar(res, anchor = activity.findViewById(R.id.bottomNav))
+                    }
+                }
+                launch {
+                    // 同 5-1 車票夾：「已刪除」＋「復原」
+                    vm.deleted.collect { route ->
+                        val activity = requireActivity() as BaseActivity
+                        activity.showSnackbar(getText(R.string.favorite_deleted), anchor = activity.findViewById(R.id.bottomNav), actionText = R.string.btn_undo) {
+                            vm.restore(route)
+                        }
                     }
                 }
                 vm.state.collect { s ->
@@ -138,19 +157,24 @@ class HighwayFragment : Fragment(R.layout.fragment_highway) {
         b.tvOfflineBanner.isVisible = offline
         if (offline) b.tvOfflineBanner.text = getString(R.string.offline_banner, hhmm(r!!.updatedAt))
 
-        // 表單
-        b.tkHwyForm.isVisible = s.freeways.isNotEmpty()
+        // 3. 開車路線晶片（會員有收藏時）
+        b.scrollDriveRoutes.isVisible = s.showChips
+        if (s.showChips) renderChips(b, s)
+
+        // 表單（訪客、沒有收藏、或「＋ 新增」）
+        b.tkHwyForm.isVisible = s.showForm && s.freeways.isNotEmpty()
         b.spFreeway.bind(s.freeways.map { it.name }, s.freeways.indexOfFirst { it.id == s.selection?.freewayId })
         b.spDirection.bind(s.directions.map { it.name }, s.directions.indexOfFirst { it.dir == s.selection?.direction })
         b.spEntryIc.bind(s.entries, s.entries.indexOf(s.selection?.entryIc))
         b.spExitIc.bind(s.exits, s.exits.indexOf(s.selection?.exitIc))
 
-        val errorRes = s.metaErrorRes ?: s.errorRes?.takeIf { r == null && !s.loading }
+        val errorRes = s.metaErrorRes?.takeIf { s.showForm } ?: s.errorRes?.takeIf { r == null && !s.loading }
         b.layoutHwyError.isVisible = errorRes != null
         errorRes?.let { b.tvHwyError.setText(it) }
-        b.layoutHwySkeleton.isVisible = s.loading || (s.metaLoading && s.freeways.isEmpty())
+        b.layoutHwySkeleton.isVisible = s.loading || (s.showForm && s.metaLoading && s.freeways.isEmpty())
         b.layoutHwyResult.isVisible = r != null && !s.loading
         b.cardLoginHint.isVisible = s.isGuest == true && !s.metaLoading // FR-HWY-06：會員不顯示
+        b.btnFavoriteDrive.isVisible = s.canFavorite && !s.loading
         r ?: return
 
         // 4. 大車票
@@ -172,6 +196,74 @@ class HighwayFragment : Fragment(R.layout.fragment_highway) {
         // 5–6. 回家方式比較：縣市用全名（實作者確認）
         b.layoutCompare.isVisible = r.compare != null
         r.compare?.let { b.tvCompareTitle.text = getString(R.string.hwy_compare_title, it.fromCity, it.toCity) }
+    }
+
+    /** FR-HWY-01：「國1 南下・開車回家」…最後一個「＋ 新增」；長按路線晶片跳「改名／刪除」（實作者確認） */
+    private fun renderChips(b: FragmentHighwayBinding, s: HighwayViewModel.UiState) {
+        val group = b.chipGroupDriveRoutes
+        val labels = s.routes.map { chipLabel(it, s) }
+        val key = s.routes.map { it.id.toString() } + labels
+        if (key != chipKey) {
+            chipKey = key
+            group.removeAllViews()
+            val inflater = LayoutInflater.from(group.context)
+            s.routes.forEachIndexed { i, route ->
+                val chip = inflater.inflate(R.layout.item_route_chip, group, false) as Chip
+                chip.id = View.generateViewId()
+                chip.text = labels[i]
+                chip.setOnClickListener { vm.selectRoute(route.id) }
+                chip.setOnLongClickListener {
+                    showRouteMenu(route)
+                    true
+                }
+                group.addView(chip)
+            }
+            val add = inflater.inflate(R.layout.item_route_chip, group, false) as Chip
+            add.id = View.generateViewId()
+            add.setText(R.string.hwy_chip_add)
+            add.setOnClickListener { vm.startAddNew() }
+            group.addView(add)
+        }
+        val index = if (s.addingNew) s.routes.size else s.routes.indexOfFirst { it.id == s.selectedRouteId }
+        (0 until group.childCount).forEach { i ->
+            val chip = group.getChildAt(i) as Chip
+            val checked = i == index
+            if (chip.isChecked != checked) chip.isChecked = checked
+        }
+    }
+
+    /** 國道簡稱與方向取自交流道清單；清單還沒拿到時用代碼 */
+    private fun chipLabel(route: DriveRoute, s: HighwayViewModel.UiState): String {
+        val f = s.freeways.firstOrNull { it.id == route.freewayId }
+        val freeway = f?.let { getString(R.string.hwy_chip_freeway, HighwayViewModel.shortCode(it.name)) } ?: route.freewayId
+        val dir = f?.directions?.firstOrNull { it.dir == route.direction }?.name ?: route.direction
+        return getString(R.string.hwy_chip_label, freeway, dir, route.label)
+    }
+
+    private fun showRouteMenu(route: DriveRoute) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(route.label)
+            .setItems(arrayOf(getString(R.string.hwy_menu_rename), getString(R.string.btn_delete))) { _, which ->
+                if (which == 0) showNameDialog(route) else vm.remove(route)
+            }
+            .show()
+    }
+
+    /** 命名（收藏時預填「開車回家」，改名時預填原名稱）；最多 10 字，空白時收藏用預設名稱、改名不儲存 */
+    private fun showNameDialog(route: DriveRoute?) {
+        val dialog = DialogRenameRouteBinding.inflate(LayoutInflater.from(requireContext()))
+        val default = getString(R.string.hwy_default_route_label)
+        dialog.etRouteLabel.setText(route?.label ?: default)
+        dialog.etRouteLabel.setSelection(dialog.etRouteLabel.length())
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.rename_route_title)
+            .setView(dialog.root)
+            .setNegativeButton(R.string.btn_cancel, null)
+            .setPositiveButton(R.string.btn_confirm) { _, _ ->
+                val text = dialog.etRouteLabel.text.toString()
+                if (route == null) vm.favorite(text.ifBlank { default }) else vm.rename(route, text)
+            }
+            .show()
     }
 
     /** 選項或選取改變時才重設，避免觸發選取監聽造成迴圈 */

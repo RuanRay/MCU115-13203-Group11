@@ -29,17 +29,29 @@ class HighwayRepository(
     @Volatile var lastQuery: HighwayQuery? = null
         private set
 
-    /** E-9：交流道清單（Worker 快取 7 天，App 在記憶體保留到程序結束） */
+    /**
+     * E-9：交流道清單（Worker 快取 7 天，App 在記憶體保留到程序結束）。
+     * 另存一份在 highway_cache（route_key「meta」，實作者確認不新增資料表），App 重開後離線仍可顯示上次的路線。
+     */
     suspend fun freeways(): Result<List<Freeway>> = guarded("Freeway meta failed") {
         meta?.let { return@guarded Result.Success(it) }
         when (val res = gate.call { api.freewayMeta() }) {
-            is Result.Failure -> res
+            is Result.Failure -> readMetaCache()?.let { Result.Success(it.also { list -> meta = list }) } ?: res
             is Result.Success -> toFreeways(res.data.data)?.let { list ->
                 meta = list
+                runCatching { cacheDao.put(META_KEY, gson.toJson(MetaCache(list)), now()) }
                 Result.Success(list)
             } ?: Result.Failure(AppError.ParseError)
         }
     }
+
+    private suspend fun readMetaCache(): List<Freeway>? = runCatching {
+        cacheDao.get(META_KEY)?.let { gson.fromJson(it.payloadJson, MetaCache::class.java)?.freeways }
+            ?.takeIf { it.isNotEmpty() && it.all { f -> f.directions.isNotEmpty() } }
+    }.getOrNull()
+
+    /** Gson 無法直接還原 List 的泛型，包一層 */
+    private data class MetaCache(val freeways: List<Freeway>)
 
     /**
      * FR-HWY-02～05：同時取路況與比較；成功時寫入 highway_cache。
@@ -87,6 +99,9 @@ class HighwayRepository(
 
     companion object {
         private const val TAG = "HighwayRepository"
+
+        /** 路線的 route_key 含「|」，不會與此衝突 */
+        private const val META_KEY = "meta"
 
         /** Gson 不保證非 null：缺欄位的國道、方向、交流道略過；整份不可用時回 null */
         fun toFreeways(d: FreewayMetaData?): List<Freeway>? = d?.freeways?.mapNotNull { f ->

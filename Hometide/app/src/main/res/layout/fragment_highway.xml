@@ -77,6 +77,7 @@
                 android:id="@+id/chipGroupDriveRoutes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                app:selectionRequired="true"
                 app:singleLine="true"
                 app:singleSelection="true" />
         </HorizontalScrollView>
@@ -347,6 +348,16 @@
                         android:textColor="@color/hwy_extra_on_main" />
                 </LinearLayout>
             </com.group11.hometide.ui.widget.TicketView>
+
+            <!-- 收藏這條路線（實作者確認：大車票下方外框按鈕；已收藏的路線不顯示；訪客按了跳登入提示） -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnFavoriteDrive"
+                style="@style/Widget.Hometide.Button.Outlined"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/hwy_btn_favorite"
+                android:visibility="gone" />
 
             <!-- 5–6. 回家方式比較（FR-HWY-04） -->
             <LinearLayout

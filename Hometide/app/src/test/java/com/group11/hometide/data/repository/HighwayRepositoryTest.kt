@@ -163,6 +163,24 @@ class HighwayRepositoryTest {
         assertEquals(Result.Success("x"), gate.call { "x" })
     }
 
+    /** App 重開後離線：交流道清單讀 highway_cache 的「meta」 */
+    @Test
+    fun freeways_offlineAfterRestart_readsCachedMeta() = runBlocking {
+        repo().freeways() // 寫入快取
+        val fresh = HighwayRepository(object : HometideApi by api {
+            override suspend fun freewayMeta(): ApiEnvelope<FreewayMetaData> = throw IOException("offline")
+        }, cache, gson, QuotaGate(gson) { now }) { now }
+        assertEquals(listOf("000010"), (fresh.freeways() as Result.Success).data.map { it.id })
+    }
+
+    @Test
+    fun freeways_offlineWithoutCache_fails() = runBlocking {
+        val fresh = HighwayRepository(object : HometideApi by api {
+            override suspend fun freewayMeta(): ApiEnvelope<FreewayMetaData> = throw IOException("offline")
+        }, cache, gson, QuotaGate(gson) { now }) { now }
+        assertEquals(Result.Failure(AppError.NetworkError), fresh.freeways())
+    }
+
     @Test
     fun load_remembersLastQuery() = runBlocking {
         val r = repo()

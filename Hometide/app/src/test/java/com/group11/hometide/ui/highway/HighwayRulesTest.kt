@@ -67,6 +67,16 @@ class HighwayRulesTest {
         assertEquals(false, partialNoLive(traffic(160, 160, RoadLevel.UNKNOWN, RoadLevel.UNKNOWN)))
     }
 
+    /** 晶片國道簡稱（6-2b 實作者確認）：國1、國2甲、國1高架 */
+    @Test
+    fun shortCode_forChips() {
+        assertEquals("1", HighwayViewModel.shortCode("國道 1 號"))
+        assertEquals("10", HighwayViewModel.shortCode("國道 10 號"))
+        assertEquals("2甲", HighwayViewModel.shortCode("國道 2 甲"))
+        assertEquals("1高架", HighwayViewModel.shortCode("國道 1 號汐止五股高架道路"))
+        assertEquals("臺 76 線", HighwayViewModel.shortCode("臺 76 線"))
+    }
+
     @Test
     fun extraMin_onlyWhenSlowerAndHasLiveData() {
         assertEquals(25, extraMin(traffic(185, 160, RoadLevel.JAM)))
