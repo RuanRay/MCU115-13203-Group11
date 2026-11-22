@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 路況圖例色塊（膠囊）；顏色由程式以 backgroundTint 設定 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <corners android:radius="4dp" />
+    <solid android:color="@color/color_outline" />
+    <size android:width="26dp" android:height="10dp" />
+</shape>

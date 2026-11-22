@@ -7,6 +7,8 @@ import com.google.gson.Gson
 import com.group11.hometide.data.local.AppDatabase
 import com.group11.hometide.data.local.SettingsStore
 import com.group11.hometide.data.remote.HometideApi
+import com.group11.hometide.data.remote.QuotaGate
+import com.group11.hometide.data.repository.HighwayRepository
 import com.group11.hometide.data.repository.AuthRepository
 import com.group11.hometide.data.repository.FavoriteRepository
 import com.group11.hometide.data.repository.ReminderRepository
@@ -31,7 +33,13 @@ class AppContainer(private val context: Context) {
     val authRepository: AuthRepository by lazy {
         AuthRepository(FirebaseAuth.getInstance(), FirebaseFirestore.getInstance(), database.userProfileDao(), settingsStore, reminderRepository)
     }
-    val transitRepository: TransitRepository by lazy { TransitRepository(api, database.stationDao(), database.searchHistoryDao(), database.timetableDao(), database.fareDao(), gson) }
+    /** 11.2：所有 Worker 呼叫共用的 QUOTA 冷卻 */
+    private val quotaGate = QuotaGate(gson)
+
+    val transitRepository: TransitRepository by lazy {
+        TransitRepository(api, database.stationDao(), database.searchHistoryDao(), database.timetableDao(), database.fareDao(), gson, quotaGate)
+    }
+    val highwayRepository: HighwayRepository by lazy { HighwayRepository(api, database.highwayCacheDao(), gson, quotaGate) }
     val favoriteRepository: FavoriteRepository by lazy { FavoriteRepository(database.favoriteDao(), transitRepository, settingsStore) }
     val reminderRepository: ReminderRepository by lazy { ReminderRepository(database.reminderDao(), ReminderScheduler(context)) }
     val favoriteCards: FavoriteCards by lazy { FavoriteCards(authRepository, favoriteRepository, transitRepository) }

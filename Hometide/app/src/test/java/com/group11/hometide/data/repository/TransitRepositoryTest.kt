@@ -84,6 +84,9 @@ class TransitRepositoryTest {
         }
         var liveResponse: () -> ApiEnvelope<LiveData> = { ApiEnvelope(1L, "TDX", LiveData(emptyList())) }
         override suspend fun live(operator: String, from: String, to: String): ApiEnvelope<LiveData> = liveResponse()
+        override suspend fun freewayMeta() = TODO()
+        override suspend fun freewayTraffic(freeway: String, dir: String, from: String, to: String) = TODO()
+        override suspend fun compare(freeway: String, dir: String, from: String, to: String) = TODO()
     }
 
     private class FakeFareDao : FareDao {

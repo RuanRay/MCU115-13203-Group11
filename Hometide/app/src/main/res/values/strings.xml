@@ -270,4 +270,41 @@
     <string name="btn_member_login">登入／註冊</string>
     <string name="btn_logout">登出</string>
     <string name="logout_confirm">確定要登出嗎？已設定的提醒會被取消</string>
+
+    <!-- 國道分頁（規格 4.11；highway.png、highway_guest.png） -->
+    <string name="hwy_header">開車回家・國道路況</string>
+    <string name="hwy_title_form">看看國道塞不塞</string>
+    <string name="hwy_title_delay">比平常多 %1$d 分鐘</string>
+    <string name="hwy_title_smooth">路況順暢</string>
+    <string name="hwy_title_no_live">暫無即時路況</string>
+    <string name="hwy_form_label">空白車票・選擇國道路線</string>
+    <string name="hwy_label_freeway">國道</string>
+    <string name="hwy_label_direction">方向</string>
+    <string name="hwy_label_entry">上路交流道</string>
+    <string name="hwy_label_exit">下路交流道</string>
+    <string name="btn_show_traffic">查看\n路況</string>
+    <string name="hwy_login_hint_title">登入後可以收藏開車路線</string>
+    <string name="hwy_login_hint_body">收藏後，打開這頁就直接看到回家的路況與比較。</string>
+    <string name="hwy_main_meta">%1$s・%2$s</string>
+    <string name="hwy_normal">平常約 %1$s・壅塞 %2$d 段</string>
+    <string name="hwy_hours_minutes">%1$d 時 %2$d 分</string>
+    <string name="hwy_minutes">%1$d 分</string>
+    <string name="hwy_updated">%1$s 更新</string>
+    <string name="hwy_updated_partial">%1$s 更新・部分路段無資料</string>
+    <string name="hwy_estimate_label">預估</string>
+    <string name="hwy_duration_hm">%1$d:%2$02d</string>
+    <string name="hwy_extra">+%1$d 分</string>
+    <string name="hwy_fastest">最快</string>
+    <string name="hwy_compare_title">回家方式比較・%1$s → %2$s</string>
+    <string name="hwy_compare_wait">含等車</string>
+    <string name="hwy_compare_thsr">🚄 %1$s</string>
+    <string name="hwy_compare_tra">🚆 %1$s</string>
+    <string name="hwy_compare_bus">🚌 %1$s</string>
+    <string name="hwy_compare_times">%1$s 發車 → %2$s</string>
+    <string name="hwy_road_title">沿路路況</string>
+    <string name="hwy_legend_smooth">順暢</string>
+    <string name="hwy_legend_busy">車多</string>
+    <string name="hwy_legend_jam">壅塞</string>
+    <string name="hwy_speed">%1$d km/h</string>
+    <string name="hwy_closed">封閉</string>
 </resources>

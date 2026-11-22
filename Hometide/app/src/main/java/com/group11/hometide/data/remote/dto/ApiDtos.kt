@@ -68,3 +68,55 @@ data class StationDto(
     val city: String?,
     val sortKey: Int?,
 )
+
+/** E-9 /api/freeway/meta */
+data class FreewayMetaData(val freeways: List<FreewayDto>?)
+
+data class FreewayDto(val id: String?, val name: String?, val directions: List<FreewayDirectionDto>?)
+
+data class FreewayDirectionDto(val dir: String?, val name: String?, val interchanges: List<InterchangeDto>?)
+
+data class InterchangeDto(val name: String?, val km: Double?)
+
+/** E-4 /api/freeway/traffic */
+data class TrafficData(
+    val freewayName: String?,
+    val directionName: String?,
+    val from: String?,
+    val to: String?,
+    val estimatedMin: Int?,
+    val normalMin: Int?,
+    val congestedCount: Int?,
+    val segments: List<SegmentDto>?,
+)
+
+data class SegmentDto(
+    val fromIc: String?,
+    val toIc: String?,
+    val speedKmh: Int?,
+    val level: String?,
+    val travelMin: Int?,
+    val closed: Boolean?,
+)
+
+/** E-5 /api/compare */
+data class CompareData(
+    val fromCity: String?,
+    val toCity: String?,
+    val drive: DriveDto?,
+    val options: List<CompareOptionDto>?,
+    val fastest: String?,
+)
+
+data class DriveDto(val totalMin: Int?)
+
+data class CompareOptionDto(
+    val operator: String?,
+    val label: String?,
+    val departTime: String?,
+    val arriveTime: String?,
+    val waitMin: Int?,
+    val transferMin: Int?,
+    val totalMin: Int?,
+    val note: String?,
+)

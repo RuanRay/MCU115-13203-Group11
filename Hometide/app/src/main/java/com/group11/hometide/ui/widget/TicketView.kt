@@ -57,11 +57,15 @@ class TicketView @JvmOverloads constructor(
     private val shape = Path()
     private val notches = Path()
 
+    /** 只有一個子 View 時的缺口位置（距右緣）；0 表示不挖 */
+    private var notchFromEnd = 0f
+
     init {
         orientation = HORIZONTAL
         setWillNotDraw(false)
         context.withStyledAttributes(attrs, R.styleable.TicketView) {
             ticketStyle = Style.entries[getInt(R.styleable.TicketView_ticketStyle, Style.PAPER.ordinal)]
+            notchFromEnd = getDimension(R.styleable.TicketView_notchFromEnd, 0f)
         }
     }
 
@@ -74,13 +78,14 @@ class TicketView @JvmOverloads constructor(
         val w = width.toFloat()
         val h = height.toFloat()
         val x = tearX
+        val notchX = x ?: (w - notchFromEnd).takeIf { notchFromEnd > 0f }
 
         shape.reset()
         shape.addRoundRect(0f, 0f, w, h, corner, corner, Path.Direction.CW)
-        if (x != null) {
+        if (notchX != null) {
             notches.reset()
-            notches.addCircle(x, 0f, notchRadius, Path.Direction.CW)
-            notches.addCircle(x, h, notchRadius, Path.Direction.CW)
+            notches.addCircle(notchX, 0f, notchRadius, Path.Direction.CW)
+            notches.addCircle(notchX, h, notchRadius, Path.Direction.CW)
             shape.op(notches, Path.Op.DIFFERENCE)
         }
 

@@ -21,4 +21,6 @@
     <color name="countdown_urgent">@color/color_stamp</color>
     <!-- P5 通知權限橫幅底色（取自 reminders.png，外框為 color_accent） -->
     <color name="permission_banner_bg">#FFF4D8</color>
+    <!-- 國道大車票存根「+N 分」（highway.png 取色：主票藏青底上的淡紅） -->
+    <color name="hwy_extra_on_main">#F3B9AE</color>
 </resources>

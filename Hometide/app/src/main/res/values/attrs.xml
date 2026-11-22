@@ -7,6 +7,8 @@
             <enum name="paper" value="1" />
             <enum name="blank" value="2" />
         </attr>
+        <!-- 只有一個子 View 時，在距右緣此距離挖上下缺口（不畫撕線；國道路線圖的空白票外框，highway.png） -->
+        <attr name="notchFromEnd" format="dimension" />
     </declare-styleable>
 
     <!-- 印章元件（規格 4.1） -->

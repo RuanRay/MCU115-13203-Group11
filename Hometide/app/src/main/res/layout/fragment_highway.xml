@@ -1,5 +1,487 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 第 1 週空版面：頁面內容依規格第 4 章於後續任務實作 -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- 國道（規格 4.11；highway.png、highway_dark.png、highway_guest.png）。
+     6-2a：空白車票表單＋結果（實作者確認：表單在上、結果接在下面）；開車路線晶片與收藏於 6-2b -->
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/scrollHwy"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:paddingBottom="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/page_horizontal_margin"
+        android:paddingTop="16dp">
+
+        <!-- 1–2. 「開車回家・國道路況」＋標題、日期章 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/hwy_header"
+                    android:textAppearance="@style/TextAppearance.Hometide.Body"
+                    android:textColor="@color/color_on_surface_muted" />
+
+                <TextView
+                    android:id="@+id/tvHwyTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textAppearance="@style/TextAppearance.Hometide.Display"
+                    android:textColor="@color/color_on_background" />
+            </LinearLayout>
+
+            <com.group11.hometide.ui.widget.DateStampView
+                android:id="@+id/vDateStamp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <!-- 離線橫幅（FR-HWY-05） -->
+        <TextView
+            android:id="@+id/tvOfflineBanner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_offline_banner"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            android:textAppearance="@style/TextAppearance.Hometide.Body"
+            android:textColor="@color/offline_banner_text"
+            android:visibility="gone" />
+
+        <!-- 3. 開車路線晶片（FR-HWY-01，6-2b） -->
+        <HorizontalScrollView
+            android:id="@+id/scrollDriveRoutes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:scrollbars="none"
+            android:visibility="gone">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupDriveRoutes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:singleLine="true"
+                app:singleSelection="true" />
+        </HorizontalScrollView>
+
+        <!-- 空白車票・選擇國道路線（FR-HWY-06） -->
+        <com.group11.hometide.ui.widget.TicketView
+            android:id="@+id/tkHwyForm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:ticketStyle="blank">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:letterSpacing="0.15"
+                    android:text="@string/hwy_form_label"
+                    android:textAppearance="@style/TextAppearance.Hometide.Caption.Large"
+                    android:textColor="@color/color_on_surface_muted" />
+
+                <LinearLayout
+                    style="@style/Widget.Hometide.HwyField"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp">
+
+                    <TextView
+                        style="@style/Widget.Hometide.HwyFieldLabel"
+                        android:text="@string/hwy_label_freeway" />
+
+                    <Spinner
+                        android:id="@+id/spFreeway"
+                        style="@style/Widget.Hometide.HwySpinner" />
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/Widget.Hometide.HwyField"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp">
+
+                    <TextView
+                        style="@style/Widget.Hometide.HwyFieldLabel"
+                        android:text="@string/hwy_label_direction" />
+
+                    <Spinner
+                        android:id="@+id/spDirection"
+                        style="@style/Widget.Hometide.HwySpinner" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        style="@style/Widget.Hometide.HwyField"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1">
+
+                        <TextView
+                            style="@style/Widget.Hometide.HwyFieldLabel"
+                            android:text="@string/hwy_label_entry" />
+
+                        <Spinner
+                            android:id="@+id/spEntryIc"
+                            style="@style/Widget.Hometide.HwySpinner" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        style="@style/Widget.Hometide.HwyField"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1">
+
+                        <TextView
+                            style="@style/Widget.Hometide.HwyFieldLabel"
+                            android:text="@string/hwy_label_exit" />
+
+                        <Spinner
+                            android:id="@+id/spExitIc"
+                            style="@style/Widget.Hometide.HwySpinner" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 存根「查看路況」為送出按鈕（同首頁空白車票） -->
+            <TextView
+                android:id="@+id/btnShowTraffic"
+                android:layout_width="@dimen/ticket_stub_max"
+                android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:lineSpacingExtra="6dp"
+                android:text="@string/btn_show_traffic"
+                android:textAppearance="@style/TextAppearance.Hometide.Button"
+                android:textColor="@color/color_on_primary" />
+        </com.group11.hometide.ui.widget.TicketView>
+
+        <!-- 錯誤（交流道清單取不到、查詢失敗且沒有快取） -->
+        <LinearLayout
+            android:id="@+id/layoutHwyError"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tvHwyError"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.Hometide.Body"
+                android:textColor="@color/color_on_surface_muted" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnHwyRetry"
+                style="@style/Widget.Hometide.Button.Outlined"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/btn_retry" />
+        </LinearLayout>
+
+        <!-- 載入中：骨架車票（AN-11 閃光於 7-3） -->
+        <LinearLayout
+            android:id="@+id/layoutHwySkeleton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <include
+                layout="@layout/item_ticket_skeleton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="0dp" />
+
+            <include
+                layout="@layout/item_ticket_skeleton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="0dp" />
+        </LinearLayout>
+
+        <!-- 查看路況的結果 -->
+        <LinearLayout
+            android:id="@+id/layoutHwyResult"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- 4. 預估行車時間大車票（FR-HWY-02） -->
+            <com.group11.hometide.ui.widget.TicketView
+                android:id="@+id/tkHwyMain"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:ticketStyle="main">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tvMainFreeway"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:alpha="0.8"
+                            android:letterSpacing="0.05"
+                            android:textAppearance="@style/TextAppearance.Hometide.Body"
+                            android:textColor="@color/color_on_primary" />
+
+                        <!-- 開車最快時（實作者確認） -->
+                        <TextView
+                            android:id="@+id/tvMainFastest"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.7"
+                            android:letterSpacing="0.1"
+                            android:text="@string/hwy_fastest"
+                            android:textAppearance="@style/TextAppearance.Hometide.Body"
+                            android:textColor="@color/color_on_primary"
+                            android:visibility="gone" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvMainRoute"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:textAppearance="@style/TextAppearance.Hometide.Display"
+                        android:textColor="@color/color_on_primary" />
+
+                    <TextView
+                        android:id="@+id/tvMainNormal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:alpha="0.85"
+                        android:textAppearance="@style/TextAppearance.Hometide.Body"
+                        android:textColor="@color/color_on_primary" />
+
+                    <TextView
+                        android:id="@+id/tvMainUpdated"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:alpha="0.7"
+                        android:textAppearance="@style/TextAppearance.Hometide.Caption.Large"
+                        android:textColor="@color/color_on_primary" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="@dimen/hwy_main_stub_width"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/hwy_estimate_label"
+                        android:textAppearance="@style/TextAppearance.Hometide.TicketRoute.Small"
+                        android:textColor="@color/color_on_primary" />
+
+                    <!-- 特大字（同下一班倒數，存根較寬以容納「3:05」） -->
+                    <TextView
+                        android:id="@+id/tvMainEstimate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:textAppearance="@style/TextAppearance.Hometide.Countdown"
+                        android:textColor="@color/color_on_primary" />
+
+                    <TextView
+                        android:id="@+id/tvMainExtra"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.Hometide.Label"
+                        android:textColor="@color/hwy_extra_on_main" />
+                </LinearLayout>
+            </com.group11.hometide.ui.widget.TicketView>
+
+            <!-- 5–6. 回家方式比較（FR-HWY-04） -->
+            <LinearLayout
+                android:id="@+id/layoutCompare"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvCompareTitle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textAppearance="@style/TextAppearance.Hometide.Label"
+                        android:textColor="@color/color_on_surface_muted" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/hwy_compare_wait"
+                        android:textAppearance="@style/TextAppearance.Hometide.Body"
+                        android:textColor="@color/color_on_surface_muted" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvCompare"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:nestedScrollingEnabled="false"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            </LinearLayout>
+
+            <!-- 7. 沿路路況＋圖例（FR-HWY-03） -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvRoadTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/hwy_road_title"
+                    android:textAppearance="@style/TextAppearance.Hometide.Label"
+                    android:textColor="@color/color_on_surface_muted" />
+
+                <LinearLayout
+                    android:id="@+id/layoutLegend"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/Widget.Hometide.HwyLegend"
+                        android:text="@string/hwy_legend_smooth"
+                        android:textColor="@color/color_success"
+                        app:drawableStartCompat="@drawable/bg_hwy_legend"
+                        app:drawableTint="@color/color_success" />
+
+                    <TextView
+                        style="@style/Widget.Hometide.HwyLegend"
+                        android:text="@string/hwy_legend_busy"
+                        android:textColor="@color/color_accent"
+                        app:drawableStartCompat="@drawable/bg_hwy_legend"
+                        app:drawableTint="@color/color_accent" />
+
+                    <TextView
+                        style="@style/Widget.Hometide.HwyLegend"
+                        android:text="@string/hwy_legend_jam"
+                        android:textColor="@color/color_stamp"
+                        app:drawableStartCompat="@drawable/bg_hwy_legend"
+                        app:drawableTint="@color/color_stamp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 8. 路線圖：外框為空白票（右側缺口與存根位置對齊） -->
+            <com.group11.hometide.ui.widget.TicketView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:notchFromEnd="@dimen/ticket_stub_max"
+                app:ticketStyle="blank">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvRoadStrip"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="16dp"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            </com.group11.hometide.ui.widget.TicketView>
+        </LinearLayout>
+
+        <!-- 訪客提示卡（FR-HWY-06；會員不顯示） -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardLoginHint"
+            style="@style/Widget.Hometide.HintCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/hwy_login_hint_title"
+                    android:textAppearance="@style/TextAppearance.Hometide.Label"
+                    android:textColor="@color/color_primary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="@string/hwy_login_hint_body"
+                    android:textAppearance="@style/TextAppearance.Hometide.Body"
+                    android:textColor="@color/color_on_surface_muted" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

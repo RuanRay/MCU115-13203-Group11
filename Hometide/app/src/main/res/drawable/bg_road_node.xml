@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 路線圖交流道節點（highway.png）：主色圓圈、內部為頁面底色 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="@color/color_surface" />
+    <stroke android:width="3dp" android:color="@color/color_primary" />
+    <size android:width="20dp" android:height="20dp" />
+</shape>

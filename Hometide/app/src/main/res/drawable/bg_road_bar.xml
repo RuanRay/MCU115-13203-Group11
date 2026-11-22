@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 路線圖路段色條；顏色由程式以 backgroundTint 依壅塞等級設定 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <corners android:radius="6dp" />
+    <solid android:color="@color/color_outline" />
+</shape>

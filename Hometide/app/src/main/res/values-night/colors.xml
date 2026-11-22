@@ -21,4 +21,7 @@
     <color name="countdown_urgent">#9B1C12</color>
     <!-- P5 通知權限橫幅：深色畫面圖未提供，暫用 surface 底＋芥末黃外框（待實作者確認） -->
     <color name="permission_banner_bg">@color/color_surface</color>
+    <!-- 國道大車票存根「+N 分」：highway_dark.png 取色 #8E2318 對比僅 3.99:1，
+         實作者確認加深到 #7A1D14（芥末黃底上 4.76:1，符合 NFR-07） -->
+    <color name="hwy_extra_on_main">#7A1D14</color>
 </resources>

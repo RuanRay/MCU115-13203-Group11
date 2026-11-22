@@ -63,4 +63,9 @@
     <dimen name="min_touch_target">48dp</dimen>
     <!-- 下一班：內容底部留給浮動一句話列的空間 -->
     <dimen name="floating_ai_space">88dp</dimen>
+    <!-- 國道路線圖（highway.png）：左側軌道寬、路段高度 -->
+    <dimen name="road_rail_width">24dp</dimen>
+    <dimen name="road_segment_height">52dp</dimen>
+    <!-- 國道大車票存根較寬（highway.png 量測約占票寬三分之一），容納特大字「3:05」 -->
+    <dimen name="hwy_main_stub_width">124dp</dimen>
 </resources>

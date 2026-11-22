@@ -17,7 +17,7 @@ import com.group11.hometide.data.local.entity.SearchHistory
 import com.group11.hometide.data.local.entity.SearchSource
 import com.group11.hometide.data.local.entity.Station
 import com.group11.hometide.data.remote.HometideApi
-import com.group11.hometide.data.remote.apiCall
+import com.group11.hometide.data.remote.QuotaGate
 import com.group11.hometide.data.remote.dto.StationDto
 import com.group11.hometide.util.AppError
 import com.group11.hometide.util.Passengers
@@ -34,8 +34,12 @@ class TransitRepository(
     private val timetableDao: TimetableDao,
     private val fareDao: FareDao,
     private val gson: Gson,
+    quotaGate: QuotaGate? = null,
     private val now: () -> Long = System::currentTimeMillis,
 ) {
+
+    /** 11.2：與 HighwayRepository 共用（AppContainer）；測試未指定時各自一份 */
+    private val gate = quotaGate ?: QuotaGate(gson, now)
 
     /** 本機沒有資料或超過 7 天（與 Worker 快取相同，8.5）才下載；成功回傳寫入筆數，未過期回傳 0。 */
     suspend fun refreshStations(operator: Operator, force: Boolean = false): Result<Int> =
@@ -60,16 +64,8 @@ class TransitRepository(
     suspend fun stationName(operator: Operator, stationId: String): String =
         runCatching { stationDao.nameOf(operator, stationId) }.getOrNull() ?: stationId
 
-    /** 收到 QUOTA 後的冷卻期（11.2：60 秒內只讀快取）；時刻表、票價、即時、站名共用 */
-    @Volatile private var quotaUntil = 0L
-
-    /** 所有 Worker 呼叫都經過這裡：冷卻中直接回 QuotaExceeded 不打網路，收到 QuotaExceeded 就開始冷卻 */
-    private suspend fun <T> workerCall(block: suspend () -> T): Result<T> {
-        if (now() < quotaUntil) return Result.Failure(AppError.QuotaExceeded)
-        return apiCall(gson, block).also {
-            if (it is Result.Failure && it.error == AppError.QuotaExceeded) quotaUntil = now() + QUOTA_COOLDOWN_MS
-        }
-    }
+    /** 所有 Worker 呼叫都經過 [QuotaGate]（11.2：QUOTA 後 60 秒內只讀快取） */
+    private suspend fun <T> workerCall(block: suspend () -> T): Result<T> = gate.call(block)
 
     /**
      * FR-RES-01、FR-OFF-01：時刻表。
@@ -208,7 +204,6 @@ class TransitRepository(
         const val TIMETABLE_FRESH_MS = 2L * 60 * 60 * 1000
         const val FARE_FRESH_MS = 7L * 24 * 60 * 60 * 1000
         const val CACHE_KEEP_MS = 3L * 24 * 60 * 60 * 1000
-        const val QUOTA_COOLDOWN_MS = 60_000L
     }
 }
 

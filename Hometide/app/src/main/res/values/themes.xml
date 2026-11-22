@@ -202,4 +202,47 @@
     <style name="TextAppearance.Hometide.Label" parent="TextAppearance.Hometide.Button">
         <item name="android:letterSpacing">0</item>
     </style>
+    <!-- 國道表單欄位（highway_guest.png）：框線方塊內「小標籤＋下拉」 -->
+    <style name="Widget.Hometide.HwyField" parent="">
+        <item name="android:orientation">vertical</item>
+        <item name="android:background">@drawable/bg_hwy_field</item>
+        <item name="android:paddingStart">10dp</item>
+        <item name="android:paddingEnd">4dp</item>
+        <item name="android:paddingTop">6dp</item>
+        <item name="android:paddingBottom">2dp</item>
+    </style>
+
+    <style name="Widget.Hometide.HwyFieldLabel" parent="">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textAppearance">@style/TextAppearance.Hometide.Caption.Large</item>
+        <item name="android:textColor">@color/color_on_surface_muted</item>
+    </style>
+
+    <style name="Widget.Hometide.HwySpinner" parent="">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">@dimen/min_touch_target</item>
+        <item name="android:background">@null</item>
+        <item name="android:popupBackground">@color/color_surface</item>
+    </style>
+
+    <!-- 路況圖例：色塊＋同色文字 -->
+    <style name="Widget.Hometide.HwyLegend" parent="">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:drawablePadding">4dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textAppearance">@style/TextAppearance.Hometide.Body</item>
+    </style>
+
+    <!-- 國道訪客提示卡（highway_guest.png）：紙色底、主色框線 -->
+    <style name="Widget.Hometide.HintCard" parent="Widget.Material3.CardView.Outlined">
+        <item name="cardBackgroundColor">@color/color_surface</item>
+        <item name="strokeColor">@color/color_primary</item>
+        <item name="strokeWidth">@dimen/button_stroke_width</item>
+        <item name="cardCornerRadius">@dimen/corner_control_small</item>
+        <item name="cardElevation">0dp</item>
+    </style>
 </resources>

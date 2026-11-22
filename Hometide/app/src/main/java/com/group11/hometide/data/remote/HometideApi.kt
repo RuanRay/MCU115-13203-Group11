@@ -3,6 +3,9 @@ package com.group11.hometide.data.remote
 import com.google.gson.Gson
 import com.group11.hometide.BuildConfig
 import com.group11.hometide.data.remote.dto.ApiEnvelope
+import com.group11.hometide.data.remote.dto.CompareData
+import com.group11.hometide.data.remote.dto.FreewayMetaData
+import com.group11.hometide.data.remote.dto.TrafficData
 import com.group11.hometide.data.remote.dto.FareData
 import com.group11.hometide.data.remote.dto.LiveData
 import com.group11.hometide.data.remote.dto.StationsData
@@ -46,6 +49,28 @@ interface HometideApi {
         @Query("from") from: String,
         @Query("to") to: String,
     ): ApiEnvelope<LiveData>
+
+    /** E-9：國道、方向、交流道清單 */
+    @GET("api/freeway/meta")
+    suspend fun freewayMeta(): ApiEnvelope<FreewayMetaData>
+
+    /** E-4；freeway 為 TDX RoadID，from／to 為交流道名稱 */
+    @GET("api/freeway/traffic")
+    suspend fun freewayTraffic(
+        @Query("freeway") freeway: String,
+        @Query("dir") dir: String,
+        @Query("from") from: String,
+        @Query("to") to: String,
+    ): ApiEnvelope<TrafficData>
+
+    /** E-5；參數同 E-4 */
+    @GET("api/compare")
+    suspend fun compare(
+        @Query("freeway") freeway: String,
+        @Query("dir") dir: String,
+        @Query("from") from: String,
+        @Query("to") to: String,
+    ): ApiEnvelope<CompareData>
 
     companion object {
         private const val TIMEOUT_S = 15L
