@@ -1,5 +1,6 @@
 package com.group11.hometide.ui.main
 
+import androidx.lifecycle.Lifecycle
 import com.group11.hometide.data.repository.TripDraft
 import android.content.Context
 import android.content.Intent
@@ -68,6 +69,10 @@ class MainActivity : BaseActivity() {
         (supportFragmentManager.findFragmentByTag(TAGS[0]) as? SearchFragment)?.fillFromAi(draft)
     }
 
+    /** FR-USG-02（實作者確認）：五個分頁各記一頁，名稱用 Fragment 類別名稱 */
+    override val pageName: String?
+        get() = supportFragmentManager.fragments.firstOrNull { !it.isHidden && it.tag in TAGS }?.javaClass?.simpleName
+
     private fun switchTo(@IdRes tab: Int, animate: Boolean) {
         val fm = supportFragmentManager
         // 目前分頁以「沒被隱藏的分頁 Fragment」為準，不依賴 bottomNav 狀態（重建時它可能尚未還原）
@@ -89,6 +94,11 @@ class MainActivity : BaseActivity() {
             current?.let { hide(it) }
             val existing = fm.findFragmentByTag(TAGS[to])
             if (existing == null) add(R.id.fragmentContainer, newTab(tab), TAGS[to]) else show(existing)
+        }
+        // 換分頁＝換頁（畫面可見時才記；onCreate 期間由 onResume 記第一頁）
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+            usageTracker.leavePage()
+            pageName?.let(usageTracker::enterPage)
         }
     }
 

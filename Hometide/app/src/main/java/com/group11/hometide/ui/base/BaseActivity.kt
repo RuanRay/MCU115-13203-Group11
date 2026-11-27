@@ -13,11 +13,11 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.progressindicator.CircularProgressIndicatorSpec
 import com.google.android.material.progressindicator.IndeterminateDrawable
 import com.google.android.material.snackbar.Snackbar
+import com.group11.hometide.HometideApp
 import com.group11.hometide.R
 
 /**
- * 所有頁面的父類別（規格 4.1）。
- * TODO(第 7 週，FR-USG-02)：頁面停留紀錄
+ * 所有頁面的父類別（規格 4.1）。onResume／onPause 記錄頁面停留（FR-USG-02）。
  */
 abstract class BaseActivity : AppCompatActivity() {
 
@@ -47,6 +47,21 @@ abstract class BaseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+    }
+
+    protected val usageTracker get() = (application as HometideApp).container.usageTracker
+
+    /** FR-USG-02 的 page_name；MainActivity 改為目前分頁的 Fragment 名稱 */
+    protected open val pageName: String? get() = javaClass.simpleName
+
+    override fun onResume() {
+        super.onResume()
+        pageName?.let(usageTracker::enterPage)
+    }
+
+    override fun onPause() {
+        usageTracker.leavePage()
+        super.onPause()
     }
 
     /** 系統「移除動畫」開啟時為 false，所有自訂動畫都要先檢查（規格 4.1）。 */

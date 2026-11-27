@@ -11,6 +11,10 @@ import com.group11.hometide.data.remote.QuotaGate
 import com.group11.hometide.data.ai.GeminiClient
 import com.group11.hometide.util.Result
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import com.group11.hometide.usage.UsageTracker
+import com.group11.hometide.data.repository.UsageRepository
 import com.group11.hometide.data.repository.AiRepository
 import com.group11.hometide.data.repository.DriveRouteRepository
 import com.group11.hometide.data.repository.HighwayRepository
@@ -59,5 +63,10 @@ class AppContainer(private val context: Context) {
             gson = gson,
         )
     }
+    /** FR-USG-01～03：寫入失敗只記 log */
+    val usageTracker: UsageTracker by lazy {
+        UsageTracker(database.usageDao(), settingsStore::deviceId, { authRepository.currentUid }, CoroutineScope(SupervisorJob()))
+    }
+    val usageRepository: UsageRepository by lazy { UsageRepository(database.usageDao(), usageTracker) }
     val favoriteCards: FavoriteCards by lazy { FavoriteCards(authRepository, favoriteRepository, transitRepository) }
 }

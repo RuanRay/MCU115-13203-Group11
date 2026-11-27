@@ -70,4 +70,9 @@
     <dimen name="hwy_main_stub_width">124dp</dimen>
     <!-- AN-15 三點跳動的點直徑 -->
     <dimen name="parse_dot_size">6dp</dimen>
+    <!-- P6 開啟次數、總使用時間的數字（profile.png） -->
+    <dimen name="stat_number_size">30sp</dimen>
+    <dimen name="stat_empty_padding">16dp</dimen>
+    <!-- spRange 量不到 ▾ 的寬度（兩字選項），給最小寬度 -->
+    <dimen name="stat_range_min_width">88dp</dimen>
 </resources>

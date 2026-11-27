@@ -33,5 +33,20 @@ interface UsageDao {
     )
     suspend fun fixUnclosed(): Int
 
-    // TODO(第 7 週，FR-USG-04)：stats(uid, from, to)，回傳格式依個人統計規格決定
+    /** FR-USG-04：開啟次數（[uid] 為 null 時統計訪客的紀錄；IS 可比對 NULL） */
+    @Query("SELECT COUNT(*) FROM app_session WHERE start_at >= :from AND uid IS :uid")
+    suspend fun sessionCount(uid: String?, from: Long): Int
+
+    /** FR-USG-04：已結束 session 的總使用時間（使用中的這次由 UsageTracker 另外加上） */
+    @Query("SELECT COALESCE(SUM(duration_ms), 0) FROM app_session WHERE start_at >= :from AND uid IS :uid")
+    suspend fun totalDuration(uid: String?, from: Long): Long
+
+    /** FR-USG-04：各頁停留時間前 [limit] 名 */
+    @Query(
+        """SELECT page_name AS pageName, SUM(duration_ms) AS durationMs FROM page_visit
+           WHERE enter_at >= :from AND uid IS :uid GROUP BY page_name ORDER BY durationMs DESC LIMIT :limit""",
+    )
+    suspend fun topPages(uid: String?, from: Long, limit: Int): List<PageTotal>
 }
+
+data class PageTotal(val pageName: String, val durationMs: Long)

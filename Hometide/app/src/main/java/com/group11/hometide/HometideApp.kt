@@ -2,6 +2,7 @@ package com.group11.hometide
 
 import android.app.Application
 import android.util.Log
+import androidx.lifecycle.ProcessLifecycleOwner
 import com.group11.hometide.data.local.entity.Operator
 import com.group11.hometide.util.NotificationChannels
 import com.group11.hometide.util.Result
@@ -30,7 +31,7 @@ class HometideApp : Application() {
         refreshStations()
         appScope.launch { container.reminderRepository.purgeOld() } // FR-FAV-05：保留 7 天
         appScope.launch { container.transitRepository.purgeOldTimetables() } // FR-OFF-01：快取保留 3 天
-        // TODO(第 7 週，FR-USG)：以 ProcessLifecycleOwner 註冊 UsageTracker（規格 6.2）
+        ProcessLifecycleOwner.get().lifecycle.addObserver(container.usageTracker) // FR-USG-01
     }
 
     /** 啟動時在背景更新台鐵、高鐵車站與國道客運站牌（沒有資料或超過 7 天才下載）；失敗不提示，下次啟動再試 */

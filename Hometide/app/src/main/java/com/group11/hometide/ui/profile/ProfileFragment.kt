@@ -22,12 +22,25 @@ import com.group11.hometide.util.Passengers
 import com.group11.hometide.util.passengerText
 import com.group11.hometide.util.labelRes
 import kotlinx.coroutines.launch
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.RelativeSizeSpan
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.TextView
+import com.group11.hometide.data.repository.UsageStats
+import com.group11.hometide.databinding.ItemPageBarBinding
 
-/** P6 個人（規格 4.8）：目前只有會員證（含預設乘客 FR-SET-02）與登出 */
+/** P6 個人（規格 4.8）：會員證（含預設乘客 FR-SET-02）、我的乘車紀錄（FR-USG-04）、登出 */
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
     private val vm: ProfileViewModel by viewModels {
-        viewModelFactory { initializer { ProfileViewModel((requireActivity().application as HometideApp).container.authRepository) } }
+        viewModelFactory {
+            initializer {
+                val c = (requireActivity().application as HometideApp).container
+                ProfileViewModel(c.authRepository, c.usageRepository)
+            }
+        }
     }
 
     // 登入成功後 profile Flow 會自動更新，這裡不需額外處理
@@ -37,6 +50,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         val binding = FragmentProfileBinding.bind(view)
         binding.btnMemberLogin.setOnClickListener { showLoginPrompt() }
         binding.btnLogout.setOnClickListener { confirmLogout() }
+        bindStats(binding)
         // FR-SET-02：會員在會員證上、訪客在登入按鈕下方；開啟同一個選擇乘客面板（設為預設）
         listOf(binding.tvDefaultPassengers, binding.tvGuestPassengers).forEach { tv ->
             tv.asButtonForAccessibility()
@@ -72,8 +86,71 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        vm.refreshStats()
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) vm.refreshStats() // 分頁以 show／hide 切換
+    }
+
+    /** FR-USG-04 */
+    private fun bindStats(binding: FragmentProfileBinding) {
+        binding.spRange.adapter = ArrayAdapter(requireContext(), R.layout.item_operator_spinner, StatRange.entries.map { getString(it.label) })
+            .apply { setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+        binding.spRange.setSelection(vm.stats.value.range.ordinal, false)
+        binding.spRange.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) = vm.setRange(StatRange.entries[position])
+            override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                vm.stats.collect { renderStats(binding, it.stats) }
+            }
+        }
+    }
+
+    private fun renderStats(binding: FragmentProfileBinding, stats: UsageStats?) {
+        binding.tvOpenCount.text = (stats?.openCount ?: 0).toString()
+        // 「46分」：單位字縮小（profile.png）
+        val minutes = UsageRules.minutes(stats?.totalMs ?: 0).toString()
+        binding.tvTotalTime.text = SpannableString(minutes + getString(R.string.stat_minutes_unit)).apply {
+            setSpan(RelativeSizeSpan(UNIT_SCALE), minutes.length, length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        val box = binding.layoutPageBars
+        box.removeAllViews()
+        val pages = stats?.pages.orEmpty()
+        if (pages.isEmpty()) {
+            // 實作者確認：沒有紀錄時的提示
+            TextView(requireContext()).apply {
+                setText(R.string.stat_empty)
+                setTextAppearance(R.style.TextAppearance_Hometide_Body)
+                setTextColor(requireContext().getColor(R.color.color_on_surface_muted))
+                resources.getDimensionPixelSize(R.dimen.stat_empty_padding).let { setPadding(0, it, 0, it) }
+                box.addView(this)
+            }
+            return
+        }
+        val max = pages.first().durationMs
+        pages.forEach { p ->
+            val row = ItemPageBarBinding.inflate(layoutInflater, box, true)
+            val name = UsageRules.pageLabel(p.pageName)?.let(::getString) ?: p.pageName
+            // 未滿 60 秒顯示「不到 1 分」，其餘四捨五入
+            val time = if (p.durationMs < MS_PER_MIN) getString(R.string.stat_page_under_minute)
+            else getString(R.string.stat_page_minutes, UsageRules.minutes(p.durationMs).toInt())
+            row.tvPageName.text = name
+            row.tvPageTime.text = time
+            row.pbPage.progress = UsageRules.barPercent(p.durationMs, max)
+            row.root.contentDescription = getString(R.string.stat_page_desc, name, time)
+        }
+    }
+
     private companion object {
         const val REQUEST_PASSENGERS = "profile_passengers"
+        const val UNIT_SCALE = 0.55f
+        const val MS_PER_MIN = 60_000L
     }
 
     /** FR-AUTH-05：確認後登出並清除堆疊回 P1 */

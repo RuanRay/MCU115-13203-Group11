@@ -342,4 +342,22 @@
     <string name="period_noon">中午</string>
     <string name="period_dusk">傍晚</string>
     <string name="cd_close_time_range">取消時段篩選</string>
+
+    <!-- 7-1 個人統計（FR-USG-04） -->
+    <string name="stat_title">我的乘車紀錄</string>
+    <string name="stat_range_today">今天</string>
+    <string name="stat_range_week">本週</string>
+    <string name="stat_range_all">全部</string>
+    <string name="stat_open_count">開啟次數</string>
+    <string name="stat_total_time">總使用時間</string>
+    <string name="stat_minutes_unit">分</string>
+    <string name="stat_page_minutes">%1$d 分</string>
+    <string name="stat_page_under_minute">不到 1 分</string>
+    <string name="stat_empty">這段時間還沒有紀錄</string>
+    <string name="cd_stat_range">統計區間</string>
+    <string name="stat_page_desc">%1$s，%2$s</string>
+    <string name="page_result">結果</string>
+    <string name="page_feedback">回饋</string>
+    <string name="page_login">登入</string>
+    <string name="page_register">註冊</string>
 </resources>

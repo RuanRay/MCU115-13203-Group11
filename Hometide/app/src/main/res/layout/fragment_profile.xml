@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- P6 個人（規格 4.8、profile.png）。2-2 只做會員證與登出；乘車紀錄、外觀、意見回饋於第 7 週 -->
+<!-- P6 個人（規格 4.8、profile.png）。外觀（7-4）、意見回饋（7-2）尚未加入 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -124,7 +124,110 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- TODO(第 7 週)：spRange、tvOpenCount、tvTotalTime、layoutPageBars、spTheme、btnFeedback -->
+        <!-- 2. 我的乘車紀錄＋統計區間（FR-USG-04） -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:accessibilityHeading="true"
+                android:text="@string/stat_title"
+                android:textAppearance="@style/TextAppearance.Hometide.TicketRoute.Small"
+                android:textColor="@color/color_on_background" />
+
+            <Spinner
+                android:id="@+id/spRange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_select"
+                android:contentDescription="@string/cd_stat_range"
+                android:minHeight="@dimen/min_touch_target"
+                android:minWidth="@dimen/stat_range_min_width"
+                android:paddingHorizontal="8dp"
+                android:popupBackground="@color/color_surface" />
+        </LinearLayout>
+
+        <!-- 3. 開啟次數、總使用時間 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_stat_ticket"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingVertical="14dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stat_open_count"
+                    android:textAppearance="@style/TextAppearance.Hometide.Body"
+                    android:textColor="@color/color_on_surface_muted" />
+
+                <TextView
+                    android:id="@+id/tvOpenCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textAppearance="@style/TextAppearance.Hometide.Display"
+                    android:includeFontPadding="false"
+                    android:textSize="@dimen/stat_number_size"
+                    android:textColor="@color/color_on_background" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:background="@drawable/bg_stat_ticket"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingVertical="14dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stat_total_time"
+                    android:textAppearance="@style/TextAppearance.Hometide.Body"
+                    android:textColor="@color/color_on_surface_muted" />
+
+                <TextView
+                    android:id="@+id/tvTotalTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:textAppearance="@style/TextAppearance.Hometide.Display"
+                    android:includeFontPadding="false"
+                    android:textSize="@dimen/stat_number_size"
+                    android:textColor="@color/color_on_background" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 4. 各頁停留時間（前 5 名） -->
+        <LinearLayout
+            android:id="@+id/layoutPageBars"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_stat_panel"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="10dp" />
+
+        <!-- 5、6 外觀（7-4）、意見回饋（7-2） -->
 
         <!-- 7. 登出 -->
         <TextView
