@@ -24,6 +24,7 @@ class HometideApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        AppCheckInstaller.install() // 規格 9.1：在使用任何 Firebase 功能前
         container = AppContainer(this)
         NotificationChannels.createAll(this)
         refreshStations()
