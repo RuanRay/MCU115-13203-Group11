@@ -10,6 +10,7 @@ import com.group11.hometide.data.local.entity.SearchSource
 import com.group11.hometide.data.local.entity.Station
 import com.group11.hometide.data.repository.AuthRepository
 import com.group11.hometide.data.repository.TransitRepository
+import com.group11.hometide.data.repository.TripDraft
 import com.group11.hometide.ui.routes.FavoriteCard
 import com.group11.hometide.ui.routes.FavoriteCards
 import com.group11.hometide.ui.routes.FavoritesState
@@ -120,6 +121,11 @@ class SearchViewModel(
     /** FR-SRCH-08「設為我的預設」→ FR-SET-02 */
     fun setDefaultPassengers(p: Passengers) {
         viewModelScope.launch { runCatching { auth.setDefaultPassengers(p) } }
+    }
+
+    /** FR-AI-04「修改」：運具、日期、乘客帶入空白車票（站名由畫面填入） */
+    fun fillFromAi(draft: TripDraft) {
+        form.update { it.copy(operator = draft.operator, operatorChosen = true, travelDate = draft.date, passengers = draft.passengers) }
     }
 
     fun setDate(date: LocalDate) {

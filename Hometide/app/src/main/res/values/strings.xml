@@ -81,7 +81,6 @@
     <string name="ai_card_label">✎ 乘車申請單・用一句話查詢</string>
     <string name="ai_hint">明天下午從桃園回台南…</string>
     <string name="btn_parse">解析</string>
-    <string name="ai_coming_soon">一句話查詢即將推出</string>
     <string name="example_tonight_home">今晚回家</string>
     <string name="example_sunday_school">週日回學校</string>
     <string name="example_thsr_fastest">高鐵最快一班</string>
@@ -315,4 +314,32 @@
     <string name="hwy_default_route_label">開車回家</string>
     <string name="hwy_route_saved">已收藏開車路線</string>
     <string name="hwy_menu_rename">改名</string>
+
+    <!-- 6-4 一句話查詢（FR-AI-01～05、FR-NEXT-05、11.2） -->
+    <string name="ai_failed">無法解析這句話，請改用手動查詢</string>
+    <string name="ai_rate_limited">操作太頻繁，請稍後再試</string>
+    <string name="ai_unrelated">這句話好像不是查詢車班，請換個說法</string>
+    <string name="ai_parsing_desc">解析中</string>
+    <string name="ai_confirm_title">AI 幫你開好票了，對嗎？</string>
+    <string name="ai_original_quote">「%1$s」</string>
+    <string name="ai_ticket_meta">%1$s・%2$s</string>
+    <string name="ai_ticket_issuer">AI 開票</string>
+    <string name="ai_ticket_stations">%1$s → %2$s</string>
+    <string name="ai_ticket_unknown_station">？</string>
+    <string name="ai_ticket_date">%1$s（%2$s）</string>
+    <string name="ai_ticket_date_time">%1$s（%2$s）・%3$s</string>
+    <string name="ai_stamp_verified">站名\n已驗證</string>
+    <string name="ai_error_station_not_found">找不到車站：%1$s，請按修改自行選擇</string>
+    <string name="ai_error_no_station">看不出起訖站，請按修改自行選擇</string>
+    <string name="ai_error_date_reset">日期超出可查範圍，已改為今天</string>
+    <string name="ai_error_passengers_reset">乘客人數已改為預設</string>
+    <string name="ai_station_separator">、</string>
+    <string name="btn_ai_edit">修改</string>
+    <string name="btn_ai_confirm">查詢班次</string>
+    <string name="time_range">%1$s–%2$s</string>
+    <string name="time_from">%1$s 以後</string>
+    <string name="period_time_range">%1$s %2$s</string>
+    <string name="period_noon">中午</string>
+    <string name="period_dusk">傍晚</string>
+    <string name="cd_close_time_range">取消時段篩選</string>
 </resources>

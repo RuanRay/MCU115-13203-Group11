@@ -27,6 +27,7 @@ import com.group11.hometide.ui.base.NotificationPermission
 import com.group11.hometide.ui.search.PassengerSheet
 import com.group11.hometide.util.Passengers
 import com.group11.hometide.util.labelRes
+import com.group11.hometide.util.timeRangeText
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -47,7 +48,8 @@ class ResultActivity : BaseActivity() {
         viewModelFactory {
             initializer {
                 val c = (application as HometideApp).container
-                ResultViewModel(c.transitRepository, c.authRepository, c.favoriteRepository, c.reminderRepository, queryOf(intent), Passengers.fromJson(intent.getStringExtra(EXTRA_PASSENGERS)))
+                ResultViewModel(c.transitRepository, c.authRepository, c.favoriteRepository, c.reminderRepository, queryOf(intent), Passengers.fromJson(intent.getStringExtra(EXTRA_PASSENGERS)),
+                    timeFrom = intent.getStringExtra(EXTRA_TIME_FROM), timeTo = intent.getStringExtra(EXTRA_TIME_TO))
             }
         }
     }
@@ -79,6 +81,11 @@ class ResultActivity : BaseActivity() {
         // FR-RES-02：改乘客只重算票價，不重新查時刻表
         binding.chipPassengers.asButtonForAccessibility()
         binding.chipPassengers.setOnClickListener { PassengerSheet.show(this, REQUEST_PASSENGERS, vm.state.value.passengers) }
+        binding.chipTimeRange.apply {
+            isCloseIconVisible = true
+            closeIconContentDescription = getString(R.string.cd_close_time_range)
+            setOnCloseIconClickListener { vm.clearTimeRange() }
+        }
         supportFragmentManager.setFragmentResultListener(REQUEST_PASSENGERS, this) { _, r ->
             val p = Passengers.fromJson(r.getString(PassengerSheet.KEY_PASSENGERS))
             if (r.getBoolean(PassengerSheet.KEY_SET_DEFAULT)) vm.setDefaultPassengers(p)
@@ -108,6 +115,10 @@ class ResultActivity : BaseActivity() {
                         binding.btnFavorite.setImageResource(if (s.isFavorite) R.drawable.ic_heart else R.drawable.ic_heart_outline)
                         binding.btnFavorite.contentDescription = getString(if (s.isFavorite) R.string.cd_unfavorite else R.string.cd_favorite)
                         binding.chipPassengers.text = getString(R.string.passengers_chip, s.passengers.total)
+                        // FR-AI-04：時段晶片可關閉
+                        val range = timeRangeText(s.timeFrom, s.timeTo)
+                        binding.chipTimeRange.isVisible = range != null
+                        binding.chipTimeRange.text = range
                         binding.tvCount.text = if (s.hasList || s.phase == ResultViewModel.Phase.EMPTY) {
                             getString(R.string.result_count, s.items.size)
                         } else {
@@ -221,6 +232,8 @@ class ResultActivity : BaseActivity() {
         const val EXTRA_DATE = "date" // yyyy-MM-dd
         const val EXTRA_PASSENGERS = "passengers" // JSON（CR-01），沒有時為全票 1
         const val EXTRA_SCROLL_TRAIN = "scrollTrain" // FR-NEXT-04：開啟後捲到這個車次
+        const val EXTRA_TIME_FROM = "timeFrom" // FR-AI-04：時段篩選 HH:mm（可為 null）
+        const val EXTRA_TIME_TO = "timeTo"
         private const val REQUEST_PASSENGERS = "result_passengers"
 
         private const val TICK_MS = 60_000L
@@ -238,8 +251,12 @@ class ResultActivity : BaseActivity() {
             date: LocalDate,
             passengers: Passengers = Passengers.DEFAULT,
             scrollToTrain: String? = null,
+            timeFrom: String? = null,
+            timeTo: String? = null,
         ): Intent =
             Intent(context, ResultActivity::class.java)
+                .putExtra(EXTRA_TIME_FROM, timeFrom)
+                .putExtra(EXTRA_TIME_TO, timeTo)
                 .putExtra(EXTRA_SCROLL_TRAIN, scrollToTrain)
                 .putExtra(EXTRA_PASSENGERS, passengers.toJson())
                 .putExtra(EXTRA_OPERATOR, operator.name)

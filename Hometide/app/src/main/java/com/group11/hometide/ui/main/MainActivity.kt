@@ -1,5 +1,6 @@
 package com.group11.hometide.ui.main
 
+import com.group11.hometide.data.repository.TripDraft
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -59,6 +60,12 @@ class MainActivity : BaseActivity() {
     fun openManualSearch() {
         binding.bottomNav.selectedItemId = R.id.navSearch // 觸發監聽器切換分頁（commitNow 已完成）
         (supportFragmentManager.findFragmentByTag(TAGS[0]) as? SearchFragment)?.focusManualSearch()
+    }
+
+    /** FR-NEXT-05：「下一班」確認卡按「修改」→ 查詢分頁的空白車票 */
+    fun openSearchWithDraft(draft: TripDraft) {
+        binding.bottomNav.selectedItemId = R.id.navSearch
+        (supportFragmentManager.findFragmentByTag(TAGS[0]) as? SearchFragment)?.fillFromAi(draft)
     }
 
     private fun switchTo(@IdRes tab: Int, animate: Boolean) {

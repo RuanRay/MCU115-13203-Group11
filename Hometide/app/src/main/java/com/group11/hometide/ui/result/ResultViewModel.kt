@@ -19,6 +19,7 @@ import com.group11.hometide.util.AppError
 import com.group11.hometide.util.FareTotal
 import com.group11.hometide.util.Passengers
 import com.group11.hometide.util.Result
+import com.group11.hometide.util.inTimeRange
 import com.group11.hometide.util.messageRes
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
@@ -48,6 +49,8 @@ class ResultViewModel(
     private val query: TimetableQuery,
     initialPassengers: Passengers = Passengers.DEFAULT,
     private val clock: () -> LocalDateTime = LocalDateTime::now,
+    timeFrom: String? = null,
+    timeTo: String? = null,
 ) : ViewModel() {
 
     /**
@@ -86,6 +89,9 @@ class ResultViewModel(
         @param:StringRes val errorRes: Int? = null,
         val refreshing: Boolean = false,
         val passengers: Passengers = Passengers.DEFAULT,
+        /** FR-AI-04：AI 查詢帶來的時段篩選（HH:mm；都為 null 表示不篩選） */
+        val timeFrom: String? = null,
+        val timeTo: String? = null,
     ) {
         val hasList: Boolean get() = phase == Phase.SUCCESS || phase == Phase.OFFLINE
 
@@ -120,6 +126,7 @@ class ResultViewModel(
     private val expanded = MutableStateFlow<Set<String>>(emptySet())
     private val live = MutableStateFlow<Map<String, LiveInfo>>(emptyMap())
     private val sort = MutableStateFlow(SortOption.DEPART)
+    private val timeRange = MutableStateFlow(timeFrom to timeTo)
     private val names = MutableStateFlow("" to "")
     private val now = MutableStateFlow(clock())
     private val events = Channel<Int>(Channel.BUFFERED)
@@ -164,7 +171,7 @@ class ResultViewModel(
 
     private val data = combine(load, fares, live, passengers, expanded, ::Data)
 
-    val state: StateFlow<UiState> = combine(data, names, now, member, sort) { d, n, nowTime, m, option ->
+    val state: StateFlow<UiState> = combine(data, names, now, member, combine(sort, timeRange, ::Pair)) { d, n, nowTime, m, (option, range) ->
         val today = nowTime.toLocalDate()
         val items = d.load.trains.map { t ->
             val base = TrainStatus.of(query.operator, t.departTime, date, today, nowTime.toLocalTime())
@@ -178,7 +185,7 @@ class ResultViewModel(
             originName = n.first,
             destName = n.second,
             phase = d.load.phase,
-            items = ResultSort.apply(items, option),
+            items = ResultSort.apply(items.filter { inTimeRange(it.train.departTime, range.first, range.second) }, option),
             isToday = date == today,
             now = nowTime,
             isGuest = m.isGuest,
@@ -188,6 +195,8 @@ class ResultViewModel(
             errorRes = d.load.errorRes,
             refreshing = d.load.refreshing,
             passengers = d.passengers,
+            timeFrom = range.first,
+            timeTo = range.second,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), UiState(query.operator, date, now = clock()))
 
@@ -301,6 +310,11 @@ class ResultViewModel(
     /** FR-RES-07：點車票本體展開／收合票價明細，可同時展開多張；重新整理與改乘客後保留 */
     fun toggleDetail(trainNo: String) {
         expanded.update { if (trainNo in it) it - trainNo else it + trainNo }
+    }
+
+    /** 關閉時段晶片 */
+    fun clearTimeRange() {
+        timeRange.value = null to null
     }
 
     fun setSort(option: SortOption) {

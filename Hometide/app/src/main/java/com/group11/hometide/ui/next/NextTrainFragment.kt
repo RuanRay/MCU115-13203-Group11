@@ -29,6 +29,8 @@ import com.group11.hometide.ui.result.ResultActivity
 import com.group11.hometide.util.labelRes
 import com.group11.hometide.util.passengerText
 import com.group11.hometide.util.priceText
+import com.group11.hometide.ui.search.AiQueryViewModel
+import com.group11.hometide.ui.search.bindAiInput
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -39,7 +41,7 @@ import java.time.format.DateTimeFormatter
 
 /**
  * 下一班分頁（規格 4.5、next.png、next_guest.png；FR-NEXT-01～04、06）。
- * 倒數只在分頁可見時每 60 秒更新（FR-NEXT-03）；翻牌 AN-13 與脈動於 7-3；浮動一句話列的解析於 6-4。
+ * 倒數只在分頁可見時每 60 秒更新（FR-NEXT-03）；翻牌 AN-13 與脈動於 7-3；浮動一句話列見 FR-NEXT-05。
  */
 class NextTrainFragment : Fragment(R.layout.fragment_next_train) {
 
@@ -48,6 +50,15 @@ class NextTrainFragment : Fragment(R.layout.fragment_next_train) {
             initializer {
                 val c = (requireActivity().application as HometideApp).container
                 NextTrainViewModel(c.authRepository, c.favoriteRepository, c.reminderRepository)
+            }
+        }
+    }
+
+    private val aiVm: AiQueryViewModel by viewModels {
+        viewModelFactory {
+            initializer {
+                val c = (requireActivity().application as HometideApp).container
+                AiQueryViewModel(c.aiRepository, c.authRepository, c.transitRepository)
             }
         }
     }
@@ -85,7 +96,8 @@ class NextTrainFragment : Fragment(R.layout.fragment_next_train) {
         b.tvSeeAll.asButtonForAccessibility()
         b.btnLogin.setOnClickListener { login.launch(LoginActivity.intentForResult(requireContext())) }
         b.btnGoSearch.setOnClickListener { (requireActivity() as MainActivity).openManualSearch() }
-        b.btnFloatingParse.setOnClickListener { snackbar(getString(R.string.ai_coming_soon)) }
+        // FR-NEXT-05：「修改」切到查詢分頁並填入空白車票
+        bindAiInput(aiVm, b.etFloatingAi, b.btnFloatingParse, ::snackbar) { (requireActivity() as MainActivity).openSearchWithDraft(it) }
         b.chipGroupRoutes.setOnCheckedStateChangeListener { _, ids ->
             val index = ids.firstOrNull()?.let { id -> b.chipGroupRoutes.indexOfChild(b.chipGroupRoutes.findViewById(id)) } ?: return@setOnCheckedStateChangeListener
             vm.state.value.routes.getOrNull(index)?.takeIf { it.id != vm.state.value.selected?.id }?.let(vm::select)

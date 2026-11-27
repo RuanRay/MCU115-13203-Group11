@@ -301,7 +301,7 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- 7. 浮動一句話查詢列（FR-NEXT-05；5-2 只有外觀，解析於 6-4） -->
+    <!-- 7. 浮動一句話查詢列（FR-NEXT-05） -->
     <LinearLayout
         android:id="@+id/layoutFloatingAi"
         android:layout_width="match_parent"
@@ -331,8 +331,10 @@
             android:layout_weight="1"
             android:background="@null"
             android:hint="@string/floating_ai_hint"
+            android:imeOptions="actionSend"
             android:importantForAutofill="no"
             android:inputType="text"
+            android:maxLength="60"
             android:maxLines="1"
             android:minHeight="@dimen/min_touch_target"
             android:textAppearance="@style/TextAppearance.Hometide.Body"

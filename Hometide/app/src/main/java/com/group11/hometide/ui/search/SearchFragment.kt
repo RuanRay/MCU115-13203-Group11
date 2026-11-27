@@ -1,10 +1,14 @@
 package com.group11.hometide.ui.search
 
+import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
+import android.graphics.drawable.ColorDrawable
+import androidx.core.animation.doOnEnd
+import androidx.core.content.ContextCompat
+import com.group11.hometide.data.repository.TripDraft
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.View
-import android.view.inputmethod.EditorInfo
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
@@ -12,7 +16,6 @@ import android.widget.SimpleCursorAdapter
 import android.widget.TextView
 import androidx.core.view.children
 import androidx.core.view.isVisible
-import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -40,10 +43,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 
-/**
- * P3 查詢（規格 4.4、home.png、home_passenger.png）。任務 4-1：AI 解析（第 6 週）先顯示「即將推出」、
- * 車票夾（5-1）先顯示空白提示票。
- */
+/** P3 查詢（規格 4.4、home.png、home_passenger.png、ai_confirm.png） */
 class SearchFragment : Fragment(R.layout.fragment_search) {
 
     private val vm: SearchViewModel by viewModels {
@@ -51,6 +51,15 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
             initializer {
                 val c = (requireActivity().application as HometideApp).container
                 SearchViewModel(c.transitRepository, c.authRepository, c.favoriteCards)
+            }
+        }
+    }
+
+    private val aiVm: AiQueryViewModel by viewModels {
+        viewModelFactory {
+            initializer {
+                val c = (requireActivity().application as HometideApp).container
+                AiQueryViewModel(c.aiRepository, c.authRepository, c.transitRepository)
             }
         }
     }
@@ -114,6 +123,21 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         b.actvOrigin.requestFocus()
     }
 
+    /** FR-AI-04「修改」：內容填入空白車票並高亮 1 秒（從「下一班」開的確認卡也走這裡，FR-NEXT-05） */
+    fun fillFromAi(draft: TripDraft) {
+        val b = binding ?: return
+        vm.fillFromAi(draft)
+        b.actvOrigin.setText(draft.origin?.nameZh ?: draft.originText.orEmpty(), false)
+        b.actvDest.setText(draft.dest?.nameZh ?: draft.destText.orEmpty(), false)
+        b.tkManual.requestRectangleOnScreen(android.graphics.Rect(0, 0, b.tkManual.width, b.tkManual.height))
+        val glow = ColorDrawable(ContextCompat.getColor(requireContext(), R.color.color_accent))
+        b.tkManual.foreground = glow
+        ObjectAnimator.ofInt(glow, "alpha", HIGHLIGHT_ALPHA, 0).apply {
+            duration = HIGHLIGHT_MS
+            doOnEnd { b.tkManual.foreground = null }
+        }.start()
+    }
+
     override fun onDestroyView() {
         binding = null
         super.onDestroyView()
@@ -128,17 +152,15 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         b.vDateStamp.setDate(today)
     }
 
-    /** FR-AI-01、FR-SRCH-06：AI 第 6 週才接，範例句只帶入輸入框，解析顯示「即將推出」（實作者確認） */
+    /** FR-AI-01～05；FR-SRCH-06：點範例句帶入輸入框並立即解析 */
     private fun bindAiCard(b: FragmentSearchBinding) {
-        b.etAiQuery.doAfterTextChanged { b.btnParse.isEnabled = !it.isNullOrBlank() }
-        b.btnParse.setOnClickListener { snackbar(getString(R.string.ai_coming_soon)) }
-        b.etAiQuery.setOnEditorActionListener { _, action, _ ->
-            (action == EditorInfo.IME_ACTION_SEND && b.btnParse.isEnabled).also { if (it) b.btnParse.performClick() }
-        }
+        bindAiInput(aiVm, b.etAiQuery, b.btnParse, ::snackbar, ::fillFromAi)
         b.chipGroupExamples.children.forEach { chip ->
             chip.setOnClickListener {
+                if (aiVm.parsing.value) return@setOnClickListener // 解析中輸入框不可改（FR-AI-01）
                 b.etAiQuery.setText((chip as TextView).text)
                 b.etAiQuery.setSelection(b.etAiQuery.length())
+                aiVm.parse(b.etAiQuery.text.toString())
             }
         }
     }
@@ -230,5 +252,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         const val REQUEST_PASSENGERS = "search_passengers"
         const val SWAP_ROTATION = 180f
         const val SWAP_MS = 250L
+        const val HIGHLIGHT_ALPHA = 90 // 芥末黃半透明疊在車票上
+        const val HIGHLIGHT_MS = 1_000L
     }
 }

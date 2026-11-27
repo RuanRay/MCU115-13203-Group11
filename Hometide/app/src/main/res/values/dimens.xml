@@ -68,4 +68,6 @@
     <dimen name="road_segment_height">52dp</dimen>
     <!-- 國道大車票存根較寬（highway.png 量測約占票寬三分之一），容納特大字「3:05」 -->
     <dimen name="hwy_main_stub_width">124dp</dimen>
+    <!-- AN-15 三點跳動的點直徑 -->
+    <dimen name="parse_dot_size">6dp</dimen>
 </resources>

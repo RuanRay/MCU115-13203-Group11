@@ -104,14 +104,6 @@
             android:textAppearance="@style/TextAppearance.Hometide.Body"
             android:textColor="@color/color_on_surface_muted" />
 
-        <!-- AI 時段篩選（第 6 週） -->
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipTimeRange"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:visibility="gone" />
-
         <Space
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -126,6 +118,13 @@
             android:minHeight="@dimen/min_touch_target"
             android:popupBackground="@color/color_surface" />
     </LinearLayout>
+
+    <!-- AI 時段篩選（FR-AI-04）：有篩選時才出現，自成一列（上一列寬度不足，6-4b 實作者確認） -->
+    <com.google.android.material.chip.Chip
+        android:id="@+id/chipTimeRange"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
 
     <FrameLayout
         android:layout_width="match_parent"
