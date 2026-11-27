@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.group11.hometide.data.local.dao.AiQueryLogDao
 import com.group11.hometide.data.local.dao.DriveRouteDao
 import com.group11.hometide.data.local.dao.FareDao
 import com.group11.hometide.data.local.dao.FavoriteDao
@@ -53,6 +54,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun feedbackDao(): FeedbackDao
     abstract fun driveRouteDao(): DriveRouteDao
     abstract fun highwayCacheDao(): HighwayCacheDao
+    abstract fun aiQueryLogDao(): AiQueryLogDao
 
     companion object {
         // 規格 7.1 寫 homebound.db，2026-11-10 實作者決定改為 hometide.db

@@ -28,4 +28,13 @@ class StationNameNormalizerTest {
         assertEquals("Taipei Main", StationNameNormalizer.normalizeQuery("  Taipei   Main "))
         assertEquals("tainan", StationNameNormalizer.normalizeQuery("tainan"))
     }
+
+    /** 9.6 第 30 題、FR-BUS-06 */
+    @Test
+    fun alias_thsrAndBusCity() {
+        assertEquals("左營", StationNameNormalizer.alias(com.group11.hometide.data.local.entity.Operator.THSR, "高雄"))
+        assertEquals("臺南轉運站", StationNameNormalizer.alias(com.group11.hometide.data.local.entity.Operator.BUS, "臺南市"))
+        assertEquals("縣政府", StationNameNormalizer.alias(com.group11.hometide.data.local.entity.Operator.BUS, "嘉義縣"))
+        assertEquals(null, StationNameNormalizer.alias(com.group11.hometide.data.local.entity.Operator.TRA, "高雄"))
+    }
 }

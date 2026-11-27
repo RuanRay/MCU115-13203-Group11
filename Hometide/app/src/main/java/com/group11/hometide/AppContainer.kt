@@ -8,6 +8,10 @@ import com.group11.hometide.data.local.AppDatabase
 import com.group11.hometide.data.local.SettingsStore
 import com.group11.hometide.data.remote.HometideApi
 import com.group11.hometide.data.remote.QuotaGate
+import com.group11.hometide.data.ai.GeminiClient
+import com.group11.hometide.util.Result
+import kotlinx.coroutines.flow.first
+import com.group11.hometide.data.repository.AiRepository
 import com.group11.hometide.data.repository.DriveRouteRepository
 import com.group11.hometide.data.repository.HighwayRepository
 import com.group11.hometide.data.repository.AuthRepository
@@ -44,5 +48,16 @@ class AppContainer(private val context: Context) {
     val driveRouteRepository: DriveRouteRepository by lazy { DriveRouteRepository(database.driveRouteDao(), settingsStore) }
     val favoriteRepository: FavoriteRepository by lazy { FavoriteRepository(database.favoriteDao(), transitRepository, settingsStore) }
     val reminderRepository: ReminderRepository by lazy { ReminderRepository(database.reminderDao(), ReminderScheduler(context)) }
+    val aiRepository: AiRepository by lazy {
+        val model = GeminiClient.jsonModel(GeminiClient.tripSchema)
+        AiRepository(
+            logDao = database.aiQueryLogDao(),
+            findStation = { op, name -> (transitRepository.findStation(op, name) as? Result.Success)?.data },
+            loadWindow = { settingsStore.aiCallsWindow.first() },
+            saveWindow = settingsStore::setAiCallsWindow,
+            generate = { prompt -> model.generateContent(prompt).text },
+            gson = gson,
+        )
+    }
     val favoriteCards: FavoriteCards by lazy { FavoriteCards(authRepository, favoriteRepository, transitRepository) }
 }
