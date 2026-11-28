@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- spCategory 選取後的顯示：「錯誤回報 ▾」（feedback.png） -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:drawableEnd="@drawable/ic_arrow_drop_down"
+    android:drawablePadding="2dp"
+    android:gravity="center_vertical"
+    android:minHeight="@dimen/min_touch_target"
+    android:textAppearance="@style/TextAppearance.Hometide.Body"
+    android:textColor="@color/color_on_background"
+    android:textSize="@dimen/feedback_category_text" />

@@ -69,4 +69,22 @@ object GeminiClient {
     """.trimIndent()
 
     private val WEEKDAYS = listOf("星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日")
+
+    /** 9.4 回饋分類與摘要 */
+    val feedbackSchema: Schema = Schema.obj(
+        properties = mapOf(
+            "category" to Schema.enumeration(listOf("SUGGESTION", "BUG", "DATA_ERROR", "OTHER")),
+            "sentiment" to Schema.enumeration(listOf("POSITIVE", "NEUTRAL", "NEGATIVE")),
+            "summary" to Schema.string(),
+        ),
+    )
+
+    /** 9.4 提示詞（送給模型的指令）；只帶入回饋文字，不送 Email、uid、使用統計 */
+    fun feedbackPrompt(content: String): String = """
+        請閱讀以下 App 使用者回饋，只輸出符合 schema 的 JSON：
+        category：SUGGESTION（功能建議）、BUG（錯誤回報）、DATA_ERROR（班次或票價資料有誤）、OTHER。
+        sentiment：POSITIVE、NEUTRAL、NEGATIVE。
+        summary：以繁體中文、30 字以內摘要重點，不要包含個人資料。
+        回饋內容：$content
+    """.trimIndent()
 }

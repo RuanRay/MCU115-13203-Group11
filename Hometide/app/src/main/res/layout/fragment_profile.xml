@@ -227,7 +227,14 @@
             android:paddingHorizontal="16dp"
             android:paddingVertical="10dp" />
 
-        <!-- 5、6 外觀（7-4）、意見回饋（7-2） -->
+        <!-- 6. 意見回饋（外觀 spTheme 於 7-4 加在左側） -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnFeedback"
+            style="@style/Widget.Hometide.Button.Outlined"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/btn_feedback" />
 
         <!-- 7. 登出 -->
         <TextView

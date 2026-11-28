@@ -75,4 +75,9 @@
     <dimen name="stat_empty_padding">16dp</dimen>
     <!-- spRange 量不到 ▾ 的寬度（兩字選項），給最小寬度 -->
     <dimen name="stat_range_min_width">88dp</dimen>
+    <!-- P7「已收件」郵戳（feedback_done.png） -->
+    <dimen name="received_stamp_size">120dp</dimen>
+    <!-- P7 回饋類型選取值（feedback.png）、AI 卡片由下往上的位移（AN-10） -->
+    <dimen name="feedback_category_text">18sp</dimen>
+    <dimen name="feedback_card_rise">24dp</dimen>
 </resources>

@@ -360,4 +360,32 @@
     <string name="page_feedback">回饋</string>
     <string name="page_login">登入</string>
     <string name="page_register">註冊</string>
+
+    <!-- 7-2a 意見回饋（FR-FB-01～03、4.9） -->
+    <string name="title_feedback">意見回饋</string>
+    <string name="feedback_rating_prompt">這次用起來如何？</string>
+    <string name="feedback_category_label">回饋類型</string>
+    <string name="feedback_category_suggestion">功能建議</string>
+    <string name="feedback_category_bug">錯誤回報</string>
+    <string name="feedback_category_data_error">班次資料有誤</string>
+    <string name="feedback_category_other">其他</string>
+    <string name="feedback_content_hint">想告訴我們的事…</string>
+    <string name="feedback_attach_usage">附上我的使用統計</string>
+    <string name="feedback_counter">%1$d / %2$d</string>
+    <string name="btn_feedback_submit">送　出</string>
+    <string name="feedback_received_stamp">已收件\n%1$s</string>
+    <string name="feedback_thanks">謝謝你的回饋！</string>
+    <string name="feedback_sent_hint">已送出，將由背景服務上傳</string>
+    <string name="feedback_ai_header">AI 整理的這則回饋</string>
+    <string name="feedback_ai_category">分類</string>
+    <string name="feedback_ai_sentiment">情緒</string>
+    <string name="feedback_ai_summary">摘要</string>
+    <string name="feedback_ai_pending">AI 分析中，完成後會自動同步</string>
+    <string name="feedback_ai_match">一致</string>
+    <string name="feedback_ai_maybe">AI 判斷可能是：\n%1$s</string>
+    <string name="sentiment_positive">正面</string>
+    <string name="sentiment_neutral">中性</string>
+    <string name="sentiment_negative">負面</string>
+    <string name="btn_back_profile">返回個人頁</string>
+    <string name="btn_feedback">意見回饋</string>
 </resources>

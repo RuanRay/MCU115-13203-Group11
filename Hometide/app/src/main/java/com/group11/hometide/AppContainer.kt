@@ -17,6 +17,7 @@ import com.group11.hometide.usage.UsageTracker
 import com.group11.hometide.data.repository.UsageRepository
 import com.group11.hometide.data.repository.AiRepository
 import com.group11.hometide.data.repository.DriveRouteRepository
+import com.group11.hometide.data.repository.FeedbackRepository
 import com.group11.hometide.data.repository.HighwayRepository
 import com.group11.hometide.data.repository.AuthRepository
 import com.group11.hometide.data.repository.FavoriteRepository
@@ -68,5 +69,17 @@ class AppContainer(private val context: Context) {
         UsageTracker(database.usageDao(), settingsStore::deviceId, { authRepository.currentUid }, CoroutineScope(SupervisorJob()))
     }
     val usageRepository: UsageRepository by lazy { UsageRepository(database.usageDao(), usageTracker) }
+    /** FR-FB-02、03 */
+    val feedbackRepository: FeedbackRepository by lazy {
+        val model = GeminiClient.jsonModel(GeminiClient.feedbackSchema)
+        FeedbackRepository(
+            dao = database.feedbackDao(),
+            deviceId = settingsStore::deviceId,
+            uid = { authRepository.currentUid },
+            classify = { prompt -> model.generateContent(prompt).text },
+            appVersion = BuildConfig.VERSION_NAME,
+            gson = gson,
+        )
+    }
     val favoriteCards: FavoriteCards by lazy { FavoriteCards(authRepository, favoriteRepository, transitRepository) }
 }

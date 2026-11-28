@@ -1,5 +1,333 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 第 1 週空版面：頁面內容依規格第 4 章於後續任務實作 -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- P7 意見回饋（規格 4.9、feedback.png、feedback_done.png） -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/page_horizontal_margin"
+        android:paddingBottom="24dp">
+
+        <!-- 1. 返回＋標題 -->
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/min_touch_target"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            app:contentInsetStart="0dp"
+            app:navigationContentDescription="@string/btn_back"
+            app:navigationIcon="@drawable/ic_back"
+            app:navigationIconTint="@color/color_on_surface_muted"
+            app:title="@string/btn_back"
+            app:titleTextAppearance="@style/TextAppearance.Hometide.Body"
+            app:titleTextColor="@color/color_on_surface_muted" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:accessibilityHeading="true"
+            android:text="@string/title_feedback"
+            android:textAppearance="@style/TextAppearance.Hometide.Display"
+            android:textColor="@color/color_on_background" />
+
+        <ViewFlipper
+            android:id="@+id/flipperFeedback"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:measureAllChildren="false">
+
+            <!-- 第一頁：填寫 -->
+            <LinearLayout
+                android:id="@+id/layoutForm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- 2. 評分 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_stat_panel"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    android:paddingVertical="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:labelFor="@id/ratingBar"
+                        android:text="@string/feedback_rating_prompt"
+                        android:textAppearance="@style/TextAppearance.Hometide.Body"
+                        android:textColor="@color/color_on_surface_muted" />
+
+                    <RatingBar
+                        android:id="@+id/ratingBar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:numStars="5"
+                        android:progressBackgroundTint="@color/color_outline"
+                        android:progressTint="@color/color_accent"
+                        android:rating="0"
+                        android:secondaryProgressTint="@color/color_accent"
+                        android:stepSize="1" />
+                </LinearLayout>
+
+                <!-- 3. 回饋類型 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_stat_panel"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="4dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:labelFor="@id/spCategory"
+                        android:text="@string/feedback_category_label"
+                        android:textAppearance="@style/TextAppearance.Hometide.Caption.Large"
+                        android:textColor="@color/color_on_surface_muted" />
+
+                    <Spinner
+                        android:id="@+id/spCategory"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@null"
+                        android:minHeight="@dimen/min_touch_target"
+                        android:popupBackground="@color/color_surface" />
+                </LinearLayout>
+
+                <!-- 4. 內容（橫線信紙底） -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/etContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    app:boxBackgroundColor="@color/color_surface"
+                    app:boxBackgroundMode="outline"
+                    app:boxCornerRadiusBottomEnd="@dimen/corner_ticket"
+                    app:boxCornerRadiusBottomStart="@dimen/corner_ticket"
+                    app:boxCornerRadiusTopEnd="@dimen/corner_ticket"
+                    app:boxCornerRadiusTopStart="@dimen/corner_ticket"
+                    app:boxStrokeColor="@color/color_outline"
+                    app:hintEnabled="false">
+
+                    <com.group11.hometide.ui.widget.LinedEditText
+                        android:id="@+id/etContentInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="top|start"
+                        android:hint="@string/feedback_content_hint"
+                        android:importantForAutofill="no"
+                        android:inputType="textMultiLine"
+                        android:lineSpacingMultiplier="1.6"
+                        android:maxLength="500"
+                        android:minLines="6"
+                        android:textAppearance="@style/TextAppearance.Hometide.Body"
+                        android:textColor="@color/color_on_background"
+                        android:textColorHint="@color/color_on_surface_muted" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- 5. 附上使用統計＋字數 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <CheckBox
+                        android:id="@+id/cbAttachUsage"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:buttonTint="@color/color_primary"
+                        android:checked="true"
+                        android:minHeight="@dimen/min_touch_target"
+                        android:text="@string/feedback_attach_usage"
+                        android:textAppearance="@style/TextAppearance.Hometide.Body"
+                        android:textColor="@color/color_on_background" />
+
+                    <TextView
+                        android:id="@+id/tvContentCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.Hometide.Body"
+                        android:textColor="@color/color_on_surface_muted" />
+                </LinearLayout>
+
+                <!-- 6. 送出 -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSubmit"
+                    style="@style/Widget.Hometide.Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:enabled="false"
+                    android:text="@string/btn_feedback_submit" />
+            </LinearLayout>
+
+            <!-- 第二頁：7. 送出成功區 -->
+            <LinearLayout
+                android:id="@+id/layoutSuccess"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <com.group11.hometide.ui.widget.StampView
+                    android:id="@+id/vReceivedStamp"
+                    android:layout_width="@dimen/received_stamp_size"
+                    android:layout_height="@dimen/received_stamp_size"
+                    android:layout_marginTop="16dp"
+                    app:stampColor="red" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/feedback_thanks"
+                    android:textAppearance="@style/TextAppearance.Hometide.Display"
+                    android:textColor="@color/color_on_background" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/feedback_sent_hint"
+                    android:textAppearance="@style/TextAppearance.Hometide.Body"
+                    android:textColor="@color/color_on_surface_muted" />
+
+                <!-- AI 結果車票（FR-FB-03） -->
+                <com.group11.hometide.ui.widget.TicketView
+                    android:id="@+id/tkAiResult"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:accessibilityLiveRegion="polite"
+                    android:visibility="invisible"
+                    app:ticketStyle="paper">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:importantForAccessibility="no"
+                                android:src="@drawable/ic_sparkle" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:letterSpacing="0.05"
+                                android:text="@string/feedback_ai_header"
+                                android:textAppearance="@style/TextAppearance.Hometide.Body"
+                                android:textColor="@color/color_on_surface_muted" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/tvAiPending"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:text="@string/feedback_ai_pending"
+                            android:textAppearance="@style/TextAppearance.Hometide.Body"
+                            android:textColor="@color/color_on_background"
+                            android:visibility="gone" />
+
+                        <GridLayout
+                            android:id="@+id/gridAiResult"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:columnCount="2">
+
+                            <TextView
+                                style="@style/Widget.Hometide.FeedbackAiLabel"
+                                android:text="@string/feedback_ai_category" />
+
+                            <TextView
+                                android:id="@+id/tvAiCategory"
+                                style="@style/Widget.Hometide.FeedbackAiValue" />
+
+                            <TextView
+                                style="@style/Widget.Hometide.FeedbackAiLabel"
+                                android:text="@string/feedback_ai_sentiment" />
+
+                            <TextView
+                                android:id="@+id/tvAiSentiment"
+                                style="@style/Widget.Hometide.FeedbackAiValue" />
+
+                            <TextView
+                                style="@style/Widget.Hometide.FeedbackAiLabel"
+                                android:text="@string/feedback_ai_summary" />
+
+                            <TextView
+                                android:id="@+id/tvAiSummary"
+                                style="@style/Widget.Hometide.FeedbackAiValue" />
+                        </GridLayout>
+                    </LinearLayout>
+
+                    <!-- 存根：「一致」綠章，或「AI 判斷可能是：○○」灰字（實作者確認） -->
+                    <FrameLayout
+                        android:layout_width="@dimen/ticket_stub_max"
+                        android:layout_height="match_parent">
+
+                        <com.group11.hometide.ui.widget.StampView
+                            android:id="@+id/vMatchStamp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:visibility="gone"
+                            app:stampColor="green"
+                            app:stampText="@string/feedback_ai_match" />
+
+                        <TextView
+                            android:id="@+id/tvAiMaybe"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:padding="8dp"
+                            android:textAppearance="@style/TextAppearance.Hometide.Caption.Large"
+                            android:textColor="@color/color_on_surface_muted"
+                            android:visibility="gone" />
+                    </FrameLayout>
+                </com.group11.hometide.ui.widget.TicketView>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnBack"
+                    style="@style/Widget.Hometide.Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="@string/btn_back_profile" />
+            </LinearLayout>
+        </ViewFlipper>
+    </LinearLayout>
+</ScrollView>

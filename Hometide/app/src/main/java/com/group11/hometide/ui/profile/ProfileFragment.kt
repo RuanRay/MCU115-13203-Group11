@@ -22,6 +22,8 @@ import com.group11.hometide.util.Passengers
 import com.group11.hometide.util.passengerText
 import com.group11.hometide.util.labelRes
 import kotlinx.coroutines.launch
+import android.content.Intent
+import com.group11.hometide.ui.feedback.FeedbackActivity
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.RelativeSizeSpan
@@ -50,6 +52,8 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         val binding = FragmentProfileBinding.bind(view)
         binding.btnMemberLogin.setOnClickListener { showLoginPrompt() }
         binding.btnLogout.setOnClickListener { confirmLogout() }
+        // FR-FB：訪客也能送出回饋（7.4，實作者確認）
+        binding.btnFeedback.setOnClickListener { startActivity(Intent(requireContext(), FeedbackActivity::class.java)) }
         bindStats(binding)
         // FR-SET-02：會員在會員證上、訪客在登入按鈕下方；開啟同一個選擇乘客面板（設為預設）
         listOf(binding.tvDefaultPassengers, binding.tvGuestPassengers).forEach { tv ->
