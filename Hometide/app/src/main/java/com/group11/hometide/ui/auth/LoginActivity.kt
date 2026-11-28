@@ -39,10 +39,15 @@ class LoginActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // AN-01：只在冷啟動播一次（從其他頁要求登入、登出回來都不播）
+        val playSplash = savedInstanceState == null && !returnResult && SplashTicket.consumeColdStart() && animationsEnabled
         // FR-AUTH-03：已登入直接進 P3，不顯示 P1
-        // TODO(第 7 週，AN-01)：冷啟動先播放售票機出票動畫
         if (!returnResult && vm.isLoggedIn) {
-            goToSearch()
+            if (playSplash) {
+                SplashTicket.show(this, fadeOut = false) { goToSearch(fade = true) }
+            } else {
+                goToSearch()
+            }
             return
         }
 
@@ -50,6 +55,7 @@ class LoginActivity : BaseActivity() {
         setContentView(binding.root)
         applySystemBarInsets(binding.root)
         binding.heroStamp.text = getString(R.string.hero_stamp, DateUtils.rocDate(LocalDate.now()))
+        if (playSplash) SplashTicket.show(this)
 
         listOf(binding.etEmail, binding.etPassword).forEach(::clearErrorOnInput)
         binding.btnLogin.setOnClickListener { submit() }
@@ -99,11 +105,14 @@ class LoginActivity : BaseActivity() {
     }
 
     /** P1 → P3，清除堆疊（規格 4.10；FR-AUTH-02 AC：返回鍵不會回到 P1） */
-    private fun goToSearch() {
+    private fun goToSearch(fade: Boolean = false) {
         startActivity(
             Intent(this, MainActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK),
         )
+        // AN-01 結尾淡入首頁
+        @Suppress("DEPRECATION")
+        if (fade) overridePendingTransition(android.R.anim.fade_in, R.anim.splash_hold)
         finish()
     }
 

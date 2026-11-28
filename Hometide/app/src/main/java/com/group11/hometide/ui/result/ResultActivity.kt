@@ -22,6 +22,7 @@ import com.group11.hometide.data.local.entity.Operator
 import com.group11.hometide.databinding.ActivityResultBinding
 import com.group11.hometide.ui.auth.registerLoginPrompt
 import com.group11.hometide.ui.base.BaseActivity
+import com.group11.hometide.ui.base.ExpandTransition
 import com.group11.hometide.ui.base.asButtonForAccessibility
 import com.group11.hometide.ui.base.NotificationPermission
 import com.group11.hometide.ui.search.PassengerSheet
@@ -57,6 +58,7 @@ class ResultActivity : BaseActivity() {
     private var scrolledToNow = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ExpandTransition.enableExpandEnter(this) // AN-03
         super.onCreate(savedInstanceState)
         binding = ActivityResultBinding.inflate(layoutInflater)
         setContentView(binding.root)

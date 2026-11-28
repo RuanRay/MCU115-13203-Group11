@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AN-01 售票機機身：藏青、下緣圓角 -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/color_primary" />
+    <corners android:bottomLeftRadius="12dp" android:bottomRightRadius="12dp" />
+</shape>

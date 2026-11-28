@@ -131,16 +131,8 @@ class FeedbackActivity : BaseActivity() {
         if (!match) binding.tvAiMaybe.text = getString(R.string.feedback_ai_maybe, fb.aiCategory?.let { getString(it.labelRes) }.orEmpty())
     }
 
-    /** AN-10：郵戳蓋下（scale 1.8→1、alpha） */
-    private fun playStamp() {
-        if (!animationsEnabled) return
-        binding.vReceivedStamp.apply {
-            scaleX = STAMP_FROM_SCALE
-            scaleY = STAMP_FROM_SCALE
-            alpha = 0f
-            animate().scaleX(1f).scaleY(1f).alpha(1f).setDuration(STAMP_MS).start()
-        }
-    }
+    /** AN-10：郵戳蓋下（共用 AN-07 蓋章） */
+    private fun playStamp() = binding.vReceivedStamp.playStampAnimation()
 
     /** AN-10：AI 結果車票延遲 300 ms 後由下往上淡入（250 ms） */
     private fun fadeIn(v: View) {
@@ -153,8 +145,6 @@ class FeedbackActivity : BaseActivity() {
     }
 
     private companion object {
-        const val STAMP_FROM_SCALE = 1.8f
-        const val STAMP_MS = 220L
         const val CARD_DELAY_MS = 300L
         const val CARD_FADE_MS = 250L
     }

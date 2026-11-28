@@ -48,12 +48,12 @@ class SearchViewModel(
         favoritesRefresh.tryEmit(Unit)
     }
 
-    /** FR-SRCH-04：點存根以「今天」查詢（AN-05、AN-03 於 7-3）；乘客用預設乘客 */
+    /** FR-SRCH-04：撕下存根（AN-05）後以「今天」查詢；乘客用預設乘客 */
     fun searchFavorite(card: FavoriteCard) {
         viewModelScope.launch {
             val r = card.route
             val date = today()
-            events.send(Event.OpenResult(r.operator, r.originId, r.destId, date, favoriteCards.prepareOpen(r, date.toString())))
+            events.send(Event.OpenResult(r.operator, r.originId, r.destId, date, favoriteCards.prepareOpen(r, date.toString()), fromFavorite = true))
         }
     }
 
@@ -74,6 +74,8 @@ class SearchViewModel(
             val destId: String,
             val date: LocalDate,
             val passengers: Passengers,
+            /** 從車票夾開啟（AN-03 展開轉場） */
+            val fromFavorite: Boolean = false,
         ) : Event
         data class ClearStations(val origin: Boolean, val dest: Boolean) : Event
     }

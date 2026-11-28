@@ -389,4 +389,7 @@
     <string name="sentiment_negative">負面</string>
     <string name="btn_back_profile">返回個人頁</string>
     <string name="btn_feedback">意見回饋</string>
+    <!-- 7-3 動畫 -->
+    <string name="splash_machine_label">HOMETIDE 售票機</string>
+    <string name="splash_ticket_brand">HOMETIDE・歸潮</string>
 </resources>

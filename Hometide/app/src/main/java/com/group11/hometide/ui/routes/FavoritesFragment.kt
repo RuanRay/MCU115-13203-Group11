@@ -17,6 +17,7 @@ import com.group11.hometide.databinding.DialogRenameRouteBinding
 import com.group11.hometide.databinding.FragmentFavoritesBinding
 import com.group11.hometide.ui.base.BaseActivity
 import com.group11.hometide.ui.result.ResultActivity
+import com.group11.hometide.ui.base.ExpandTransition
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -28,12 +29,17 @@ class FavoritesFragment : Fragment(R.layout.fragment_favorites) {
     /** 拖曳中不套用新狀態（下一班重算會重設清單），放開後寫回排序，資料庫的新順序會再送回來 */
     private var dragging = false
 
+    private var openedTicket: View? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val b = FragmentFavoritesBinding.bind(view)
         lateinit var touch: ItemTouchHelper
         val adapter = FavoriteTicketAdapter(
             horizontal = false,
-            onQuery = { vm.openToday(it.route) },
+            onQuery = { card, ticket ->
+                openedTicket = ticket
+                vm.openToday(card.route)
+            },
             onRename = ::showRename,
             onStartDrag = { touch.startDrag(it) },
         )
@@ -63,9 +69,11 @@ class FavoritesFragment : Fragment(R.layout.fragment_favorites) {
                     }
                 }
                 launch {
-                    // FR-FAV-03：以今天、預設乘客開啟 P4（AN-03 於 7-3）
+                    // FR-FAV-03：以今天、預設乘客開啟 P4，車票展開成結果頁（AN-03）
                     vm.open.collect { (r, pax) ->
-                        startActivity(ResultActivity.intent(requireContext(), r.operator, r.originId, r.destId, LocalDate.now(), pax))
+                        val intent = ResultActivity.intent(requireContext(), r.operator, r.originId, r.destId, LocalDate.now(), pax)
+                        ExpandTransition.startExpanding(requireActivity(), intent, openedTicket)
+                        openedTicket = null
                     }
                 }
                 launch {

@@ -11,6 +11,7 @@ import androidx.fragment.app.commitNow
 import com.group11.hometide.R
 import com.group11.hometide.databinding.ActivityMainBinding
 import com.group11.hometide.ui.base.BaseActivity
+import com.group11.hometide.ui.base.ExpandTransition
 import com.group11.hometide.ui.highway.HighwayFragment
 import com.group11.hometide.ui.next.NextTrainFragment
 import com.group11.hometide.ui.profile.ProfileFragment
@@ -26,6 +27,7 @@ class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        ExpandTransition.enableExpandExit(this) // AN-03（須在 super.onCreate 前）
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)

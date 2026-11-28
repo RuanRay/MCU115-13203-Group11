@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AN-01 售票機出票（規格 5.4、animations.html）：冷啟動時蓋在第一個畫面上，播完淡出 -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layoutSplash"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_background"
+    android:clickable="true"
+    android:focusable="true"
+    android:importantForAccessibility="noHideDescendants">
+
+    <LinearLayout
+        android:layout_width="@dimen/splash_machine_width"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="@dimen/splash_offset"
+        android:orientation="vertical">
+
+        <!-- 售票機（指示燈＋文字） -->
+        <FrameLayout
+            android:id="@+id/vMachine"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/splash_machine_height"
+            android:background="@drawable/bg_splash_machine">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:layout_marginTop="14dp"
+                android:alpha="0.85"
+                android:letterSpacing="0.2"
+                android:text="@string/splash_machine_label"
+                android:textAppearance="@style/TextAppearance.Hometide.Caption.Large"
+                android:textColor="@color/color_on_primary" />
+
+            <View
+                android:id="@+id/vLamp"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_gravity="end|top"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/bg_splash_lamp" />
+
+            <!-- 出票口 -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:layout_gravity="bottom"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/bg_printer_slot" />
+        </FrameLayout>
+
+        <com.group11.hometide.ui.widget.TicketPrinterView
+            android:id="@+id/printerSplash"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="22dp"
+            android:layout_marginTop="-10dp"
+            android:paddingBottom="12dp">
+
+            <com.group11.hometide.ui.widget.TicketView
+                android:id="@+id/tkSplash"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:ticketStyle="main">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:alpha="0.8"
+                        android:letterSpacing="0.05"
+                        android:text="@string/splash_ticket_brand"
+                        android:textAppearance="@style/TextAppearance.Hometide.Caption.Large"
+                        android:textColor="@color/color_on_primary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/slogan"
+                        android:textAppearance="@style/TextAppearance.Hometide.TicketRoute.Small"
+                        android:textColor="@color/color_on_primary" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvSplashDate"
+                    android:layout_width="@dimen/splash_stub_width"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textAppearance="@style/TextAppearance.Hometide.Caption.Large"
+                    android:textColor="@color/color_accent" />
+            </com.group11.hometide.ui.widget.TicketView>
+        </com.group11.hometide.ui.widget.TicketPrinterView>
+    </LinearLayout>
+</FrameLayout>

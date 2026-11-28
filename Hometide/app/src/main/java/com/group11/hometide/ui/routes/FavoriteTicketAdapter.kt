@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -27,7 +28,8 @@ import com.group11.hometide.util.priceText
  */
 class FavoriteTicketAdapter(
     private val horizontal: Boolean,
-    private val onQuery: (FavoriteCard) -> Unit,
+    /** 第二個參數為被點的車票 tkRoute（AN-05 撕票、AN-03 展開） */
+    private val onQuery: (FavoriteCard, View) -> Unit,
     private val onRename: (FavoriteCard) -> Unit = {},
     private val onStartDrag: (RecyclerView.ViewHolder) -> Unit = {},
 ) : ListAdapter<FavoriteCard, FavoriteTicketAdapter.Holder>(Diff) {
@@ -65,7 +67,8 @@ class FavoriteTicketAdapter(
         ImageViewCompat.setImageTintList(b.ivDragHandle, ColorStateList.valueOf(muted))
 
         b.ivDragHandle.isVisible = !horizontal
-        b.btnRouteQuery.setOnClickListener { onQuery(card) }
+        b.btnRouteQuery.isVisible = true // AN-05 撕下後隱藏，重新綁定時恢復
+        b.btnRouteQuery.setOnClickListener { onQuery(card, b.tkRoute) }
         b.btnRouteQuery.asButtonForAccessibility()
         if (horizontal) {
             b.tvRouteMeta.isClickable = false
@@ -73,7 +76,7 @@ class FavoriteTicketAdapter(
             b.tkRoute.isClickable = false
         } else {
             // FR-FAV-03：點卡片查詢；點左上角名稱改名；長按 ≡ 拖曳
-            b.tkRoute.setOnClickListener { onQuery(card) }
+            b.tkRoute.setOnClickListener { onQuery(card, b.tkRoute) }
             b.tvRouteMeta.setOnClickListener { onRename(card) }
             b.ivDragHandle.setOnLongClickListener {
                 onStartDrag(holder)

@@ -1,5 +1,8 @@
 package com.group11.hometide.ui.widget
 
+import android.view.animation.OvershootInterpolator
+import android.view.HapticFeedbackConstants
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -80,6 +83,29 @@ class StampView @JvmOverloads constructor(
         }
     }
 
-    /** TODO(第 7 週，AN-07)：蓋章動畫。 */
-    fun playStampAnimation() = Unit
+    /**
+     * 蓋章（AN-07、AN-04、AN-10 共用，220 ms）：從 1.8 倍、偏轉 -18° 落下到原本角度，並觸發觸覺回饋（5.4 共同原則）。
+     * 系統「移除動畫」時直接顯示。
+     */
+    fun playStampAnimation(startDelayMs: Long = 0L) {
+        val endRotation = resources.getInteger(R.integer.stamp_rotation_status).toFloat()
+        if (!ValueAnimator.areAnimatorsEnabled()) {
+            alpha = 1f
+            return
+        }
+        scaleX = STAMP_FROM_SCALE
+        scaleY = STAMP_FROM_SCALE
+        rotation = endRotation + STAMP_FROM_ROTATION
+        alpha = 0f
+        animate().scaleX(1f).scaleY(1f).rotation(endRotation).alpha(1f)
+            .setStartDelay(startDelayMs).setDuration(STAMP_MS).setInterpolator(OvershootInterpolator())
+            .withEndAction { performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY) }
+            .start()
+    }
+
+    private companion object {
+        const val STAMP_FROM_SCALE = 1.8f
+        const val STAMP_FROM_ROTATION = -18f
+        const val STAMP_MS = 220L
+    }
 }

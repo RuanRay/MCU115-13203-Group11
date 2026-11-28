@@ -80,4 +80,9 @@
     <!-- P7 回饋類型選取值（feedback.png）、AI 卡片由下往上的位移（AN-10） -->
     <dimen name="feedback_category_text">18sp</dimen>
     <dimen name="feedback_card_rise">24dp</dimen>
+    <!-- AN-01 售票機 -->
+    <dimen name="splash_machine_width">330dp</dimen>
+    <dimen name="splash_machine_height">88dp</dimen>
+    <dimen name="splash_stub_width">64dp</dimen>
+    <dimen name="splash_offset">80dp</dimen>
 </resources>

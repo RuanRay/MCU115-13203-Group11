@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AN-01 結尾：售票機畫面停住，等首頁淡入蓋過去（避免中間出現空白） -->
+<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="600"
+    android:fromAlpha="1"
+    android:toAlpha="1" />

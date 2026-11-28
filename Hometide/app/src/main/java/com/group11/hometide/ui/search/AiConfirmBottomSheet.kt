@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 
 /**
  * AI 確認卡（FR-AI-04；4.4、ai_confirm.png）。父 Fragment 的 [AiQueryViewModel] 持有內容，按鈕交給它處理。
- * AN-04 先做簡單版：滑上＋蓋章（6-4b 實作者確認），完整出票動畫於 7-3。
+ * AN-04（約 1 秒）：確認卡滑上 → 頂端出票口分段印出預覽車票（與 AN-01 共用 TicketPrinterView）→ 驗證通過才蓋章。
  */
 class AiConfirmBottomSheet : BottomSheetDialogFragment() {
 
@@ -39,7 +39,12 @@ class AiConfirmBottomSheet : BottomSheetDialogFragment() {
         val b = binding!!
         val ticket = vm.card.value ?: return dismiss()
         render(b, ticket.draft)
-        if (savedInstanceState == null && ticket.draft.canSearch) stamp(b)
+        if (savedInstanceState == null) {
+            // 印票期間先藏章，印完才蓋（驗證失敗不蓋）
+            b.vVerifyStamp.alpha = 0f
+            b.printerAi.hideTicket()
+            b.printerAi.print(PRINT_MS, PRINT_DELAY_MS) { if (ticket.draft.canSearch) stamp(b) else b.vVerifyStamp.alpha = 1f }
+        }
         b.btnConfirm.setOnClickListener { vm.confirm(); dismiss() }
         b.btnEdit.setOnClickListener { vm.edit(); dismiss() }
         viewLifecycleOwner.lifecycleScope.launch {
@@ -104,21 +109,12 @@ class AiConfirmBottomSheet : BottomSheetDialogFragment() {
         if (d.passengersReset) add(getString(R.string.ai_error_passengers_reset))
     }
 
-    /** 「站名已驗證」章：放大落下（同 AN-07 的 scale 1.8→1、alpha） */
-    private fun stamp(b: SheetAiConfirmBinding) {
-        if (!ValueAnimator.areAnimatorsEnabled()) return
-        b.vVerifyStamp.apply {
-            scaleX = STAMP_FROM_SCALE
-            scaleY = STAMP_FROM_SCALE
-            alpha = 0f
-            animate().scaleX(1f).scaleY(1f).alpha(1f).setStartDelay(STAMP_DELAY_MS).setDuration(STAMP_MS).start()
-        }
-    }
+    /** 「站名已驗證」章（AN-07 的蓋章，含觸覺回饋） */
+    private fun stamp(b: SheetAiConfirmBinding) = b.vVerifyStamp.playStampAnimation()
 
     companion object {
         const val TAG = "AiConfirmBottomSheet"
-        private const val STAMP_FROM_SCALE = 1.8f
-        private const val STAMP_DELAY_MS = 300L
-        private const val STAMP_MS = 220L
+        private const val PRINT_MS = 700L
+        private const val PRINT_DELAY_MS = 280L // 等確認卡滑上
     }
 }

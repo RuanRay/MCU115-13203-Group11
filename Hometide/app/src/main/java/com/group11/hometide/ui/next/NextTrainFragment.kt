@@ -26,6 +26,7 @@ import com.group11.hometide.ui.base.asButtonForAccessibility
 import com.group11.hometide.ui.main.MainActivity
 import com.group11.hometide.ui.result.ReminderDialog
 import com.group11.hometide.ui.result.ResultActivity
+import com.group11.hometide.ui.base.ExpandTransition
 import com.group11.hometide.util.labelRes
 import com.group11.hometide.util.passengerText
 import com.group11.hometide.util.priceText
@@ -80,7 +81,7 @@ class NextTrainFragment : Fragment(R.layout.fragment_next_train) {
             val s = vm.state.value
             val main = s.main ?: return@setOnClickListener
             if (s.mainReminder != null) {
-                openResult(main.train)
+                openResult(main.train, fromMain = true)
             } else {
                 ReminderDialog.show(
                     requireContext(),
@@ -92,7 +93,7 @@ class NextTrainFragment : Fragment(R.layout.fragment_next_train) {
             }
         }
         b.tkNextMain.asButtonForAccessibility()
-        b.tvSeeAll.setOnClickListener { openResult(null) }
+        b.tvSeeAll.setOnClickListener { openResult(null, fromMain = true) }
         b.tvSeeAll.asButtonForAccessibility()
         b.btnLogin.setOnClickListener { login.launch(LoginActivity.intentForResult(requireContext())) }
         b.btnGoSearch.setOnClickListener { (requireActivity() as MainActivity).openManualSearch() }
@@ -259,13 +260,12 @@ class NextTrainFragment : Fragment(R.layout.fragment_next_train) {
         }
     }
 
-    /** FR-NEXT-04：開 P4（今天、預設乘客），[train] 非 null 時捲到該班 */
-    private fun openResult(train: TimetableCache?) {
+    /** FR-NEXT-04：開 P4（今天、預設乘客），[train] 非 null 時捲到該班；[fromMain] 從主車票展開（AN-03） */
+    private fun openResult(train: TimetableCache?, fromMain: Boolean = false) {
         val s = vm.state.value
         val r = s.selected ?: return
-        startActivity(
-            ResultActivity.intent(requireContext(), r.operator, r.originId, r.destId, LocalDate.now(), s.passengers, scrollToTrain = train?.trainNo),
-        )
+        val intent = ResultActivity.intent(requireContext(), r.operator, r.originId, r.destId, LocalDate.now(), s.passengers, scrollToTrain = train?.trainNo)
+        ExpandTransition.startExpanding(requireActivity(), intent, binding?.tkNextMain?.takeIf { fromMain })
     }
 
     private fun snackbar(text: String) {

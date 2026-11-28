@@ -32,7 +32,11 @@ import com.group11.hometide.ui.auth.registerLoginPrompt
 import com.group11.hometide.ui.base.BaseActivity
 import com.group11.hometide.ui.base.asButtonForAccessibility
 import com.group11.hometide.ui.result.ResultActivity
+import com.group11.hometide.ui.routes.FavoriteCard
 import com.group11.hometide.ui.routes.FavoriteTicketAdapter
+import com.group11.hometide.ui.base.ExpandTransition
+import com.group11.hometide.ui.widget.TearAnimator
+import androidx.core.view.isInvisible
 import com.group11.hometide.util.DateUtils
 import com.group11.hometide.util.Passengers
 import com.group11.hometide.util.labelRes
@@ -72,7 +76,7 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         bindAiCard(b)
         // FR-SRCH-04：訪客顯示登入提示；會員說明如何收藏
         b.tkFavEmpty.setOnClickListener { if (vm.state.value.isGuest) showLoginPrompt() else snackbar(getString(R.string.fav_member_hint)) }
-        val favAdapter = FavoriteTicketAdapter(horizontal = true, onQuery = vm::searchFavorite)
+        val favAdapter = FavoriteTicketAdapter(horizontal = true, onQuery = ::tearAndSearch)
         b.rvFavorites.adapter = favAdapter
         bindManualTicket(b)
 
@@ -104,8 +108,36 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
         }
     }
 
+    /** AN-05：撕下存根後才查詢；撕票中再點不反應 */
+    private fun tearAndSearch(card: FavoriteCard, ticket: View) {
+        if (tearing) return
+        val stub = ticket.findViewById<View>(R.id.btnRouteQuery)
+        tearing = true
+        tornTicket = ticket
+        vm.searchFavorite(card) // 與撕票同時查詢，撕完就能開
+        TearAnimator.play(ticket, stub.width) {
+            tearing = false
+            if (!isAdded || binding == null) return@play
+            stub.isInvisible = true // 本體留在原處，存根已撕走（回到本頁時恢復）
+            pendingOpen?.let { open(it) }
+            pendingOpen = null
+        }
+    }
+
+    private var tearing = false
+    private var tornTicket: View? = null
+    private var pendingOpen: SearchViewModel.Event.OpenResult? = null
+
+    private fun open(e: SearchViewModel.Event.OpenResult) {
+        val intent = ResultActivity.intent(requireContext(), e.operator, e.originId, e.destId, e.date, e.passengers)
+        // AN-03：從車票夾撕下的車票展開；其他來源一般開啟
+        ExpandTransition.startExpanding(requireActivity(), intent, tornTicket?.takeIf { e.fromFavorite })
+    }
+
     override fun onResume() {
         super.onResume()
+        tornTicket?.findViewById<View>(R.id.btnRouteQuery)?.isVisible = true
+        tornTicket = null
         binding?.let(::bindHeader) // 時段與日期可能在離開期間改變
         vm.ensureValidDate()
         vm.refreshFavorites()
@@ -233,8 +265,8 @@ class SearchFragment : Fragment(R.layout.fragment_search) {
     private fun onEvent(b: FragmentSearchBinding, e: SearchViewModel.Event) {
         when (e) {
             is SearchViewModel.Event.Message -> snackbar(if (e.arg == null) getString(e.res) else getString(e.res, e.arg))
-            is SearchViewModel.Event.OpenResult ->
-                startActivity(ResultActivity.intent(requireContext(), e.operator, e.originId, e.destId, e.date, e.passengers))
+            // 撕票還沒播完就先等（AN-05 → AN-03）
+            is SearchViewModel.Event.OpenResult -> if (tearing && e.fromFavorite) pendingOpen = e else open(e)
             is SearchViewModel.Event.ClearStations -> {
                 if (e.origin) b.actvOrigin.setText("", false)
                 if (e.dest) b.actvDest.setText("", false)

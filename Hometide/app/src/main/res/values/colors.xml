@@ -23,4 +23,7 @@
     <color name="permission_banner_bg">#FFF4D8</color>
     <!-- 國道大車票存根「+N 分」（highway.png 取色：主票藏青底上的淡紅） -->
     <color name="hwy_extra_on_main">#F3B9AE</color>
+    <!-- AN-01、AN-04 售票機：出票口、熄滅的指示燈 -->
+    <color name="printer_slot">#0B0F17</color>
+    <color name="splash_lamp_off">#5A6478</color>
 </resources>
