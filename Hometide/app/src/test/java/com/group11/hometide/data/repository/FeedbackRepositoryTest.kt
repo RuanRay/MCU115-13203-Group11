@@ -7,6 +7,7 @@ import com.group11.hometide.data.local.entity.FeedbackCategory
 import com.group11.hometide.data.local.entity.Sentiment
 import com.group11.hometide.ui.feedback.FeedbackRules
 import com.group11.hometide.util.Result
+import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -30,6 +31,8 @@ class FeedbackRepositoryTest {
         }
         override suspend fun pendingAi() = rows.filter { it.aiStatus == AiStatus.PENDING }
         override suspend fun unsynced(limit: Int) = rows.filter { !it.synced }.take(limit)
+        override suspend fun readyToUpload(limit: Int, pendingBefore: Long) =
+            rows.filter { !it.synced && (it.aiStatus != AiStatus.PENDING || it.createdAt < pendingBefore) }.take(limit)
         override suspend fun markSynced(ids: List<Long>) = Unit
     }
 
@@ -80,6 +83,20 @@ class FeedbackRepositoryTest {
     fun analyze_skipsAlreadyDone() {
         val fb = submitAndAnalyze()
         runBlocking { repo.analyze(fb.id) }
+        assertEquals(1, prompts.size)
+    }
+
+    /** P7 與 SyncService 同時分析同一筆：Gemini 只呼叫一次 */
+    @Test
+    fun analyze_concurrentCallsShareOneRequest() = runBlocking {
+        val gate = kotlinx.coroutines.CompletableDeferred<Unit>()
+        reply = { gate.await(); """{"category":"BUG","sentiment":"NEUTRAL","summary":"x"}""" }
+        val id = (repo.submit(4, FeedbackCategory.BUG, "內容", true) as Result.Success).data
+        val a = async(kotlinx.coroutines.Dispatchers.Default) { repo.analyze(id) }
+        val b = async(kotlinx.coroutines.Dispatchers.Default) { repo.analyze(id) }
+        kotlinx.coroutines.delay(200)
+        gate.complete(Unit)
+        assertEquals(a.await(), b.await())
         assertEquals(1, prompts.size)
     }
 

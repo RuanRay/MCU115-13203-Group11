@@ -10,7 +10,12 @@ import com.group11.hometide.data.local.entity.FeedbackCategory
 import com.group11.hometide.data.local.entity.Sentiment
 import com.group11.hometide.util.AppError
 import com.group11.hometide.util.Result
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.async
 import kotlinx.coroutines.withTimeout
 import java.io.IOException
 import kotlin.coroutines.cancellation.CancellationException
@@ -28,6 +33,7 @@ class FeedbackRepository(
     private val appVersion: String,
     private val gson: Gson = Gson(),
     private val now: () -> Long = System::currentTimeMillis,
+    private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO),
 ) {
 
     /** FR-FB-02：回傳 feedback id */
@@ -47,7 +53,19 @@ class FeedbackRepository(
      * - 連線失敗或逾時 8 秒（同 FR-AI-02）：維持 PENDING（之後由 SyncService 補做），回傳原資料
      * - 其他失敗（格式錯誤、拒答）：FAILED
      */
-    suspend fun analyze(id: Long): Result<Feedback> = guarded {
+    suspend fun analyze(id: Long): Result<Feedback> {
+        // P7 與 SyncService 可能同時分析同一筆：共用同一個工作，Gemini 只呼叫一次；離開 P7 也不會中斷
+        val job = synchronized(inFlight) {
+            inFlight.getOrPut(id) {
+                scope.async { analyzeNow(id) }.also { d -> d.invokeOnCompletion { synchronized(inFlight) { inFlight.remove(id) } } }
+            }
+        }
+        return job.await()
+    }
+
+    private val inFlight = HashMap<Long, Deferred<Result<Feedback>>>()
+
+    private suspend fun analyzeNow(id: Long): Result<Feedback> = guarded {
         val fb = dao.get(id) ?: return@guarded Result.Failure(AppError.NotFound)
         if (fb.aiStatus != AiStatus.PENDING) return@guarded Result.Success(fb)
         val text = try {

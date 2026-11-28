@@ -14,6 +14,7 @@
     <!-- 通知頻道（規格 10.5） -->
     <string name="channel_trip_reminder">出發提醒</string>
     <string name="channel_sync">資料同步</string>
+    <string name="sync_notification">正在同步回饋與使用紀錄</string>
 
     <!-- 共用 -->
     <string name="btn_back">返回</string>

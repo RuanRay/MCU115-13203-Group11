@@ -2,7 +2,11 @@ package com.group11.hometide
 
 import android.app.Application
 import android.util.Log
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
+import com.group11.hometide.service.SyncService
+import kotlinx.coroutines.flow.first
 import com.group11.hometide.data.local.entity.Operator
 import com.group11.hometide.util.NotificationChannels
 import com.group11.hometide.util.Result
@@ -32,6 +36,29 @@ class HometideApp : Application() {
         appScope.launch { container.reminderRepository.purgeOld() } // FR-FAV-05：保留 7 天
         appScope.launch { container.transitRepository.purgeOldTimetables() } // FR-OFF-01：快取保留 3 天
         ProcessLifecycleOwner.get().lifecycle.addObserver(container.usageTracker) // FR-USG-01
+        ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onStart(owner: LifecycleOwner) = syncIfStale()
+        })
+        watchNetwork()
+    }
+
+    /** FR-SYNC-01 (2)：回到前景且距上次同步超過 15 分鐘 */
+    private fun syncIfStale() {
+        appScope.launch {
+            val last = container.settingsStore.lastSyncAt.first() ?: 0L
+            if (System.currentTimeMillis() - last > SYNC_INTERVAL_MS) SyncService.start(this@HometideApp)
+        }
+    }
+
+    /** FR-SYNC-01 (3)：網路恢復且 App 在前景（SyncService.start 會檢查前景） */
+    private fun watchNetwork() {
+        appScope.launch {
+            var wasOnline = container.networkMonitor.online.value
+            container.networkMonitor.online.collect { online ->
+                if (online && !wasOnline) SyncService.start(this@HometideApp)
+                wasOnline = online
+            }
+        }
     }
 
     /** 啟動時在背景更新台鐵、高鐵車站與國道客運站牌（沒有資料或超過 7 天才下載）；失敗不提示，下次啟動再試 */
@@ -46,5 +73,6 @@ class HometideApp : Application() {
 
     private companion object {
         const val TAG = "HometideApp"
+        const val SYNC_INTERVAL_MS = 15 * 60_000L
     }
 }

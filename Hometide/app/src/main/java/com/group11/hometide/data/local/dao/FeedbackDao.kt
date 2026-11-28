@@ -27,6 +27,13 @@ interface FeedbackDao {
     @Query("SELECT * FROM feedback WHERE synced = 0 ORDER BY created_at LIMIT :limit")
     suspend fun unsynced(limit: Int): List<Feedback>
 
+    /** FR-FB-04：AI 已有結果（或失敗）才上傳；仍 PENDING 的等下次，[pendingBefore] 之前建立的不再等 */
+    @Query(
+        """SELECT * FROM feedback WHERE synced = 0 AND (ai_status != 'PENDING' OR created_at < :pendingBefore)
+           ORDER BY created_at LIMIT :limit""",
+    )
+    suspend fun readyToUpload(limit: Int, pendingBefore: Long): List<Feedback>
+
     @Query("UPDATE feedback SET synced = 1 WHERE id IN (:ids)")
     suspend fun markSynced(ids: List<Long>)
 }

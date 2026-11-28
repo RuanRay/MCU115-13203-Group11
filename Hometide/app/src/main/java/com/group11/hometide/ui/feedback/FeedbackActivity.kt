@@ -22,6 +22,7 @@ import com.group11.hometide.data.local.entity.Feedback
 import com.group11.hometide.data.local.entity.FeedbackCategory
 import com.group11.hometide.data.local.entity.Sentiment
 import com.group11.hometide.databinding.ActivityFeedbackBinding
+import com.group11.hometide.service.SyncService
 import com.group11.hometide.ui.base.BaseActivity
 import com.group11.hometide.util.DateUtils
 import kotlinx.coroutines.launch
@@ -82,6 +83,7 @@ class FeedbackActivity : BaseActivity() {
         val date = s.receivedOn ?: return
         if (binding.flipperFeedback.displayedChild == 0) {
             binding.flipperFeedback.displayedChild = 1
+            SyncService.start(this) // FR-SYNC-01 (1)（重複啟動時 Service 只跑一輪）
             ViewCompat.getWindowInsetsController(binding.root)?.hide(WindowInsetsCompat.Type.ime())
             binding.root.scrollTo(0, 0)
             // 實作者確認：成功頁按返回鍵直接回 P6

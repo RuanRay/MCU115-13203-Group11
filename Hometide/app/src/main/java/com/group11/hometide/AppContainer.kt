@@ -11,6 +11,10 @@ import com.group11.hometide.data.remote.QuotaGate
 import com.group11.hometide.data.ai.GeminiClient
 import com.group11.hometide.util.Result
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeout
+import com.group11.hometide.data.repository.SyncRepository
+import com.group11.hometide.util.NetworkMonitor
+import com.group11.hometide.util.await
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import com.group11.hometide.usage.UsageTracker
@@ -81,5 +85,32 @@ class AppContainer(private val context: Context) {
             gson = gson,
         )
     }
+    /** 10.2 */
+    val networkMonitor: NetworkMonitor by lazy { NetworkMonitor(context) }
+
+    /** FR-SYNC-02、FR-FB-04 */
+    val syncRepository: SyncRepository by lazy {
+        val firestore = FirebaseFirestore.getInstance()
+        SyncRepository(
+            feedbackDao = database.feedbackDao(),
+            usageDao = database.usageDao(),
+            analyze = { id -> feedbackRepository.analyze(id) },
+            refreshStations = { op -> transitRepository.refreshStations(op) },
+            upload = { collection, docs ->
+                // 實作者確認：每批最多等 30 秒，逾時視為失敗
+                withTimeout(FIRESTORE_BATCH_TIMEOUT_MS) {
+                    val batch = firestore.batch()
+                    docs.forEach { batch.set(firestore.collection(collection).document(), it) }
+                    batch.commit().await()
+                }
+            },
+            online = { networkMonitor.online.value },
+            markStarted = settingsStore::setLastSyncAt,
+        )
+    }
     val favoriteCards: FavoriteCards by lazy { FavoriteCards(authRepository, favoriteRepository, transitRepository) }
+
+    private companion object {
+        const val FIRESTORE_BATCH_TIMEOUT_MS = 30_000L
+    }
 }

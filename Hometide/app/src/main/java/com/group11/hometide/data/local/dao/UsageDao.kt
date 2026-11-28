@@ -3,6 +3,7 @@ package com.group11.hometide.data.local.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Transaction
 import com.group11.hometide.data.local.entity.AppSession
 import com.group11.hometide.data.local.entity.PageVisit
 
@@ -47,6 +48,26 @@ interface UsageDao {
            WHERE enter_at >= :from AND uid IS :uid GROUP BY page_name ORDER BY durationMs DESC LIMIT :limit""",
     )
     suspend fun topPages(uid: String?, from: Long, limit: Int): List<PageTotal>
+
+    /** FR-SYNC-02：已結束、尚未上傳的 session（使用中的那筆不傳，實作者確認） */
+    @Query("SELECT * FROM app_session WHERE synced = 0 AND end_at IS NOT NULL ORDER BY start_at LIMIT :limit")
+    suspend fun unsyncedSessions(limit: Int): List<AppSession>
+
+    @Query("SELECT * FROM page_visit WHERE session_id IN (:sessionIds) ORDER BY enter_at")
+    suspend fun visitsOf(sessionIds: List<Long>): List<PageVisit>
+
+    /** session 與其頁面一起標記已上傳 */
+    @Transaction
+    suspend fun markSynced(sessionIds: List<Long>) {
+        markSessionsSynced(sessionIds)
+        markVisitsSynced(sessionIds)
+    }
+
+    @Query("UPDATE app_session SET synced = 1 WHERE id IN (:ids)")
+    suspend fun markSessionsSynced(ids: List<Long>)
+
+    @Query("UPDATE page_visit SET synced = 1 WHERE session_id IN (:sessionIds)")
+    suspend fun markVisitsSynced(sessionIds: List<Long>)
 }
 
 data class PageTotal(val pageName: String, val durationMs: Long)

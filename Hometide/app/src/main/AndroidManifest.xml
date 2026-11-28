@@ -42,7 +42,11 @@
             android:name=".provider.StationProvider"
             android:authorities="com.group11.hometide.stations"
             android:exported="false" />
-        <!-- SyncService、ReminderReceiver、BootReceiver（規格 10.4）於第 5、7 週實作時再宣告 -->
+        <!-- 同步回饋與使用紀錄（規格 10.1） -->
+        <service
+            android:name=".service.SyncService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
         <!-- 出發提醒（FR-RMD-03、規格 10.2）；BootReceiver 於 5-4 -->
         <receiver android:name=".receiver.ReminderReceiver" android:exported="false" />
         <receiver android:name=".receiver.BootReceiver" android:exported="true">

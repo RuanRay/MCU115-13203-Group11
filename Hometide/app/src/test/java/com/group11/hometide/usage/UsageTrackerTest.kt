@@ -37,6 +37,10 @@ class UsageTrackerTest {
         override suspend fun sessionCount(uid: String?, from: Long) = 0
         override suspend fun totalDuration(uid: String?, from: Long) = 0L
         override suspend fun topPages(uid: String?, from: Long, limit: Int) = emptyList<PageTotal>()
+        override suspend fun unsyncedSessions(limit: Int) = emptyList<AppSession>()
+        override suspend fun visitsOf(sessionIds: List<Long>) = emptyList<PageVisit>()
+        override suspend fun markSessionsSynced(ids: List<Long>) = Unit
+        override suspend fun markVisitsSynced(sessionIds: List<Long>) = Unit
     }
 
     private val dao = FakeDao()
